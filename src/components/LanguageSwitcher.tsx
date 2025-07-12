@@ -31,15 +31,15 @@ const LanguageSwitcher = () => {
   console.log('Available languages:', Object.keys(i18n.store.data));
 
   return (
-    <div className="fixed top-4 right-4 z-50">
+    <div className="fixed top-4 right-2 z-50">
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-2 border rounded-md px-3 py-1.5 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white/90 transition-colors">
+        <DropdownMenuTrigger className="flex items-center gap-2 border rounded-md top-2 px-3 py-1.5 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white/90 transition-colors">
           <Globe className="w-4 h-4 text-health-600" />
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-semibold text-gray-600">
             {getCurrentLanguageLabel()}
           </span>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[160px]">
+        <DropdownMenuContent align="end" className="w-[100px]">
           {languages.map(({ code, label }) => (
             <DropdownMenuItem
               key={code}

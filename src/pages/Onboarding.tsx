@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Apple, ArrowRight, ArrowLeft, Target, User, Activity } from "lucide-react";
+import { Apple, ArrowRight, ArrowLeft, Target, User as UserIcon, Activity } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { User as AuthUser } from "@supabase/supabase-js";
@@ -137,7 +137,7 @@ const Onboarding = () => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <User className="w-16 h-16 mx-auto mb-4 text-health-500" />
+              <UserIcon className="w-16 h-16 mx-auto mb-4 text-health-500" />
               <h2 className="text-2xl font-bold mb-2">Vamos conhecer você!</h2>
               <p className="text-gray-600">Conte-nos um pouco sobre você para criarmos o plano perfeito</p>
             </div>

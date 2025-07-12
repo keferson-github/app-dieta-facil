@@ -28,6 +28,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { PricingPlans } from "@/components/PricingPlans";
 import { useSubscription } from "@/hooks/useSubscription";
+import WeightProgressChart from "@/components/WeightProgressChart";
+import ActivityChart from "@/components/ActivityChart";
+import NutritionChart from "@/components/NutritionChart";
+import AchievementsCard from "@/components/AchievementsCard";
 import type { Tables } from "@/integrations/supabase/types";
 
 interface Plan {
@@ -241,6 +245,111 @@ const Dashboard = () => {
     return levelMap[level] || level;
   };
 
+  // Dados de exemplo para os gráficos
+  const generateSampleData = () => {
+    const currentWeight = userProfile?.weight || 70;
+    const targetWeight = userProfile?.target_weight || 65;
+    const goal = userProfile?.goal || 'lose_weight';
+    
+    // Dados de evolução do peso (últimos 30 dias)
+    const weightData = [];
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const progress = (29 - i) / 29;
+      const weight = currentWeight + (targetWeight - currentWeight) * progress * 0.3; // 30% do progresso
+      weightData.push({
+        date: date.toISOString().split('T')[0],
+        weight: Math.round(weight * 10) / 10,
+      });
+    }
+
+    // Dados de atividade semanal
+    const activityData = [
+      { day: 'Dom', workouts: 1, duration: 45 },
+      { day: 'Seg', workouts: 2, duration: 90 },
+      { day: 'Ter', workouts: 0, duration: 0 },
+      { day: 'Qua', workouts: 1, duration: 60 },
+      { day: 'Qui', workouts: 2, duration: 75 },
+      { day: 'Sex', workouts: 1, duration: 30 },
+      { day: 'Sáb', workouts: 1, duration: 45 },
+    ];
+
+    // Dados nutricionais
+    const nutritionMacros = [
+      { name: 'Proteínas', value: 120, color: '#3b82f6' },
+      { name: 'Carboidratos', value: 200, color: '#10b981' },
+      { name: 'Gorduras', value: 80, color: '#f59e0b' },
+      { name: 'Fibras', value: 25, color: '#ef4444' },
+    ];
+
+    const dailyNutritionData = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      dailyNutritionData.push({
+        date: date.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }),
+        calories: Math.floor(Math.random() * 500) + 1800,
+        protein: Math.floor(Math.random() * 50) + 100,
+        carbs: Math.floor(Math.random() * 100) + 150,
+        fat: Math.floor(Math.random() * 40) + 60,
+      });
+    }
+
+    // Dados de conquistas
+    const achievements = [
+      {
+        id: '1',
+        title: 'Primeira Semana',
+        description: 'Completou 7 dias consecutivos',
+        icon: '🔥',
+        achieved: true,
+        category: 'streak' as const,
+      },
+      {
+        id: '2',
+        title: 'Guerreiro Fitness',
+        description: 'Completou 10 treinos',
+        icon: '💪',
+        achieved: true,
+        category: 'exercise' as const,
+      },
+      {
+        id: '3',
+        title: 'Meta de Peso',
+        description: 'Perdeu 2kg',
+        icon: '🎯',
+        achieved: false,
+        progress: 1.5,
+        maxProgress: 2,
+        category: 'weight' as const,
+      },
+      {
+        id: '4',
+        title: 'Nutricionista',
+        description: 'Registrou 30 refeições',
+        icon: '🍎',
+        achieved: false,
+        progress: 18,
+        maxProgress: 30,
+        category: 'nutrition' as const,
+      },
+    ];
+
+    return {
+      weightData,
+      activityData,
+      nutritionMacros,
+      dailyNutritionData,
+      achievements,
+      currentWeight,
+      targetWeight,
+      goal,
+    };
+  };
+
+  const sampleData = generateSampleData();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-health-100">
       <div className="container mx-auto px-4 py-6 lg:py-8 max-w-7xl">
@@ -251,14 +360,14 @@ const Dashboard = () => {
               <div className="w-16 h-16 health-gradient rounded-2xl flex items-center justify-center shadow-lg">
                 <Apple className="w-8 h-8 text-white" />
               </div>
-              <div>
+          <div>
                 <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
                   {getWelcomeMessage()} 💪
-                </h1>
+            </h1>
                 <p className="text-gray-600 mt-1">
                   {t('dashboard.ready_evolution')}
-                </p>
-                <div className="flex items-center gap-2 mt-2">
+            </p>
+              <div className="flex items-center gap-2 mt-2">
                   <Badge className="health-gradient text-white border-0">
                     {t('dashboard.plan')} {currentPlan}
                   </Badge>
@@ -270,26 +379,26 @@ const Dashboard = () => {
                   )}
                 </div>
               </div>
-            </div>
+          </div>
             
             <div className="flex gap-3">
               {!subscription?.subscribed && (
-                <Button 
-                  onClick={() => setShowPricing(true)}
+              <Button 
+                onClick={() => setShowPricing(true)}
                   className="health-gradient shadow-health hover:shadow-lg transition-all"
                 >
                   <Zap className="w-4 h-4 mr-2" />
                   {t('dashboard.upgrade')}
-                </Button>
-              )}
-              <Button 
-                onClick={() => navigate('/settings')}
-                variant="outline"
+              </Button>
+            )}
+            <Button 
+              onClick={() => navigate('/settings')}
+              variant="outline"
                 className="border-health-200 hover:bg-health-50"
-              >
+            >
                 <Settings className="w-4 h-4 mr-2" />
                 {t('dashboard.settings')}
-              </Button>
+            </Button>
             </div>
           </div>
         </div>
@@ -398,13 +507,13 @@ const Dashboard = () => {
                   <CardTitle className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl flex items-center justify-center">
                       <ChefHat className="h-6 w-6 text-white" />
-                    </div>
+            </div>
                     <div>
                       <h3 className="text-xl font-bold">{t('dashboard.nutrition.title')}</h3>
                       <Badge variant="outline" className="mt-1 border-red-200 text-red-700">
                         {t('dashboard.plan')} Nutri
                       </Badge>
-                    </div>
+          </div>
                   </CardTitle>
                   <CardDescription>
                     {t('dashboard.nutrition.description')}
@@ -422,7 +531,7 @@ const Dashboard = () => {
                         {t('dashboard.nutrition.create_meal')}
                       </span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
+                  </Button>
                     <Button 
                       onClick={() => handleFeatureClick(t('dashboard.nutrition.weekly_menu'), 'Nutri')}
                       className="w-full justify-between group hover:bg-red-50"
@@ -433,7 +542,7 @@ const Dashboard = () => {
                         {t('dashboard.nutrition.weekly_menu')}
                       </span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
+                  </Button>
                     <div className="pt-2 border-t border-gray-100">
                       <p className="text-sm text-gray-600 font-medium mb-2">{t('dashboard.nutrition.included_features')}</p>
                       <div className="space-y-1">
@@ -575,6 +684,51 @@ const Dashboard = () => {
               </CardContent>
             </Card>
 
+            {/* Seção de Gráficos e Analytics */}
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">📊 Seus Dados e Progresso</h2>
+                <p className="text-gray-600">Acompanhe sua evolução com gráficos detalhados</p>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Gráfico de Evolução do Peso */}
+                <WeightProgressChart
+                  data={sampleData.weightData}
+                  currentWeight={sampleData.currentWeight}
+                  targetWeight={sampleData.targetWeight}
+                  goal={sampleData.goal as 'lose_weight' | 'maintain_weight' | 'gain_muscle'}
+                />
+                
+                {/* Gráfico de Atividade Semanal */}
+                <ActivityChart
+                  data={sampleData.activityData}
+                  weeklyGoal={5}
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Gráfico de Nutrição */}
+                <NutritionChart
+                  macros={sampleData.nutritionMacros}
+                  dailyData={sampleData.dailyNutritionData}
+                  targets={{
+                    calories: 2000,
+                    protein: 150,
+                    carbs: 250,
+                    fat: 65,
+                  }}
+                />
+                
+                {/* Card de Conquistas */}
+                <AchievementsCard
+                  achievements={sampleData.achievements}
+                  totalPoints={750}
+                  level={3}
+                />
+              </div>
+            </div>
+
             {/* Call to Action para Upgrade */}
             {currentPlan === 'Nutri' && (
               <Card className="glass-effect shadow-health border-2 border-health-200 bg-gradient-to-r from-health-50 to-green-50">
@@ -605,7 +759,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             )}
-          </div>
+            </div>
         )}
       </div>
     </div>
