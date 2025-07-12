@@ -60,6 +60,33 @@ const Dashboard = () => {
   const { t } = useTranslation();
   const [userProfile, setUserProfile] = useState<Tables<"user_profiles"> | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // ----- CHART DATA STATE (deve vir antes do retorno condicional) -----
+  type WeightDatum = { date: string; weight: number };
+  type ActivityDatum = { day: string; workouts: number; duration: number };
+  type MacroDatum = { name: string; value: number; color: string };
+  type DailyNutritionDatum = { date: string; calories: number; protein: number; carbs: number; fat: number };
+
+  const [chartData, setChartData] = useState<{
+    weightData: WeightDatum[];
+    activityData: ActivityDatum[];
+    nutritionMacros: MacroDatum[];
+    dailyNutritionData: DailyNutritionDatum[];
+    achievements: Tables<"achievements">[];
+    currentWeight: number;
+    targetWeight: number;
+    goal: 'lose_weight' | 'maintain_weight' | 'gain_muscle';
+  }>({
+    weightData: [],
+    activityData: [],
+    nutritionMacros: [],
+    dailyNutritionData: [],
+    achievements: [],
+    currentWeight: 0,
+    targetWeight: 0,
+    goal: 'lose_weight',
+  });
+
   const [showPricing, setShowPricing] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
   const { subscription, loading: subscriptionLoading, refetch: refetchSubscription } = useSubscription();
@@ -192,25 +219,117 @@ const Dashboard = () => {
     });
   };
 
-  if (loading || subscriptionLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-health-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 health-gradient rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Apple className="w-8 h-8 text-white" />
-          </div>
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-health-500 mx-auto mb-4"></div>
-          <p className="text-lg font-medium text-gray-700">{t('dashboard.loading')}</p>
-        </div>
-      </div>
-    );
-  }
+  // ----- FETCH CHART DATA -----
+  const fetchChartData = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
 
-  const currentPlan = subscription?.plan || 'Nutri';
-  const bmi = calculateBMI();
-  const bmiData = getBMICategory(bmi);
-  const progressPercentage = getProgressPercentage();
+    const userId = session.user.id;
 
+    // 1. Weight logs (últimos 30 dias)
+    const since30 = new Date();
+    since30.setDate(since30.getDate() - 29);
+
+    const { data: weightLogs } = await supabase
+      .from('weight_logs')
+      .select('weight_kg, logged_at')
+      .eq('user_id', userId)
+      .gte('logged_at', since30.toISOString())
+      .order('logged_at');
+
+    const weightData: WeightDatum[] = (weightLogs || []).map(w => ({
+      date: w.logged_at.split('T')[0],
+      weight: w.weight_kg,
+    }));
+
+    // 2. Workout logs (últimos 7 dias)
+    const since7 = new Date();
+    since7.setDate(since7.getDate() - 6);
+
+    const { data: workoutLogs } = await supabase
+      .from('workout_logs')
+      .select('duration_minutes, logged_at')
+      .eq('user_id', userId)
+      .gte('logged_at', since7.toISOString());
+
+    const activityMap: Record<string, { workouts: number; duration: number }> = {};
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toLocaleDateString('pt-BR', { weekday: 'short' });
+      activityMap[key] = { workouts: 0, duration: 0 };
+    }
+    (workoutLogs || []).forEach(l => {
+      const dayKey = new Date(l.logged_at).toLocaleDateString('pt-BR', { weekday: 'short' });
+      if (!activityMap[dayKey]) activityMap[dayKey] = { workouts: 0, duration: 0 };
+      activityMap[dayKey].workouts += 1;
+      activityMap[dayKey].duration += l.duration_minutes || 0;
+    });
+    const activityData: ActivityDatum[] = Object.entries(activityMap)
+      .map(([day, v]) => ({ day, workouts: v.workouts, duration: v.duration }))
+      .reverse();
+
+    // 3. Nutrition (últimos 7 dias) via view meal_nutrition
+    const { data: nutritionRows } = await supabase
+      .from('meal_nutrition')
+      .select('total_calories, total_protein, total_carbs, total_fats, day_of_week')
+      .eq('user_id', userId)
+      .gte('day_of_week', since7.getDay());
+
+    const dailyNutritionData: DailyNutritionDatum[] = [];
+    if (nutritionRows) {
+      // aggregate by day_of_week (0-6)
+      const today = new Date();
+      nutritionRows.forEach(r => {
+        const date = new Date();
+        const diff = today.getDay() - (r.day_of_week ?? 0);
+        const d = new Date();
+        d.setDate(today.getDate() - diff);
+        dailyNutritionData.push({
+          date: d.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }),
+          calories: r.total_calories || 0,
+          protein: r.total_protein || 0,
+          carbs: r.total_carbs || 0,
+          fat: r.total_fats || 0,
+        });
+      });
+    }
+
+    // macros para hoje (pie chart)
+    const todayData = dailyNutritionData[dailyNutritionData.length - 1];
+    const nutritionMacros: MacroDatum[] = todayData ? [
+      { name: 'Proteínas', value: todayData.protein, color: '#3b82f6' },
+      { name: 'Carboidratos', value: todayData.carbs, color: '#10b981' },
+      { name: 'Gorduras', value: todayData.fat, color: '#f59e0b' },
+    ] : [];
+
+    // 4. Achievements do usuário
+    const { data: userAchievements } = await supabase
+      .from('user_achievements')
+      .select('achievement_id, awarded_at, achievements(*)')
+      .eq('user_id', userId);
+
+    const achievements = (userAchievements || []).map(ua => ua.achievements);
+
+    setChartData({
+      weightData,
+      activityData,
+      nutritionMacros,
+      dailyNutritionData,
+      achievements,
+      currentWeight: userProfile?.weight || 0,
+      targetWeight: userProfile?.target_weight || 0,
+      goal: (userProfile?.goal as 'lose_weight' | 'maintain_weight' | 'gain_muscle') || 'lose_weight',
+    });
+  }, [userProfile]);
+
+  useEffect(() => {
+    if (userProfile) {
+      fetchChartData();
+    }
+  }, [userProfile, fetchChartData]);
+
+  // Helper functions (moved after hooks)
   const getWelcomeMessage = () => {
     return userProfile?.gender === 'male' 
       ? t('dashboard.welcome_champion') 
@@ -245,110 +364,28 @@ const Dashboard = () => {
     return levelMap[level] || level;
   };
 
-  // Dados de exemplo para os gráficos
-  const generateSampleData = () => {
-    const currentWeight = userProfile?.weight || 70;
-    const targetWeight = userProfile?.target_weight || 65;
-    const goal = userProfile?.goal || 'lose_weight';
-    
-    // Dados de evolução do peso (últimos 30 dias)
-    const weightData = [];
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const progress = (29 - i) / 29;
-      const weight = currentWeight + (targetWeight - currentWeight) * progress * 0.3; // 30% do progresso
-      weightData.push({
-        date: date.toISOString().split('T')[0],
-        weight: Math.round(weight * 10) / 10,
-      });
-    }
+  // Early return after all hooks
+  if (loading || subscriptionLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-health-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 health-gradient rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Apple className="w-8 h-8 text-white" />
+          </div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-health-500 mx-auto mb-4"></div>
+          <p className="text-lg font-medium text-gray-700">{t('dashboard.loading')}</p>
+        </div>
+      </div>
+    );
+  }
 
-    // Dados de atividade semanal
-    const activityData = [
-      { day: 'Dom', workouts: 1, duration: 45 },
-      { day: 'Seg', workouts: 2, duration: 90 },
-      { day: 'Ter', workouts: 0, duration: 0 },
-      { day: 'Qua', workouts: 1, duration: 60 },
-      { day: 'Qui', workouts: 2, duration: 75 },
-      { day: 'Sex', workouts: 1, duration: 30 },
-      { day: 'Sáb', workouts: 1, duration: 45 },
-    ];
+  const currentPlan = subscription?.plan || 'Nutri';
+  const bmi = calculateBMI();
+  const bmiData = getBMICategory(bmi);
+  const progressPercentage = getProgressPercentage();
 
-    // Dados nutricionais
-    const nutritionMacros = [
-      { name: 'Proteínas', value: 120, color: '#3b82f6' },
-      { name: 'Carboidratos', value: 200, color: '#10b981' },
-      { name: 'Gorduras', value: 80, color: '#f59e0b' },
-      { name: 'Fibras', value: 25, color: '#ef4444' },
-    ];
-
-    const dailyNutritionData = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      dailyNutritionData.push({
-        date: date.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }),
-        calories: Math.floor(Math.random() * 500) + 1800,
-        protein: Math.floor(Math.random() * 50) + 100,
-        carbs: Math.floor(Math.random() * 100) + 150,
-        fat: Math.floor(Math.random() * 40) + 60,
-      });
-    }
-
-    // Dados de conquistas
-    const achievements = [
-      {
-        id: '1',
-        title: 'Primeira Semana',
-        description: 'Completou 7 dias consecutivos',
-        icon: '🔥',
-        achieved: true,
-        category: 'streak' as const,
-      },
-      {
-        id: '2',
-        title: 'Guerreiro Fitness',
-        description: 'Completou 10 treinos',
-        icon: '💪',
-        achieved: true,
-        category: 'exercise' as const,
-      },
-      {
-        id: '3',
-        title: 'Meta de Peso',
-        description: 'Perdeu 2kg',
-        icon: '🎯',
-        achieved: false,
-        progress: 1.5,
-        maxProgress: 2,
-        category: 'weight' as const,
-      },
-      {
-        id: '4',
-        title: 'Nutricionista',
-        description: 'Registrou 30 refeições',
-        icon: '🍎',
-        achieved: false,
-        progress: 18,
-        maxProgress: 30,
-        category: 'nutrition' as const,
-      },
-    ];
-
-    return {
-      weightData,
-      activityData,
-      nutritionMacros,
-      dailyNutritionData,
-      achievements,
-      currentWeight,
-      targetWeight,
-      goal,
-    };
-  };
-
-  const sampleData = generateSampleData();
+  // Se ainda não há dados, mostrar vazio para evitar erros nos gráficos
+  const sampleData = chartData;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-health-100">
@@ -697,7 +734,7 @@ const Dashboard = () => {
                   data={sampleData.weightData}
                   currentWeight={sampleData.currentWeight}
                   targetWeight={sampleData.targetWeight}
-                  goal={sampleData.goal as 'lose_weight' | 'maintain_weight' | 'gain_muscle'}
+                  goal={sampleData.goal}
                 />
                 
                 {/* Gráfico de Atividade Semanal */}
@@ -722,7 +759,20 @@ const Dashboard = () => {
                 
                 {/* Card de Conquistas */}
                 <AchievementsCard
-                  achievements={sampleData.achievements}
+                  achievements={(sampleData.achievements || []).map((a: Tables<"achievements">) => {
+                    const category: 'weight' | 'exercise' | 'nutrition' | 'streak' = 
+                      a.code?.startsWith('first_meal') || a.code?.includes('nutrition') ? 'nutrition' :
+                      a.code?.includes('workout') ? 'exercise' :
+                      a.code?.includes('weight') ? 'weight' : 'streak';
+                    return {
+                      id: a.id,
+                      title: a.title,
+                      description: a.description || '',
+                      icon: a.icon || '🏆',
+                      achieved: true,
+                      category
+                    };
+                  })}
                   totalPoints={750}
                   level={3}
                 />
