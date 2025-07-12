@@ -11,12 +11,13 @@ import { Progress } from "@/components/ui/progress";
 import { Apple, ArrowRight, ArrowLeft, Target, User, Activity } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import type { User as AuthUser } from "@supabase/supabase-js";
 
 const Onboarding = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [formData, setFormData] = useState({
     age: "",
     gender: "",

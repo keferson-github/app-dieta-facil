@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,46 +9,47 @@ import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeFeature, setActiveFeature] = useState(0);
 
   const features = [
     {
       icon: Target,
-      title: "Dietas Personalizadas",
-      description: "Planos alimentares únicos baseados no seu perfil e objetivos"
+      title: t('features.custom_diets.title'),
+      description: t('features.custom_diets.description')
     },
     {
       icon: Dumbbell,
-      title: "Fichas de Treino",
-      description: "Exercícios adaptados para casa ou academia"
+      title: t('features.workout_plans.title'),
+      description: t('features.workout_plans.description')
     },
     {
       icon: Heart,
-      title: "Acompanhamento",
-      description: "Monitore seu progresso e evolução"
+      title: t('features.tracking.title'),
+      description: t('features.tracking.description')
     },
     {
       icon: Zap,
-      title: "Resultados Rápidos",
-      description: "Veja mudanças em poucas semanas"
+      title: t('features.fast_results.title'),
+      description: t('features.fast_results.description')
     }
   ];
 
   const testimonials = [
     {
-      name: "Ana Silva",
-      result: "Perdeu 8kg em 2 meses",
-      text: "O Dieta Fácil mudou minha vida! Finalmente consegui um plano que funciona para minha rotina."
+      name: t('testimonials.1.name'),
+      result: t('testimonials.1.result'),
+      text: t('testimonials.1.text')
     },
     {
-      name: "Carlos Santos",
-      result: "Ganhou 5kg de massa muscular",
-      text: "As fichas de treino são perfeitas. Consegui ganhar massa muscular treinando em casa."
+      name: t('testimonials.2.name'),
+      result: t('testimonials.2.result'),
+      text: t('testimonials.2.text')
     },
     {
-      name: "Maria Oliveira",
-      result: "Mantém peso ideal há 6 meses",
-      text: "Depois de anos tentando, finalmente encontrei equilíbrio na alimentação."
+      name: t('testimonials.3.name'),
+      result: t('testimonials.3.result'),
+      text: t('testimonials.3.text')
     }
   ];
 
@@ -60,14 +62,14 @@ const Index = () => {
             <div className="w-10 h-10 health-gradient rounded-xl flex items-center justify-center">
               <Apple className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">Dieta Fácil</span>
+            <span className="text-2xl font-bold text-gray-900">{t('brand')}</span>
           </div>
           <div className="flex items-center space-x-4">
             <Button variant="ghost" onClick={() => navigate('/auth')}>
-              Entrar
+              {t('nav.login')}
             </Button>
             <Button className="health-gradient shadow-health" onClick={() => navigate('/auth')}>
-              Começar Agora
+              {t('nav.start_now')}
             </Button>
           </div>
         </nav>
@@ -77,17 +79,16 @@ const Index = () => {
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-4xl mx-auto animate-fade-in">
           <Badge className="mb-6 health-gradient text-white border-0">
-            🎯 Sua transformação começa aqui
+            {t('hero.badge')}
           </Badge>
           
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Dietas personalizadas para
-            <span className="health-gradient bg-clip-text text-transparent"> seus objetivos</span>
+            {t('hero.title')}{' '}
+            <span className="health-gradient bg-clip-text text-transparent">{t('hero.title_highlight')}</span>
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Crie seu plano alimentar e de treino personalizado em minutos. 
-            Baseado em ciência, feito para você.
+            {t('hero.subtitle')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
@@ -96,22 +97,22 @@ const Index = () => {
               className="health-gradient shadow-health text-lg px-8 py-6"
               onClick={() => navigate('/auth')}
             >
-              Criar Minha Dieta Gratuita
+              {t('hero.cta')}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <div className="flex items-center text-sm text-gray-500">
               <Users className="w-4 h-4 mr-2" />
-              <span>Mais de 10.000 pessoas já transformaram suas vidas</span>
+              <span>{t('hero.users_count')}</span>
             </div>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
             {[
-              { number: "10k+", label: "Usuários Ativos" },
-              { number: "50k+", label: "Dietas Criadas" },
-              { number: "95%", label: "Taxa de Sucesso" },
-              { number: "4.9★", label: "Avaliação" }
+              { number: "10k+", label: t('stats.active_users') },
+              { number: "50k+", label: t('stats.diets_created') },
+              { number: "95%", label: t('stats.success_rate') },
+              { number: "4.9★", label: t('stats.rating') }
             ].map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="text-3xl font-bold text-health-600">{stat.number}</div>
@@ -126,10 +127,10 @@ const Index = () => {
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Tudo que você precisa em um só lugar
+            {t('features.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Ferramentas completas para sua jornada de transformação
+            {t('features.subtitle')}
           </p>
         </div>
 
@@ -162,34 +163,22 @@ const Index = () => {
       <section className="bg-gradient-to-r from-health-500 to-health-600 py-20 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Como funciona</h2>
-            <p className="text-xl opacity-90">3 passos simples para transformar sua vida</p>
+            <h2 className="text-4xl font-bold mb-4">{t('how_it_works.title')}</h2>
+            <p className="text-xl opacity-90">{t('how_it_works.subtitle')}</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {[
-              {
-                step: "1",
-                title: "Conte sobre você",
-                description: "Idade, peso, altura, objetivo e nível de atividade"
-              },
-              {
-                step: "2", 
-                title: "Receba seu plano",
-                description: "Dieta personalizada e ficha de treino sob medida"
-              },
-              {
-                step: "3",
-                title: "Veja os resultados",
-                description: "Acompanhe seu progresso e conquiste seus objetivos"
-              }
-            ].map((item, index) => (
-              <div key={index} className="text-center">
+            {[1, 2, 3].map((step) => (
+              <div key={step} className="text-center">
                 <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold">{item.step}</span>
+                  <span className="text-2xl font-bold">{step}</span>
                 </div>
-                <h3 className="text-xl font-semibold mb-3">{item.title}</h3>
-                <p className="opacity-90">{item.description}</p>
+                <h3 className="text-xl font-semibold mb-3">
+                  {t(`how_it_works.steps.${step}.title`)}
+                </h3>
+                <p className="opacity-90">
+                  {t(`how_it_works.steps.${step}.description`)}
+                </p>
               </div>
             ))}
           </div>
@@ -200,10 +189,10 @@ const Index = () => {
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Histórias de sucesso
+            {t('testimonials.title')}
           </h2>
           <p className="text-xl text-gray-600">
-            Veja como o Dieta Fácil transformou a vida dessas pessoas
+            {t('testimonials.subtitle')}
           </p>
         </div>
 
@@ -233,17 +222,17 @@ const Index = () => {
       <section className="bg-gray-50 py-20">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Pronto para transformar sua vida?
+            {t('cta.title')}
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Junte-se a milhares de pessoas que já alcançaram seus objetivos com o Dieta Fácil
+            {t('cta.subtitle')}
           </p>
           <Button 
             size="lg" 
             className="health-gradient shadow-health text-lg px-8 py-6"
             onClick={() => navigate('/auth')}
           >
-            Começar Minha Transformação
+            {t('cta.button')}
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
@@ -257,10 +246,10 @@ const Index = () => {
               <div className="w-8 h-8 health-gradient rounded-lg flex items-center justify-center">
                 <Apple className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold">Dieta Fácil</span>
+              <span className="text-xl font-bold">{t('brand')}</span>
             </div>
             <p className="text-gray-400 text-center md:text-right">
-              © 2024 Dieta Fácil. Transformando vidas através da alimentação saudável.
+              {t('footer.rights')}
             </p>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,7 @@ const getPlanFeatures = (planName: string): string[] => {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [userProfile, setUserProfile] = useState<Tables<"user_profiles"> | null>(null);
   const [loading, setLoading] = useState(true);
   const [showPricing, setShowPricing] = useState(false);
@@ -150,10 +152,10 @@ const Dashboard = () => {
   };
 
   const getBMICategory = (bmi: number) => {
-    if (bmi < 18.5) return { category: 'Abaixo do peso', color: 'text-blue-600' };
-    if (bmi < 25) return { category: 'Peso normal', color: 'text-health-600' };
-    if (bmi < 30) return { category: 'Sobrepeso', color: 'text-yellow-600' };
-    return { category: 'Obesidade', color: 'text-red-600' };
+    if (bmi < 18.5) return { category: t('dashboard.bmi_categories.underweight'), color: 'text-blue-600' };
+    if (bmi < 25) return { category: t('dashboard.bmi_categories.normal'), color: 'text-health-600' };
+    if (bmi < 30) return { category: t('dashboard.bmi_categories.overweight'), color: 'text-yellow-600' };
+    return { category: t('dashboard.bmi_categories.obese'), color: 'text-red-600' };
   };
 
   const getProgressPercentage = () => {
@@ -171,8 +173,8 @@ const Dashboard = () => {
 
     if (currentIndex < requiredIndex) {
       toast({
-        title: `🔒 Recurso Premium`,
-        description: `Esta funcionalidade está disponível no plano ${requiredPlan}. Faça upgrade para acessar!`,
+        title: t('dashboard.premium_feature'),
+        description: t('dashboard.premium_description', { plan: requiredPlan }),
         variant: "destructive",
       });
       setShowPricing(true);
@@ -181,8 +183,8 @@ const Dashboard = () => {
 
     // Implementar navegação para a funcionalidade
     toast({
-      title: "Em breve!",
-      description: `A funcionalidade "${feature}" estará disponível em breve.`,
+      title: t('dashboard.coming_soon'),
+      description: t('dashboard.feature_coming_soon', { feature }),
     });
   };
 
@@ -194,7 +196,7 @@ const Dashboard = () => {
             <Apple className="w-8 h-8 text-white" />
           </div>
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-health-500 mx-auto mb-4"></div>
-          <p className="text-lg font-medium text-gray-700">Carregando seu painel...</p>
+          <p className="text-lg font-medium text-gray-700">{t('dashboard.loading')}</p>
         </div>
       </div>
     );
@@ -204,6 +206,40 @@ const Dashboard = () => {
   const bmi = calculateBMI();
   const bmiData = getBMICategory(bmi);
   const progressPercentage = getProgressPercentage();
+
+  const getWelcomeMessage = () => {
+    return userProfile?.gender === 'male' 
+      ? t('dashboard.welcome_champion') 
+      : t('dashboard.welcome_champion_female');
+  };
+
+  const getGoalText = () => {
+    const goal = userProfile?.goal;
+    if (!goal) return t('dashboard.not_defined');
+    
+    const goalMap: Record<string, string> = {
+      'lose_weight': t('dashboard.goals.lose_weight'),
+      'maintain_weight': t('dashboard.goals.maintain_weight'),
+      'gain_muscle': t('dashboard.goals.gain_muscle'),
+    };
+    
+    return goalMap[goal] || goal;
+  };
+
+  const getActivityLevelText = () => {
+    const level = userProfile?.activity_level;
+    if (!level) return t('dashboard.not_informed');
+    
+    const levelMap: Record<string, string> = {
+      'sedentary': t('dashboard.activity_levels.sedentary'),
+      'lightly_active': t('dashboard.activity_levels.lightly_active'),
+      'moderately_active': t('dashboard.activity_levels.moderately_active'),
+      'very_active': t('dashboard.activity_levels.very_active'),
+      'extremely_active': t('dashboard.activity_levels.extremely_active'),
+    };
+    
+    return levelMap[level] || level;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-health-100">
@@ -217,19 +253,19 @@ const Dashboard = () => {
               </div>
               <div>
                 <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-                  Olá, {userProfile?.gender === 'male' ? 'campeão' : 'campeã'}! 💪
+                  {getWelcomeMessage()} 💪
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  Pronto para mais um dia de evolução?
+                  {t('dashboard.ready_evolution')}
                 </p>
                 <div className="flex items-center gap-2 mt-2">
                   <Badge className="health-gradient text-white border-0">
-                    Plano {currentPlan}
+                    {t('dashboard.plan')} {currentPlan}
                   </Badge>
                   {subscription?.subscribed && (
                     <Badge variant="outline" className="border-health-200 text-health-700">
                       <Heart className="w-3 h-3 mr-1" />
-                      Ativo
+                      {t('dashboard.active')}
                     </Badge>
                   )}
                 </div>
@@ -243,7 +279,7 @@ const Dashboard = () => {
                   className="health-gradient shadow-health hover:shadow-lg transition-all"
                 >
                   <Zap className="w-4 h-4 mr-2" />
-                  Upgrade
+                  {t('dashboard.upgrade')}
                 </Button>
               )}
               <Button 
@@ -252,7 +288,7 @@ const Dashboard = () => {
                 className="border-health-200 hover:bg-health-50"
               >
                 <Settings className="w-4 h-4 mr-2" />
-                Configurações
+                {t('dashboard.settings')}
               </Button>
             </div>
           </div>
@@ -291,7 +327,7 @@ const Dashboard = () => {
               {/* Peso Atual */}
               <Card className="glass-effect hover:shadow-health transition-all duration-300 cursor-pointer group">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Peso Atual</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.current_weight')}</CardTitle>
                   <div className="w-10 h-10 bg-health-100 rounded-xl flex items-center justify-center group-hover:bg-health-200 transition-colors">
                     <TrendingUp className="h-5 w-5 text-health-600" />
                   </div>
@@ -299,7 +335,7 @@ const Dashboard = () => {
                 <CardContent>
                   <div className="text-3xl font-bold text-gray-900">{userProfile?.weight || 0}<span className="text-lg text-gray-500 ml-1">kg</span></div>
                   <p className="text-sm text-gray-500 mt-1">
-                    Meta: {userProfile?.target_weight || 0} kg
+                    {t('dashboard.target')}: {userProfile?.target_weight || 0} kg
                   </p>
                   <Progress value={progressPercentage} className="mt-3 h-2" />
                 </CardContent>
@@ -308,7 +344,7 @@ const Dashboard = () => {
               {/* IMC */}
               <Card className="glass-effect hover:shadow-health transition-all duration-300 cursor-pointer group">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">IMC</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.bmi')}</CardTitle>
                   <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
                     <BarChart3 className="h-5 w-5 text-blue-600" />
                   </div>
@@ -324,15 +360,15 @@ const Dashboard = () => {
               {/* Objetivo */}
               <Card className="glass-effect hover:shadow-health transition-all duration-300 cursor-pointer group">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Objetivo</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.goal')}</CardTitle>
                   <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
                     <Target className="h-5 w-5 text-purple-600" />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-lg font-bold text-gray-900 capitalize">{userProfile?.goal || 'Não definido'}</div>
+                  <div className="text-lg font-bold text-gray-900 capitalize">{getGoalText()}</div>
                   <p className="text-sm text-gray-500 mt-1">
-                    Meta principal
+                    {t('dashboard.main_goal')}
                   </p>
                 </CardContent>
               </Card>
@@ -340,15 +376,15 @@ const Dashboard = () => {
               {/* Atividade */}
               <Card className="glass-effect hover:shadow-health transition-all duration-300 cursor-pointer group">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Atividade</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">{t('dashboard.activity')}</CardTitle>
                   <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center group-hover:bg-orange-200 transition-colors">
                     <Activity className="h-5 w-5 text-orange-600" />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-lg font-bold text-gray-900 capitalize">{userProfile?.activity_level || 'Não informado'}</div>
+                  <div className="text-lg font-bold text-gray-900 capitalize">{getActivityLevelText()}</div>
                   <p className="text-sm text-gray-500 mt-1">
-                    Nível atual
+                    {t('dashboard.current_level')}
                   </p>
                 </CardContent>
               </Card>
@@ -364,42 +400,42 @@ const Dashboard = () => {
                       <ChefHat className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold">Alimentação</h3>
+                      <h3 className="text-xl font-bold">{t('dashboard.nutrition.title')}</h3>
                       <Badge variant="outline" className="mt-1 border-red-200 text-red-700">
-                        Plano Nutri
+                        {t('dashboard.plan')} Nutri
                       </Badge>
                     </div>
                   </CardTitle>
                   <CardDescription>
-                    Monte refeições personalizadas para sua rotina alimentar
+                    {t('dashboard.nutrition.description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <Button 
-                      onClick={() => handleFeatureClick('Criar Refeição', 'Nutri')}
+                      onClick={() => handleFeatureClick(t('dashboard.nutrition.create_meal'), 'Nutri')}
                       className="w-full justify-between group hover:bg-red-50"
                       variant="outline"
                     >
                       <span className="flex items-center gap-2">
                         <Plus className="w-4 h-4" />
-                        Criar Refeição
+                        {t('dashboard.nutrition.create_meal')}
                       </span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                     <Button 
-                      onClick={() => handleFeatureClick('Cardápio Semanal', 'Nutri')}
+                      onClick={() => handleFeatureClick(t('dashboard.nutrition.weekly_menu'), 'Nutri')}
                       className="w-full justify-between group hover:bg-red-50"
                       variant="outline"
                     >
                       <span className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        Cardápio Semanal
+                        {t('dashboard.nutrition.weekly_menu')}
                       </span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                     <div className="pt-2 border-t border-gray-100">
-                      <p className="text-sm text-gray-600 font-medium mb-2">Recursos inclusos:</p>
+                      <p className="text-sm text-gray-600 font-medium mb-2">{t('dashboard.nutrition.included_features')}</p>
                       <div className="space-y-1">
                         {getPlanFeatures('Plano Nutri').map((feature, index) => (
                           <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
@@ -421,42 +457,42 @@ const Dashboard = () => {
                       <Dumbbell className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold">Exercícios</h3>
+                      <h3 className="text-xl font-bold">{t('dashboard.exercises.title')}</h3>
                       <Badge variant="outline" className="mt-1 border-blue-200 text-blue-700">
-                        Plano Energia
+                        {t('dashboard.plan')} Energia
                       </Badge>
                     </div>
                   </CardTitle>
                   <CardDescription>
-                    Crie refeições e treinos para manter o corpo ativo e saudável
+                    {t('dashboard.exercises.description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <Button 
-                      onClick={() => handleFeatureClick('Iniciar Treino', 'Energia')}
+                      onClick={() => handleFeatureClick(t('dashboard.exercises.start_workout'), 'Energia')}
                       className="w-full justify-between group hover:bg-blue-50"
                       variant="outline"
                     >
                       <span className="flex items-center gap-2">
                         {currentPlan === 'Nutri' ? <Lock className="w-4 h-4" /> : <Zap className="w-4 h-4" />}
-                        Iniciar Treino
+                        {t('dashboard.exercises.start_workout')}
                       </span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                     <Button 
-                      onClick={() => handleFeatureClick('Ficha de Treino', 'Energia')}
+                      onClick={() => handleFeatureClick(t('dashboard.exercises.workout_sheet'), 'Energia')}
                       className="w-full justify-between group hover:bg-blue-50"
                       variant="outline"
                     >
                       <span className="flex items-center gap-2">
                         {currentPlan === 'Nutri' ? <Lock className="w-4 h-4" /> : <Calendar className="w-4 h-4" />}
-                        Ficha de Treino
+                        {t('dashboard.exercises.workout_sheet')}
                       </span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                     <div className="pt-2 border-t border-gray-100">
-                      <p className="text-sm text-gray-600 font-medium mb-2">Recursos inclusos:</p>
+                      <p className="text-sm text-gray-600 font-medium mb-2">{t('dashboard.nutrition.included_features')}</p>
                       <div className="space-y-1">
                         {getPlanFeatures('Plano Energia').map((feature, index) => (
                           <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
@@ -479,54 +515,54 @@ const Dashboard = () => {
                     <Trophy className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold">Acompanhamento de Progresso</h3>
+                    <h3 className="text-xl font-bold">{t('dashboard.progress.title')}</h3>
                     <Badge variant="outline" className="mt-1 border-purple-200 text-purple-700">
-                      Plano Performance
+                      {t('dashboard.plan')} Performance
                     </Badge>
                   </div>
                 </CardTitle>
                 <CardDescription>
-                  Alimentação, treinos e progresso em um só lugar. Evolua de verdade
+                  {t('dashboard.progress.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <Button 
-                    onClick={() => handleFeatureClick('Relatórios Detalhados', 'Performance')}
+                    onClick={() => handleFeatureClick(t('dashboard.progress.detailed_reports'), 'Performance')}
                     className="justify-between group hover:bg-purple-50"
                     variant="outline"
                   >
                     <span className="flex items-center gap-2">
                       {['Nutri', 'Energia'].includes(currentPlan) ? <Lock className="w-4 h-4" /> : <BarChart3 className="w-4 h-4" />}
-                      Relatórios
+                      {t('dashboard.progress.detailed_reports')}
                     </span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                   <Button 
-                    onClick={() => handleFeatureClick('Medidas Corporais', 'Performance')}
+                    onClick={() => handleFeatureClick(t('dashboard.progress.body_measurements'), 'Performance')}
                     className="justify-between group hover:bg-purple-50"
                     variant="outline"
                   >
                     <span className="flex items-center gap-2">
                       {['Nutri', 'Energia'].includes(currentPlan) ? <Lock className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
-                      Medidas
+                      {t('dashboard.progress.body_measurements')}
                     </span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                   <Button 
-                    onClick={() => handleFeatureClick('Fotos de Progresso', 'Performance')}
+                    onClick={() => handleFeatureClick(t('dashboard.progress.progress_photos'), 'Performance')}
                     className="justify-between group hover:bg-purple-50"
                     variant="outline"
                   >
                     <span className="flex items-center gap-2">
                       {['Nutri', 'Energia'].includes(currentPlan) ? <Lock className="w-4 h-4" /> : <Target className="w-4 h-4" />}
-                      Fotos
+                      {t('dashboard.progress.progress_photos')}
                     </span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </div>
                 <div className="pt-2 border-t border-gray-100">
-                  <p className="text-sm text-gray-600 font-medium mb-2">Recursos inclusos:</p>
+                  <p className="text-sm text-gray-600 font-medium mb-2">{t('dashboard.nutrition.included_features')}</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {getPlanFeatures('Plano Performance').map((feature, index) => (
                       <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
@@ -547,11 +583,10 @@ const Dashboard = () => {
                     <Zap className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                    🚀 Acelere seus resultados!
+                    {t('dashboard.cta_upgrade.title')}
                   </h3>
                   <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                    Desbloqueie treinos personalizados e acompanhamento completo de progresso. 
-                    Transforme seu corpo mais rápido!
+                    {t('dashboard.cta_upgrade.description')}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button 
@@ -560,11 +595,11 @@ const Dashboard = () => {
                       size="lg"
                     >
                       <Zap className="w-5 h-5 mr-2" />
-                      Fazer Upgrade Agora
+                      {t('dashboard.cta_upgrade.button')}
                     </Button>
                     <Button variant="outline" className="border-health-200">
                       <Clock className="w-4 h-4 mr-2" />
-                      7 dias grátis
+                      {t('dashboard.cta_upgrade.trial')}
                     </Button>
                   </div>
                 </CardContent>
