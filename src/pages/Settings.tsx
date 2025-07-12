@@ -10,13 +10,14 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, User, Activity, Target, Save, Apple } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [formData, setFormData] = useState({
     age: "",
     gender: "",
