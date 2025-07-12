@@ -103,11 +103,28 @@ const Auth = () => {
           });
         }
       } else {
-        toast({
-          title: "Login realizado com sucesso!",
-          description: "Bem-vindo de volta ao Dieta Fácil",
-        });
-        navigate('/dashboard');
+        // Verifica se o usuário já possui perfil
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session?.user.id;
+
+        if (userId) {
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('id')
+            .eq('user_id', userId)
+            .single();
+
+          toast({
+            title: "Login realizado com sucesso!",
+            description: "Bem-vindo de volta ao Dieta Fácil",
+          });
+
+          if (profile) {
+            navigate('/dashboard');
+          } else {
+            navigate('/onboarding');
+          }
+        }
       }
     } catch (error) {
       toast({
@@ -126,7 +143,7 @@ const Auth = () => {
 
     setIsLoading(true);
     try {
-      const redirectUrl = `${window.location.origin}/dashboard`;
+      const redirectUrl = `${window.location.origin}/onboarding`;
       
       const { error } = await supabase.auth.signUp({
         email: formData.email,
