@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +26,16 @@ const Auth = () => {
     name: ""
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Check URL parameter for mode and set active tab
+  useEffect(() => {
+    const mode = searchParams.get('mode');
+    if (mode === 'register') {
+      setActiveTab("signup");
+    } else if (mode === 'login') {
+      setActiveTab("login");
+    }
+  }, [searchParams]);
 
   // Check if user is already authenticated
   useEffect(() => {

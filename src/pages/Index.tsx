@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, CheckCircle, Users, Target, Zap, Heart, Apple, Dumbbell } from "lucide-react";
+import { ArrowRight, CheckCircle, Users, Target, Zap, Heart, Apple, Dumbbell, Utensils, Clock, Calendar, TrendingUp, Star, Shield, Flame, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
@@ -17,22 +17,58 @@ const Index = () => {
     {
       icon: Target,
       title: t('features.custom_diets.title'),
-      description: t('features.custom_diets.description')
+      description: t('features.custom_diets.description'),
+      overlayContent: {
+        title: "Dietas Personalizadas",
+        subtitle: "Planos alimentares únicos para você",
+        items: [
+          { icon: Utensils, text: "Receitas exclusivas" },
+          { icon: Calendar, text: "Cardápio semanal" },
+          { icon: Star, text: "Ingredientes selecionados" }
+        ]
+      }
     },
     {
       icon: Dumbbell,
       title: t('features.workout_plans.title'),
-      description: t('features.workout_plans.description')
+      description: t('features.workout_plans.description'),
+      overlayContent: {
+        title: "Planos de Treino",
+        subtitle: "Exercícios adaptados ao seu nível",
+        items: [
+          { icon: Activity, text: "Treinos progressivos" },
+          { icon: Clock, text: "Flexibilidade de horários" },
+          { icon: TrendingUp, text: "Acompanhamento de evolução" }
+        ]
+      }
     },
     {
       icon: Heart,
       title: t('features.tracking.title'),
-      description: t('features.tracking.description')
+      description: t('features.tracking.description'),
+      overlayContent: {
+        title: "Acompanhamento Total",
+        subtitle: "Monitore seu progresso em tempo real",
+        items: [
+          { icon: Heart, text: "Saúde cardiovascular" },
+          { icon: Target, text: "Metas personalizadas" },
+          { icon: Shield, text: "Resultados garantidos" }
+        ]
+      }
     },
     {
       icon: Zap,
       title: t('features.fast_results.title'),
-      description: t('features.fast_results.description')
+      description: t('features.fast_results.description'),
+      overlayContent: {
+        title: "Resultados Rápidos",
+        subtitle: "Transformação acelerada e sustentável",
+        items: [
+          { icon: Flame, text: "Queima de gordura" },
+          { icon: Zap, text: "Energia renovada" },
+          { icon: Star, text: "Confiança elevada" }
+        ]
+      }
     }
   ];
 
@@ -66,7 +102,10 @@ const Index = () => {
             <span className="text-2xl font-bold text-gray-900">{t('brand')}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <Button className="health-gradient shadow-health hidden lg:block" onClick={() => navigate('/auth')}>
+            <Button className="health-gradient shadow-health px-4 py-2" onClick={() => navigate('/auth?mode=login')}>
+              Entrar
+            </Button>
+            <Button className="health-gradient shadow-health hidden lg:block" onClick={() => navigate('/auth?mode=register')}>
               {t('nav.start_now')}
             </Button>
             <LanguageSwitcher fixed={false} />
@@ -94,9 +133,9 @@ const Index = () => {
             <Button 
               size="lg" 
               className="health-gradient shadow-health text-lg px-8 py-6"
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/auth?mode=register')}
             >
-              Criar Minha Dieta Agora
+              Iniciar Plano Fitness
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <div className="flex items-center text-sm text-gray-500">
@@ -137,22 +176,76 @@ const Index = () => {
           {features.map((feature, index) => (
             <Card 
               key={index}
-              className={`cursor-pointer transition-all duration-300 hover:shadow-health hover:-translate-y-2 ${
-                activeFeature === index ? 'ring-2 ring-health-500 shadow-health' : ''
+              className={`cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 group relative overflow-hidden rounded-xl h-96 ${
+                activeFeature === index ? 'ring-4 ring-health-500 shadow-2xl' : ''
               }`}
-              onMouseEnter={() => setActiveFeature(index)}
+              onMouseEnter={() => setActiveFeature(-1)}
+              onClick={() => setActiveFeature(activeFeature === index ? -1 : index)}
             >
-              <CardHeader className="text-center">
-                <div className="w-16 h-16 health-gradient rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <feature.icon className="w-8 h-8 text-white" />
+              {/* Imagem ocupando todo o container */}
+              <div className="absolute inset-0">
+                <img 
+                  src={
+                    index === 0 ? "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=500&h=400&fit=crop&crop=center" :
+                    index === 1 ? "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=400&fit=crop&crop=center" :
+                    index === 2 ? "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=500&h=400&fit=crop&crop=center" :
+                    "https://images.unsplash.com/photo-1517963628607-235ccdd5476c?w=500&h=400&fit=crop&crop=center"
+                  }
+                  alt={feature.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              </div>
+
+              {/* Overlay escuro permanente com gradiente */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+              {/* Ícone e título sempre visíveis - ocultos quando slide up está ativo */}
+              <div className={`absolute top-6 left-6 z-10 transition-all duration-500 ${
+                activeFeature === index ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
+              }`}>
+                <div className="w-14 h-14 health-gradient rounded-2xl flex items-center justify-center shadow-lg mb-3">
+                  <feature.icon className="w-7 h-7 text-white" />
                 </div>
-                <CardTitle className="text-xl">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-center text-base">
-                  {feature.description}
-                </CardDescription>
-              </CardContent>
+                <h3 className="text-white font-bold text-lg">{feature.title}</h3>
+              </div>
+
+              {/* Overlay com slide up - aparece quando clicado */}
+              <div className={`absolute inset-0 bg-gradient-to-t from-health-600/95 via-health-500/85 to-health-400/75 backdrop-blur-sm transition-all duration-700 ${
+                activeFeature === index ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+              }`}>
+                <div className="absolute inset-0 flex flex-col justify-center items-center p-6 text-white">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <feature.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-2">{feature.overlayContent.title}</h3>
+                    <p className="text-white/90 text-sm">{feature.overlayContent.subtitle}</p>
+                  </div>
+                  
+                  <div className="space-y-3 w-full max-w-xs">
+                    {feature.overlayContent.items.map((item, itemIndex) => (
+                      <div key={itemIndex} className="flex items-center gap-3 bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                        <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                          <item.icon className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="text-white font-medium text-sm">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-6">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveFeature(-1);
+                      }}
+                      className="text-white/70 hover:text-white text-sm underline transition-colors"
+                    >
+                      Fechar
+                    </button>
+                  </div>
+                </div>
+              </div>
             </Card>
           ))}
         </div>
@@ -229,9 +322,9 @@ const Index = () => {
           <Button 
             size="lg" 
             className="health-gradient shadow-health text-lg px-8 py-6"
-            onClick={() => navigate('/auth')}
+            onClick={() => navigate('/auth?mode=register')}
           >
-            Criar Minha Dieta Agora
+            Iniciar Plano Fitness
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
