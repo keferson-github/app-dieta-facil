@@ -215,7 +215,7 @@ const Dashboard = () => {
     // Implementar navegação para a funcionalidade
     toast({
       title: t('dashboard.coming_soon'),
-      description: t('dashboard.feature_coming_soon', { feature }),
+      description: feature,
     });
   };
 
