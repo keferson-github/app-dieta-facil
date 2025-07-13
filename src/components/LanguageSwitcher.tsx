@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Globe } from 'lucide-react';
 
-const LanguageSwitcher = () => {
+interface LanguageSwitcherProps {
+  fixed?: boolean;
+}
+
+const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ fixed = true }) => {
   const { i18n, t } = useTranslation();
 
   const changeLanguage = (lng: string) => {
@@ -30,16 +34,18 @@ const LanguageSwitcher = () => {
   console.log('Current language:', i18n.language);
   console.log('Available languages:', Object.keys(i18n.store.data));
 
+  const containerClass = fixed ? "fixed top-4 right-2 z-50" : "";
+
   return (
-    <div className="fixed top-4 right-2 z-50">
+    <div className={containerClass}>
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-2 border rounded-md top-2 px-3 py-1.5 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white/90 transition-colors">
+        <DropdownMenuTrigger className="flex items-center gap-2 border rounded-md px-3 py-1.5 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white/90 transition-colors w-full">
           <Globe className="w-4 h-4 text-health-600" />
           <span className="text-sm font-semibold text-gray-600">
             {getCurrentLanguageLabel()}
           </span>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[100px]">
+        <DropdownMenuContent align={fixed ? "end" : "start"} className="w-[100px]">
           {languages.map(({ code, label }) => (
             <DropdownMenuItem
               key={code}

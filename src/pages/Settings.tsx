@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,14 +8,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, User, Activity, Target, Save, Apple } from "lucide-react";
+import { ArrowLeft, User, Activity, Target, Save, Apple, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
@@ -49,8 +52,8 @@ const Settings = () => {
       if (error) {
         toast({
           variant: "destructive",
-          title: "Erro ao carregar perfil",
-          description: "Não foi possível carregar seus dados.",
+          title: t('settings.messages.profile_load_error'),
+          description: t('settings.messages.profile_load_error_desc'),
         });
         navigate('/dashboard');
         return;
@@ -72,7 +75,7 @@ const Settings = () => {
     };
 
     getUser();
-  }, [navigate, toast]);
+  }, [navigate, toast, t]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -100,20 +103,20 @@ const Settings = () => {
       if (error) {
         toast({
           variant: "destructive",
-          title: "Erro ao salvar",
+          title: t('settings.messages.save_error'),
           description: error.message,
         });
       } else {
         toast({
-          title: "Configurações salvas!",
-          description: "Suas informações foram atualizadas com sucesso.",
+          title: t('settings.messages.save_success'),
+          description: t('settings.messages.save_success_desc'),
         });
       }
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Erro inesperado",
-        description: "Ocorreu um erro. Tente novamente.",
+        title: t('settings.messages.unexpected_error'),
+        description: t('settings.messages.unexpected_error_desc'),
       });
     } finally {
       setSaving(false);
@@ -126,13 +129,13 @@ const Settings = () => {
     if (error) {
       toast({
         variant: "destructive",
-        title: "Erro ao sair",
+        title: t('settings.messages.logout_error'),
         description: error.message,
       });
     } else {
       toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso.",
+        title: t('settings.messages.logout_success'),
+        description: t('settings.messages.logout_success_desc'),
       });
       navigate('/');
     }
@@ -160,15 +163,21 @@ const Settings = () => {
                 className="text-gray-600 hover:text-gray-900"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar ao Dashboard
+                {t('settings.back_to_dashboard')}
               </Button>
             </div>
             
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 health-gradient rounded-lg flex items-center justify-center">
-                <Apple className="w-5 h-5 text-white" />
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 health-gradient rounded-lg flex items-center justify-center">
+                  <Apple className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold text-gray-900">Dieta Fácil</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">Dieta Fácil</span>
+              
+              <div className="ml-4">
+                <LanguageSwitcher fixed={false} />
+              </div>
             </div>
           </div>
         </div>
@@ -176,8 +185,8 @@ const Settings = () => {
 
       <div className="max-w-4xl mx-auto p-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Configurações</h1>
-          <p className="text-gray-600">Atualize suas informações pessoais e preferências</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('settings.title')}</h1>
+          <p className="text-gray-600">{t('settings.subtitle')}</p>
         </div>
 
         <div className="grid gap-6">
@@ -186,20 +195,20 @@ const Settings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="w-5 h-5 text-health-500" />
-                Informações Pessoais
+                {t('settings.personal_info.title')}
               </CardTitle>
               <CardDescription>
-                Suas informações básicas para cálculo nutricional
+                {t('settings.personal_info.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="age">Idade</Label>
+                  <Label htmlFor="age">{t('settings.personal_info.age')}</Label>
                   <Input
                     id="age"
                     type="number"
-                    placeholder="Ex: 30"
+                    placeholder={t('settings.personal_info.age_placeholder')}
                     value={formData.age}
                     onChange={(e) => handleInputChange("age", e.target.value)}
                     className="mt-2"
@@ -207,7 +216,7 @@ const Settings = () => {
                 </div>
 
                 <div>
-                  <Label>Sexo</Label>
+                  <Label>{t('settings.personal_info.gender')}</Label>
                   <RadioGroup
                     value={formData.gender}
                     onValueChange={(value) => handleInputChange("gender", value)}
@@ -215,11 +224,11 @@ const Settings = () => {
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="male" id="male" />
-                      <Label htmlFor="male">Masculino</Label>
+                      <Label htmlFor="male">{t('settings.personal_info.male')}</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="female" id="female" />
-                      <Label htmlFor="female">Feminino</Label>
+                      <Label htmlFor="female">{t('settings.personal_info.female')}</Label>
                     </div>
                   </RadioGroup>
                 </div>
@@ -232,20 +241,20 @@ const Settings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Activity className="w-5 h-5 text-health-500" />
-                Medidas Corporais
+                {t('settings.body_measurements.title')}
               </CardTitle>
               <CardDescription>
-                Suas medidas atuais para cálculo de necessidades nutricionais
+                {t('settings.body_measurements.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="height">Altura (cm)</Label>
+                  <Label htmlFor="height">{t('settings.body_measurements.height')}</Label>
                   <Input
                     id="height"
                     type="number"
-                    placeholder="Ex: 170"
+                    placeholder={t('settings.body_measurements.height_placeholder')}
                     value={formData.height}
                     onChange={(e) => handleInputChange("height", e.target.value)}
                     className="mt-2"
@@ -253,12 +262,12 @@ const Settings = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="weight">Peso atual (kg)</Label>
+                  <Label htmlFor="weight">{t('settings.body_measurements.weight')}</Label>
                   <Input
                     id="weight"
                     type="number"
                     step="0.1"
-                    placeholder="Ex: 70.5"
+                    placeholder={t('settings.body_measurements.weight_placeholder')}
                     value={formData.weight}
                     onChange={(e) => handleInputChange("weight", e.target.value)}
                     className="mt-2"
@@ -273,15 +282,15 @@ const Settings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-health-500" />
-                Objetivos e Atividade
+                {t('settings.goals_activity.title')}
               </CardTitle>
               <CardDescription>
-                Seus objetivos e nível de atividade física
+                {t('settings.goals_activity.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <Label>Objetivo principal</Label>
+                <Label>{t('settings.goals_activity.main_goal')}</Label>
                 <RadioGroup
                   value={formData.goal}
                   onValueChange={(value) => handleInputChange("goal", value)}
@@ -290,24 +299,24 @@ const Settings = () => {
                   <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-health-50 transition-colors">
                     <RadioGroupItem value="lose_weight" id="lose_weight" />
                     <div className="flex-1">
-                      <Label htmlFor="lose_weight" className="font-medium">Emagrecer</Label>
-                      <p className="text-sm text-gray-600">Reduzir peso e gordura corporal</p>
+                      <Label htmlFor="lose_weight" className="font-medium">{t('settings.goals_activity.lose_weight.title')}</Label>
+                      <p className="text-sm text-gray-600">{t('settings.goals_activity.lose_weight.description')}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-health-50 transition-colors">
                     <RadioGroupItem value="maintain_weight" id="maintain_weight" />
                     <div className="flex-1">
-                      <Label htmlFor="maintain_weight" className="font-medium">Manter peso</Label>
-                      <p className="text-sm text-gray-600">Manter peso atual com alimentação equilibrada</p>
+                      <Label htmlFor="maintain_weight" className="font-medium">{t('settings.goals_activity.maintain_weight.title')}</Label>
+                      <p className="text-sm text-gray-600">{t('settings.goals_activity.maintain_weight.description')}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-health-50 transition-colors">
                     <RadioGroupItem value="gain_muscle" id="gain_muscle" />
                     <div className="flex-1">
-                      <Label htmlFor="gain_muscle" className="font-medium">Ganhar massa muscular</Label>
-                      <p className="text-sm text-gray-600">Aumentar massa muscular e peso</p>
+                      <Label htmlFor="gain_muscle" className="font-medium">{t('settings.goals_activity.gain_muscle.title')}</Label>
+                      <p className="text-sm text-gray-600">{t('settings.goals_activity.gain_muscle.description')}</p>
                     </div>
                   </div>
                 </RadioGroup>
@@ -315,28 +324,28 @@ const Settings = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="activity_level">Nível de atividade física</Label>
+                  <Label htmlFor="activity_level">{t('settings.goals_activity.activity_level')}</Label>
                   <Select value={formData.activity_level} onValueChange={(value) => handleInputChange("activity_level", value)}>
                     <SelectTrigger className="mt-2">
-                      <SelectValue placeholder="Selecione seu nível de atividade" />
+                      <SelectValue placeholder={t('settings.goals_activity.activity_placeholder')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="sedentary">Sedentário (pouco ou nenhum exercício)</SelectItem>
-                      <SelectItem value="lightly_active">Levemente ativo (1-3 dias por semana)</SelectItem>
-                      <SelectItem value="moderately_active">Moderadamente ativo (3-5 dias por semana)</SelectItem>
-                      <SelectItem value="very_active">Muito ativo (6-7 dias por semana)</SelectItem>
-                      <SelectItem value="extremely_active">Extremamente ativo (2x por dia ou trabalho físico)</SelectItem>
+                      <SelectItem value="sedentary">{t('settings.goals_activity.sedentary')}</SelectItem>
+                      <SelectItem value="lightly_active">{t('settings.goals_activity.lightly_active')}</SelectItem>
+                      <SelectItem value="moderately_active">{t('settings.goals_activity.moderately_active')}</SelectItem>
+                      <SelectItem value="very_active">{t('settings.goals_activity.very_active')}</SelectItem>
+                      <SelectItem value="extremely_active">{t('settings.goals_activity.extremely_active')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <Label htmlFor="target_weight">Peso desejado (kg)</Label>
+                  <Label htmlFor="target_weight">{t('settings.goals_activity.target_weight')}</Label>
                   <Input
                     id="target_weight"
                     type="number"
                     step="0.1"
-                    placeholder="Ex: 65.0"
+                    placeholder={t('settings.goals_activity.target_weight_placeholder')}
                     value={formData.target_weight}
                     onChange={(e) => handleInputChange("target_weight", e.target.value)}
                     className="mt-2"
@@ -349,9 +358,9 @@ const Settings = () => {
           {/* Ações */}
           <Card className="glass-effect shadow-health">
             <CardHeader>
-              <CardTitle>Conta</CardTitle>
+              <CardTitle>{t('settings.account.title')}</CardTitle>
               <CardDescription>
-                Gerenciar sua conta e configurações
+                {t('settings.account.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -362,7 +371,7 @@ const Settings = () => {
                   className="health-gradient shadow-health flex-1"
                 >
                   <Save className="w-4 h-4 mr-2" />
-                  {saving ? "Salvando..." : "Salvar Alterações"}
+                  {saving ? t('settings.account.saving') : t('settings.account.save_changes')}
                 </Button>
                 
                 <Separator orientation="vertical" className="hidden sm:block" />
@@ -372,7 +381,7 @@ const Settings = () => {
                   onClick={handleLogout}
                   className="flex-1"
                 >
-                  Sair da Conta
+                  {t('settings.account.logout')}
                 </Button>
               </div>
             </CardContent>

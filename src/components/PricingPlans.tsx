@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,7 @@ const planColors = {
 export function PricingPlans({ plans, currentPlan, onPlanSelect }: PricingPlansProps) {
   const [loading, setLoading] = useState<string | null>(null);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleSubscribe = async (priceId: string, planName: string) => {
     try {
@@ -54,8 +56,8 @@ export function PricingPlans({ plans, currentPlan, onPlanSelect }: PricingPlansP
     } catch (error) {
       console.error('Erro ao criar checkout:', error);
       toast({
-        title: "Erro",
-        description: "Não foi possível iniciar o processo de assinatura. Tente novamente.",
+        title: t('pricing.error_title'),
+        description: t('pricing.error_checkout'),
         variant: "destructive",
       });
     } finally {
@@ -77,8 +79,8 @@ export function PricingPlans({ plans, currentPlan, onPlanSelect }: PricingPlansP
     } catch (error) {
       console.error('Erro ao abrir portal do cliente:', error);
       toast({
-        title: "Erro",
-        description: "Não foi possível abrir o portal de gerenciamento. Tente novamente.",
+        title: t('pricing.error_title'),
+        description: t('pricing.error_portal'),
         variant: "destructive",
       });
     } finally {
@@ -101,12 +103,12 @@ export function PricingPlans({ plans, currentPlan, onPlanSelect }: PricingPlansP
           >
             {isPopular && (
               <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground">
-                Mais Popular
+                {t('pricing.most_popular')}
               </Badge>
             )}
             {isCurrentPlan && (
               <Badge className="absolute -top-3 right-4 bg-green-500 text-white">
-                Seu Plano
+                {t('pricing.your_plan')}
               </Badge>
             )}
             
@@ -118,7 +120,7 @@ export function PricingPlans({ plans, currentPlan, onPlanSelect }: PricingPlansP
               <CardDescription className="text-sm">{plan.description}</CardDescription>
               <div className="mt-4">
                 <span className="text-3xl font-bold">R$ {plan.price_monthly.toFixed(2).replace('.', ',')}</span>
-                <span className="text-muted-foreground">/mês</span>
+                <span className="text-muted-foreground">{t('pricing.per_month')}</span>
               </div>
             </CardHeader>
             
@@ -139,7 +141,7 @@ export function PricingPlans({ plans, currentPlan, onPlanSelect }: PricingPlansP
                   variant="outline" 
                   className="w-full"
                 >
-                  {loading === 'manage' ? 'Carregando...' : 'Gerenciar Assinatura'}
+                  {loading === 'manage' ? t('pricing.loading') : t('pricing.manage_subscription')}
                 </Button>
               ) : (
                 <Button 
@@ -148,7 +150,7 @@ export function PricingPlans({ plans, currentPlan, onPlanSelect }: PricingPlansP
                   className="w-full"
                   variant={isPopular ? "default" : "outline"}
                 >
-                  {loading === plan.stripe_price_id ? 'Carregando...' : 'Assinar Agora'}
+                  {loading === plan.stripe_price_id ? t('pricing.loading') : t('pricing.subscribe_now')}
                 </Button>
               )}
             </CardFooter>

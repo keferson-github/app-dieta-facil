@@ -100,6 +100,7 @@ const resources = {
         "active": "Ativo",
         "upgrade": "Upgrade",
         "settings": "Configurações",
+        "logout": "Sair",
         "current_weight": "Peso Atual",
         "target": "Meta",
         "bmi": "IMC",
@@ -136,10 +137,14 @@ const resources = {
           "trial": "7 dias grátis"
         },
         "loading": "Carregando seu painel...",
-        "premium_feature": "�� Recurso Premium",
+        "premium_feature": "🔒 Recurso Premium",
         "premium_description": "Esta funcionalidade está disponível no plano {plan}. Faça upgrade para acessar!",
         "coming_soon": "Em breve!",
         "feature_coming_soon": "A funcionalidade \"{feature}\" estará disponível em breve.",
+        "logout_error": "Erro",
+        "logout_error_desc": "Não foi possível fazer logout. Tente novamente.",
+        "logout_success": "Logout realizado",
+        "logout_success_desc": "Você foi desconectado com sucesso.",
         "bmi_categories": {
           "underweight": "Abaixo do peso",
           "normal": "Peso normal",
@@ -191,6 +196,88 @@ const resources = {
         "currentProgress": "Progresso Atual",
         "nextLevel": "Próximo Nível",
         "pointsToNextLevel": "pontos para o próximo nível"
+      },
+      "settings": {
+        "language": {
+          "title": "Idioma",
+          "description": "Escolha o idioma da aplicação"
+        },
+        "title": "Configurações",
+        "subtitle": "Atualize suas informações pessoais e preferências",
+        "back_to_dashboard": "Voltar ao Dashboard",
+        "personal_info": {
+          "title": "Informações Pessoais",
+          "description": "Suas informações básicas para cálculo nutricional",
+          "age": "Idade",
+          "age_placeholder": "Ex: 30",
+          "gender": "Sexo",
+          "male": "Masculino",
+          "female": "Feminino"
+        },
+        "body_measurements": {
+          "title": "Medidas Corporais",
+          "description": "Suas medidas atuais para cálculo de necessidades nutricionais",
+          "height": "Altura (cm)",
+          "height_placeholder": "Ex: 170",
+          "weight": "Peso atual (kg)",
+          "weight_placeholder": "Ex: 70.5"
+        },
+        "goals_activity": {
+          "title": "Objetivos e Atividade",
+          "description": "Seus objetivos e nível de atividade física",
+          "main_goal": "Objetivo principal",
+          "lose_weight": {
+            "title": "Emagrecer",
+            "description": "Reduzir peso e gordura corporal"
+          },
+          "maintain_weight": {
+            "title": "Manter peso",
+            "description": "Manter peso atual com alimentação equilibrada"
+          },
+          "gain_muscle": {
+            "title": "Ganhar massa muscular",
+            "description": "Aumentar massa muscular e peso"
+          },
+          "activity_level": "Nível de atividade física",
+          "activity_placeholder": "Selecione seu nível de atividade",
+          "sedentary": "Sedentário (pouco ou nenhum exercício)",
+          "lightly_active": "Levemente ativo (1-3 dias por semana)",
+          "moderately_active": "Moderadamente ativo (3-5 dias por semana)",
+          "very_active": "Muito ativo (6-7 dias por semana)",
+          "extremely_active": "Extremamente ativo (2x por dia ou trabalho físico)",
+          "target_weight": "Peso desejado (kg)",
+          "target_weight_placeholder": "Ex: 65.0"
+        },
+        "account": {
+          "title": "Conta",
+          "description": "Gerenciar sua conta e configurações",
+          "save_changes": "Salvar Alterações",
+          "saving": "Salvando...",
+          "logout": "Sair da Conta"
+        },
+        "messages": {
+          "profile_load_error": "Erro ao carregar perfil",
+          "profile_load_error_desc": "Não foi possível carregar seus dados.",
+          "save_success": "Configurações salvas!",
+          "save_success_desc": "Suas informações foram atualizadas com sucesso.",
+          "save_error": "Erro ao salvar",
+          "unexpected_error": "Erro inesperado",
+          "unexpected_error_desc": "Ocorreu um erro. Tente novamente.",
+          "logout_success": "Logout realizado",
+          "logout_success_desc": "Você foi desconectado com sucesso.",
+          "logout_error": "Erro ao sair"
+        }
+      },
+      "pricing": {
+        "most_popular": "Mais Popular",
+        "your_plan": "Seu Plano",
+        "per_month": "/mês",
+        "subscribe_now": "Assinar Agora",
+        "manage_subscription": "Gerenciar Assinatura",
+        "loading": "Carregando...",
+        "error_title": "Erro",
+        "error_checkout": "Não foi possível iniciar o processo de assinatura. Tente novamente.",
+        "error_portal": "Não foi possível abrir o portal de gerenciamento. Tente novamente."
       }
     }
   },
@@ -292,6 +379,7 @@ const resources = {
         "active": "Active",
         "upgrade": "Upgrade",
         "settings": "Settings",
+        "logout": "Logout",
         "current_weight": "Current Weight",
         "target": "Target",
         "bmi": "BMI",
@@ -332,6 +420,10 @@ const resources = {
         "premium_description": "This feature is available in the {plan} plan. Upgrade to access!",
         "coming_soon": "Coming soon!",
         "feature_coming_soon": "The \"{feature}\" feature will be available soon.",
+        "logout_error": "Error",
+        "logout_error_desc": "Could not initiate logout. Please try again.",
+        "logout_success": "Logout successful",
+        "logout_success_desc": "You have been disconnected successfully.",
         "bmi_categories": {
           "underweight": "Underweight",
           "normal": "Normal weight",
@@ -383,6 +475,88 @@ const resources = {
         "currentProgress": "Current Progress",
         "nextLevel": "Next Level",
         "pointsToNextLevel": "points to next level"
+      },
+      "settings": {
+        "language": {
+          "title": "Language",
+          "description": "Choose the application language"
+        },
+        "title": "Settings",
+        "subtitle": "Update your personal information and preferences",
+        "back_to_dashboard": "Back to Dashboard",
+        "personal_info": {
+          "title": "Personal Information",
+          "description": "Your basic information for nutritional calculation",
+          "age": "Age",
+          "age_placeholder": "Ex: 30",
+          "gender": "Gender",
+          "male": "Male",
+          "female": "Female"
+        },
+        "body_measurements": {
+          "title": "Body Measurements",
+          "description": "Your current measurements for nutritional needs",
+          "height": "Height (cm)",
+          "height_placeholder": "Ex: 170",
+          "weight": "Current weight (kg)",
+          "weight_placeholder": "Ex: 70.5"
+        },
+        "goals_activity": {
+          "title": "Goals and Activity",
+          "description": "Your goals and physical activity level",
+          "main_goal": "Main Goal",
+          "lose_weight": {
+            "title": "Lose Weight",
+            "description": "Reduce body weight and fat"
+          },
+          "maintain_weight": {
+            "title": "Maintain Weight",
+            "description": "Maintain current weight with balanced nutrition"
+          },
+          "gain_muscle": {
+            "title": "Gain Muscle",
+            "description": "Increase muscle mass and weight"
+          },
+          "activity_level": "Physical Activity Level",
+          "activity_placeholder": "Select your activity level",
+          "sedentary": "Sedentary (little or no exercise)",
+          "lightly_active": "Lightly Active (1-3 days per week)",
+          "moderately_active": "Moderately Active (3-5 days per week)",
+          "very_active": "Very Active (6-7 days per week)",
+          "extremely_active": "Extremely Active (2x per day or physically demanding work)",
+          "target_weight": "Desired Weight (kg)",
+          "target_weight_placeholder": "Ex: 65.0"
+        },
+        "account": {
+          "title": "Account",
+          "description": "Manage your account and settings",
+          "save_changes": "Save Changes",
+          "saving": "Saving...",
+          "logout": "Logout"
+        },
+        "messages": {
+          "profile_load_error": "Error loading profile",
+          "profile_load_error_desc": "Could not load your data.",
+          "save_success": "Settings saved!",
+          "save_success_desc": "Your information has been updated successfully.",
+          "save_error": "Error saving",
+          "unexpected_error": "Unexpected error",
+          "unexpected_error_desc": "An error occurred. Please try again.",
+          "logout_success": "Logout successful",
+          "logout_success_desc": "You have been disconnected successfully.",
+          "logout_error": "Error logging out"
+        }
+      },
+      "pricing": {
+        "most_popular": "Most Popular",
+        "your_plan": "Your Plan",
+        "per_month": "/month",
+        "subscribe_now": "Subscribe Now",
+        "manage_subscription": "Manage Subscription",
+        "loading": "Loading...",
+        "error_title": "Error",
+        "error_checkout": "Could not initiate subscription process. Please try again.",
+        "error_portal": "Could not open management portal. Please try again."
       }
     }
   },
@@ -484,6 +658,7 @@ const resources = {
         "active": "Activo",
         "upgrade": "Actualizar",
         "settings": "Configuración",
+        "logout": "Cerrar Sesión",
         "current_weight": "Peso Actual",
         "target": "Meta",
         "bmi": "IMC",
@@ -524,6 +699,10 @@ const resources = {
         "premium_description": "Esta funcionalidad está disponible en el plan {plan}. ¡Actualiza para acceder!",
         "coming_soon": "¡Próximamente!",
         "feature_coming_soon": "La funcionalidad \"{feature}\" estará disponible pronto.",
+        "logout_error": "Error",
+        "logout_error_desc": "No se pudo iniciar el cierre de sesión. Inténtelo de nuevo.",
+        "logout_success": "Cierre de sesión exitoso",
+        "logout_success_desc": "Has sido desconectado con éxito.",
         "bmi_categories": {
           "underweight": "Bajo peso",
           "normal": "Peso normal",
@@ -575,6 +754,88 @@ const resources = {
         "currentProgress": "Progreso Actual",
         "nextLevel": "Próximo Nivel",
         "pointsToNextLevel": "puntos para el próximo nivel"
+      },
+      "settings": {
+        "language": {
+          "title": "Idioma",
+          "description": "Elige el idioma de la aplicación"
+        },
+        "title": "Configuración",
+        "subtitle": "Actualiza tus datos personales y preferencias",
+        "back_to_dashboard": "Volver al Dashboard",
+        "personal_info": {
+          "title": "Información Personal",
+          "description": "Tus datos básicos para el cálculo nutricional",
+          "age": "Edad",
+          "age_placeholder": "Ej: 30",
+          "gender": "Género",
+          "male": "Masculino",
+          "female": "Femenino"
+        },
+        "body_measurements": {
+          "title": "Medidas Corporales",
+          "description": "Tus medidas actuales para las necesidades nutricionales",
+          "height": "Altura (cm)",
+          "height_placeholder": "Ej: 170",
+          "weight": "Peso actual (kg)",
+          "weight_placeholder": "Ej: 70.5"
+        },
+        "goals_activity": {
+          "title": "Objetivos y Actividad",
+          "description": "Tus objetivos y nivel de actividad física",
+          "main_goal": "Objetivo Principal",
+          "lose_weight": {
+            "title": "Perder Peso",
+            "description": "Reducir peso y grasa corporal"
+          },
+          "maintain_weight": {
+            "title": "Mantener Peso",
+            "description": "Mantener el peso actual con una alimentación equilibrada"
+          },
+          "gain_muscle": {
+            "title": "Ganar Masa Muscular",
+            "description": "Aumentar masa muscular y peso"
+          },
+          "activity_level": "Nivel de Actividad Física",
+          "activity_placeholder": "Selecciona tu nivel de actividad",
+          "sedentary": "Sedentario (poco o ningún ejercicio)",
+          "lightly_active": "Ligeramente Activo (1-3 días por semana)",
+          "moderately_active": "Moderadamente Activo (3-5 días por semana)",
+          "very_active": "Muy Activo (6-7 días por semana)",
+          "extremely_active": "Extremadamente Activo (2x por día o trabajo físico)",
+          "target_weight": "Peso Deseado (kg)",
+          "target_weight_placeholder": "Ej: 65.0"
+        },
+        "account": {
+          "title": "Cuenta",
+          "description": "Gestiona tu cuenta y configuraciones",
+          "save_changes": "Guardar Cambios",
+          "saving": "Guardando...",
+          "logout": "Cerrar Sesión"
+        },
+        "messages": {
+          "profile_load_error": "Error al cargar el perfil",
+          "profile_load_error_desc": "No se pudieron cargar sus datos.",
+          "save_success": "Configuraciones guardadas!",
+          "save_success_desc": "Tus datos se han actualizado correctamente.",
+          "save_error": "Error al guardar",
+          "unexpected_error": "Error inesperado",
+          "unexpected_error_desc": "Ocurrió un error. Inténtelo de nuevo.",
+          "logout_success": "Cierre de sesión exitoso",
+          "logout_success_desc": "Has sido desconectado con éxito.",
+          "logout_error": "Error al cerrar sesión"
+        }
+      },
+      "pricing": {
+        "most_popular": "Más Popular",
+        "your_plan": "Tu Plan",
+        "per_month": "/mes",
+        "subscribe_now": "Suscribirse Ahora",
+        "manage_subscription": "Gestionar Suscripción",
+        "loading": "Cargando...",
+        "error_title": "Error",
+        "error_checkout": "No se pudo iniciar el proceso de suscripción. Inténtelo de nuevo.",
+        "error_portal": "No se pudo abrir el portal de gestión. Inténtelo de nuevo."
       }
     }
   }

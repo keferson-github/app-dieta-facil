@@ -23,7 +23,8 @@ import {
   Plus,
   ArrowRight,
   Lock,
-  Activity
+  Activity,
+  LogOut
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PricingPlans } from "@/components/PricingPlans";
@@ -217,6 +218,24 @@ const Dashboard = () => {
       title: t('dashboard.coming_soon'),
       description: feature,
     });
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      toast({
+        title: t('dashboard.logout_error'),
+        description: t('dashboard.logout_error_desc'),
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: t('dashboard.logout_success'),
+        description: t('dashboard.logout_success_desc'),
+      });
+      navigate('/');
+    }
   };
 
   // ----- FETCH CHART DATA -----
@@ -435,6 +454,14 @@ const Dashboard = () => {
             >
                 <Settings className="w-4 h-4 mr-2" />
                 {t('dashboard.settings')}
+            </Button>
+            <Button 
+              onClick={handleLogout}
+              variant="outline"
+              className="border-red-200 hover:bg-red-50 text-red-600 hover:text-red-700"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              {t('dashboard.logout')}
             </Button>
             </div>
           </div>
