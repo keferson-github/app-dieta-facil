@@ -89,8 +89,10 @@ export function PricingPlans({ plans, currentPlan, onPlanSelect }: PricingPlansP
   };
 
   return (
-    <div className="grid gap-6 md:gap-8 lg:grid-cols-3 max-w-6xl mx-auto">
-      {plans.map((plan) => {
+    <div className="grid gap-6 md:gap-8 lg:grid-cols-2 max-w-4xl mx-auto">
+      {plans
+        .filter(plan => plan.name === "Plano Energia" || plan.name === "Plano Performance")
+        .map((plan) => {
         const Icon = planIcons[plan.name as keyof typeof planIcons] || Sparkles;
         const isCurrentPlan = currentPlan === plan.name;
         const cardStyle = planColors[plan.name as keyof typeof planColors] || "bg-card";
