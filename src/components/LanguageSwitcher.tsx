@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { Globe } from 'lucide-react';
+import ReactCountryFlag from 'react-country-flag';
 
 interface LanguageSwitcherProps {
   fixed?: boolean;
@@ -21,14 +21,14 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ fixed = true }) => 
   };
 
   const languages = [
-    { code: 'pt', label: 'Português' },
-    { code: 'en', label: 'English' },
-    { code: 'es', label: 'Español' }
+    { code: 'pt', label: 'Português', countryCode: 'BR' },
+    { code: 'en', label: 'English', countryCode: 'US' },
+    { code: 'es', label: 'Español', countryCode: 'ES' }
   ];
 
-  const getCurrentLanguageLabel = () => {
+  const getCurrentLanguage = () => {
     const current = languages.find(lang => lang.code === i18n.language);
-    return current ? current.label : 'Idioma';
+    return current || { code: 'pt', label: 'Idioma', countryCode: 'BR' };
   };
 
   console.log('Current language:', i18n.language);
@@ -40,13 +40,17 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ fixed = true }) => 
     <div className={containerClass}>
       <DropdownMenu>
         <DropdownMenuTrigger className="flex items-center gap-2 border rounded-md px-3 py-1.5 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white/90 transition-colors w-full">
-          <Globe className="w-4 h-4 text-health-600" />
+          <ReactCountryFlag 
+            countryCode={getCurrentLanguage().countryCode} 
+            svg 
+            style={{ width: '1.2em', height: '1.2em' }}
+          />
           <span className="text-sm font-semibold text-gray-600">
-            {getCurrentLanguageLabel()}
+            {getCurrentLanguage().label}
           </span>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align={fixed ? "end" : "start"} className="w-[100px]">
-          {languages.map(({ code, label }) => (
+        <DropdownMenuContent align={fixed ? "end" : "start"} className="w-[140px]">
+          {languages.map(({ code, label, countryCode }) => (
             <DropdownMenuItem
               key={code}
               onClick={() => changeLanguage(code)}
@@ -54,9 +58,14 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ fixed = true }) => 
                 code === i18n.language ? 'bg-health-50 text-health-700' : ''
               }`}
             >
-              {label}
+              <ReactCountryFlag 
+                countryCode={countryCode} 
+                svg 
+                style={{ width: '1.2em', height: '1.2em' }}
+              />
+              <span className="flex-1">{label}</span>
               {code === i18n.language && (
-                <div className="w-2 h-2 rounded-full bg-health-500 ml-auto"></div>
+                <div className="w-2 h-2 rounded-full bg-health-500"></div>
               )}
             </DropdownMenuItem>
           ))}
