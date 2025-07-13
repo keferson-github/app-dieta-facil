@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +11,25 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 const Index = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [activeFeature, setActiveFeature] = useState(0);
+  const [activeFeature, setActiveFeature] = useState(-1);
+  const featuresRef = useRef<HTMLDivElement>(null);
+
+  // Fechar slide up ao clicar fora dos cards
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (featuresRef.current && !featuresRef.current.contains(event.target as Node)) {
+        setActiveFeature(-1);
+      }
+    };
+
+    if (activeFeature !== -1) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activeFeature]);
 
   const features = [
     {
@@ -172,7 +190,7 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div ref={featuresRef} className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <Card 
               key={index}
@@ -213,33 +231,35 @@ const Index = () => {
               <div className={`absolute inset-0 bg-gradient-to-t from-health-600/95 via-health-500/85 to-health-400/75 backdrop-blur-sm transition-all duration-700 ${
                 activeFeature === index ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
               }`}>
-                <div className="absolute inset-0 flex flex-col justify-center items-center p-6 text-white">
-                  <div className="text-center mb-6">
-                    <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <feature.icon className="w-8 h-8 text-white" />
+                <div className="absolute inset-0 flex flex-col justify-between items-center p-4 sm:p-6 text-white">
+                  <div className="flex-shrink-0 text-center pt-2 sm:pt-4">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                      <feature.icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-2">{feature.overlayContent.title}</h3>
-                    <p className="text-white/90 text-sm">{feature.overlayContent.subtitle}</p>
+                    <h3 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">{feature.overlayContent.title}</h3>
+                    <p className="text-white/90 text-xs sm:text-sm">{feature.overlayContent.subtitle}</p>
                   </div>
                   
-                  <div className="space-y-3 w-full max-w-xs">
-                    {feature.overlayContent.items.map((item, itemIndex) => (
-                      <div key={itemIndex} className="flex items-center gap-3 bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-                        <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                          <item.icon className="w-5 h-5 text-white" />
+                  <div className="flex-1 flex items-center justify-center w-full">
+                    <div className="space-y-2 sm:space-y-3 w-full max-w-xs">
+                      {feature.overlayContent.items.map((item, itemIndex) => (
+                        <div key={itemIndex} className="flex items-center gap-2 sm:gap-3 bg-white/10 rounded-lg p-2 sm:p-3 backdrop-blur-sm">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <item.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                          </div>
+                          <span className="text-white font-medium text-xs sm:text-sm">{item.text}</span>
                         </div>
-                        <span className="text-white font-medium text-sm">{item.text}</span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                   
-                  <div className="mt-6">
+                  <div className="flex-shrink-0 pb-2 sm:pb-4">
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
                         setActiveFeature(-1);
                       }}
-                      className="text-white/70 hover:text-white text-sm underline transition-colors"
+                      className="bg-white/20 hover:bg-white/30 text-white font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/30 hover:border-white/50 text-sm"
                     >
                       Fechar
                     </button>
