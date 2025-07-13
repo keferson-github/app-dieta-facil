@@ -198,6 +198,37 @@ const Dashboard = () => {
   };
 
   const handleFeatureClick = (feature: string, requiredPlan: string) => {
+    // Liberar recursos do Plano Nutri gratuitamente
+    if (requiredPlan === 'Nutri') {
+      // Navegação específica para cada recurso do Plano Nutri
+      if (feature.includes('Criar Refeição') || feature.includes('create_meal') || feature === t('dashboard.nutrition.create_meal')) {
+        navigate('/create-meal');
+        return;
+      }
+      if (feature.includes('Cardápio Semanal') || feature.includes('weekly_menu') || feature === t('dashboard.nutrition.weekly_menu')) {
+        navigate('/weekly-menu');
+        return;
+      }
+      
+      // Para outros recursos do Plano Nutri, mostrar "em breve"
+      toast({
+        title: "Recurso disponível",
+        description: `${feature} está disponível gratuitamente no Plano Nutri!`,
+      });
+      return;
+    }
+
+    // Verificar se o usuário tem assinatura para planos superiores (Energia e Performance)
+    if (!subscription?.subscribed) {
+      toast({
+        title: t('dashboard.premium_feature'),
+        description: t('dashboard.premium_description', { plan: requiredPlan }),
+        variant: "destructive",
+      });
+      setShowPricing(true);
+      return;
+    }
+
     const currentPlan = subscription?.plan || 'Nutri';
     const planHierarchy = ['Nutri', 'Energia', 'Performance'];
     const currentIndex = planHierarchy.indexOf(currentPlan);
@@ -592,24 +623,24 @@ const Dashboard = () => {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <Button 
-                      onClick={() => handleFeatureClick(t('dashboard.nutrition.create_meal'), 'Nutri')}
+                      onClick={() => handleFeatureClick('Criar Refeição', 'Nutri')}
                       className="w-full justify-between group hover:bg-red-50"
                       variant="outline"
                     >
                       <span className="flex items-center gap-2">
                         <Plus className="w-4 h-4" />
-                        {t('dashboard.nutrition.create_meal')}
+                        Criar Refeição
                       </span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                     <Button 
-                      onClick={() => handleFeatureClick(t('dashboard.nutrition.weekly_menu'), 'Nutri')}
+                      onClick={() => handleFeatureClick('Cardápio Semanal', 'Nutri')}
                       className="w-full justify-between group hover:bg-red-50"
                       variant="outline"
                     >
                       <span className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        {t('dashboard.nutrition.weekly_menu')}
+                        Cardápio Semanal
                       </span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>

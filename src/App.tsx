@@ -9,6 +9,8 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Onboarding from "./pages/Onboarding";
 import Settings from "./pages/Settings";
+import CreateMeal from "./pages/CreateMeal";
+import WeeklyMenu from "./pages/WeeklyMenu";
 import NotFound from "./pages/NotFound";
 import './i18n';
 
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/create-meal" element={<CreateMeal />} />
+          <Route path="/weekly-menu" element={<WeeklyMenu />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
