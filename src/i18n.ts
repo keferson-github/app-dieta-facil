@@ -119,7 +119,7 @@ const resources = {
         },
         "exercises": {
           "title": "Exercícios",
-          "description": "Crie refeições e treinos para manter o corpo ativo e saudável",
+          "description": "Crie refeições e treinos para manter o corpo muito mais ativo e saudável",
           "start_workout": "Iniciar Treino",
           "workout_sheet": "Ficha de Treino"
         },
