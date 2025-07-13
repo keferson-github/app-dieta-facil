@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const [formData, setFormData] = useState({
@@ -86,19 +88,19 @@ const Auth = () => {
         if (error.message.includes("Invalid login credentials")) {
           toast({
             variant: "destructive",
-            title: "Erro no login",
-            description: "Email ou senha incorretos. Verifique seus dados e tente novamente.",
+            title: t('notifications.auth.login_error'),
+            description: t('notifications.auth.invalid_credentials'),
           });
         } else if (error.message.includes("Email not confirmed")) {
           toast({
             variant: "destructive",
-            title: "Email não confirmado",
-            description: "Por favor, verifique seu email e clique no link de confirmação antes de fazer login.",
+            title: t('notifications.auth.email_not_confirmed'),
+            description: t('notifications.auth.email_not_confirmed_desc'),
           });
         } else {
           toast({
             variant: "destructive",
-            title: "Erro no login",
+            title: t('notifications.auth.login_error'),
             description: error.message,
           });
         }
@@ -115,8 +117,8 @@ const Auth = () => {
             .single();
 
           toast({
-            title: "Login realizado com sucesso!",
-            description: "Bem-vindo de volta ao Dieta Fácil",
+            title: t('notifications.auth.login_success'),
+            description: t('notifications.auth.login_success_desc'),
           });
 
           if (profile) {
@@ -129,8 +131,8 @@ const Auth = () => {
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Erro inesperado",
-        description: "Ocorreu um erro. Tente novamente.",
+        title: t('notifications.auth.unexpected_error'),
+        description: t('notifications.auth.unexpected_error_desc'),
       });
     } finally {
       setIsLoading(false);
@@ -160,21 +162,21 @@ const Auth = () => {
         if (error.message.includes("User already registered")) {
           toast({
             variant: "destructive",
-            title: "Usuário já existe",
-            description: "Este email já está cadastrado. Tente fazer login.",
+            title: t('notifications.auth.user_exists'),
+            description: t('notifications.auth.user_exists_desc'),
           });
           setActiveTab("login");
         } else {
           toast({
             variant: "destructive",
-            title: "Erro no cadastro",
+            title: t('notifications.auth.signup_error'),
             description: error.message,
           });
         }
       } else {
         toast({
-          title: "Cadastro realizado com sucesso!",
-          description: "Verifique seu email para confirmar a conta e então faça login.",
+          title: t('notifications.auth.signup_success'),
+          description: t('notifications.auth.signup_success_desc'),
         });
         setActiveTab("login");
         setFormData({
@@ -187,8 +189,8 @@ const Auth = () => {
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Erro inesperado",
-        description: "Ocorreu um erro. Tente novamente.",
+        title: t('notifications.auth.unexpected_error'),
+        description: t('notifications.auth.unexpected_error_desc'),
       });
     } finally {
       setIsLoading(false);

@@ -163,20 +163,20 @@ const Dashboard = () => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('success') === 'true') {
       toast({
-        title: "🎉 Bem-vindo ao time!",
-        description: "Sua assinatura foi ativada com sucesso! Vamos alcançar seus objetivos juntos.",
+        title: t('notifications.dashboard.welcome_team'),
+        description: t('notifications.dashboard.welcome_team_desc'),
       });
       refetchSubscription();
       window.history.replaceState({}, '', '/dashboard');
     } else if (urlParams.get('canceled') === 'true') {
       toast({
-        title: "Processo cancelado",
-        description: "Sem problemas! Você ainda pode continuar usando o plano gratuito.",
+        title: t('notifications.dashboard.process_canceled'),
+        description: t('notifications.dashboard.process_canceled_desc'),
         variant: "destructive",
       });
       window.history.replaceState({}, '', '/dashboard');
     }
-  }, [toast, refetchSubscription]);
+  }, [toast, refetchSubscription, t]);
 
   const calculateBMI = () => {
     if (!userProfile?.weight || !userProfile?.height) return 0;

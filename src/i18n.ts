@@ -278,6 +278,36 @@ const resources = {
         "error_title": "Erro",
         "error_checkout": "Não foi possível iniciar o processo de assinatura. Tente novamente.",
         "error_portal": "Não foi possível abrir o portal de gerenciamento. Tente novamente."
+      },
+      "notifications": {
+        "auth": {
+          "login_error": "Erro no login",
+          "invalid_credentials": "Email ou senha incorretos. Verifique seus dados e tente novamente.",
+          "email_not_confirmed": "Email não confirmado",
+          "email_not_confirmed_desc": "Por favor, verifique seu email e clique no link de confirmação antes de fazer login.",
+          "login_success": "Login realizado com sucesso!",
+          "login_success_desc": "Bem-vindo de volta ao Dieta Fácil",
+          "user_exists": "Usuário já existe",
+          "user_exists_desc": "Este email já está cadastrado. Tente fazer login.",
+          "signup_error": "Erro no cadastro",
+          "signup_success": "Cadastro realizado com sucesso!",
+          "signup_success_desc": "Verifique seu email para confirmar a conta e então faça login.",
+          "unexpected_error": "Erro inesperado",
+          "unexpected_error_desc": "Ocorreu um erro. Tente novamente."
+        },
+        "onboarding": {
+          "profile_error": "Erro ao salvar perfil",
+          "profile_success": "Perfil criado com sucesso!",
+          "profile_success_desc": "Agora você pode acessar todas as funcionalidades do Dieta Fácil",
+          "unexpected_error": "Erro inesperado",
+          "unexpected_error_desc": "Ocorreu um erro. Tente novamente."
+        },
+        "dashboard": {
+          "welcome_team": "🎉 Bem-vindo ao time!",
+          "welcome_team_desc": "Sua assinatura foi ativada com sucesso! Vamos alcançar seus objetivos juntos.",
+          "process_canceled": "Processo cancelado",
+          "process_canceled_desc": "Sem problemas! Você ainda pode continuar usando o plano gratuito."
+        }
       }
     }
   },
@@ -557,6 +587,36 @@ const resources = {
         "error_title": "Error",
         "error_checkout": "Could not initiate subscription process. Please try again.",
         "error_portal": "Could not open management portal. Please try again."
+      },
+      "notifications": {
+        "auth": {
+          "login_error": "Login Error",
+          "invalid_credentials": "Invalid email or password. Please check your credentials and try again.",
+          "email_not_confirmed": "Email Not Confirmed",
+          "email_not_confirmed_desc": "Please check your email and click the confirmation link before logging in.",
+          "login_success": "Login Successful!",
+          "login_success_desc": "Welcome back to Easy Diet",
+          "user_exists": "User Already Exists",
+          "user_exists_desc": "This email is already registered. Try logging in.",
+          "signup_error": "Registration Error",
+          "signup_success": "Registration Successful!",
+          "signup_success_desc": "Check your email to confirm your account and then log in.",
+          "unexpected_error": "Unexpected Error",
+          "unexpected_error_desc": "An error occurred. Please try again."
+        },
+        "onboarding": {
+          "profile_error": "Error Saving Profile",
+          "profile_success": "Profile Created Successfully!",
+          "profile_success_desc": "You can now access all Easy Diet features",
+          "unexpected_error": "Unexpected Error",
+          "unexpected_error_desc": "An error occurred. Please try again."
+        },
+        "dashboard": {
+          "welcome_team": "🎉 Welcome to the team!",
+          "welcome_team_desc": "Your subscription has been activated successfully! Let's achieve your goals together.",
+          "process_canceled": "Process Canceled",
+          "process_canceled_desc": "No problem! You can still continue using the free plan."
+        }
       }
     }
   },
@@ -836,6 +896,36 @@ const resources = {
         "error_title": "Error",
         "error_checkout": "No se pudo iniciar el proceso de suscripción. Inténtelo de nuevo.",
         "error_portal": "No se pudo abrir el portal de gestión. Inténtelo de nuevo."
+      },
+      "notifications": {
+        "auth": {
+          "login_error": "Error de Inicio de Sesión",
+          "invalid_credentials": "Email o contraseña incorrectos. Verifique sus datos e inténtelo de nuevo.",
+          "email_not_confirmed": "Email No Confirmado",
+          "email_not_confirmed_desc": "Por favor, verifique su email y haga clic en el enlace de confirmación antes de iniciar sesión.",
+          "login_success": "¡Inicio de Sesión Exitoso!",
+          "login_success_desc": "Bienvenido de vuelta a Dieta Fácil",
+          "user_exists": "Usuario Ya Existe",
+          "user_exists_desc": "Este email ya está registrado. Intente iniciar sesión.",
+          "signup_error": "Error de Registro",
+          "signup_success": "¡Registro Exitoso!",
+          "signup_success_desc": "Verifique su email para confirmar la cuenta y luego inicie sesión.",
+          "unexpected_error": "Error Inesperado",
+          "unexpected_error_desc": "Ocurrió un error. Inténtelo de nuevo."
+        },
+        "onboarding": {
+          "profile_error": "Error al Guardar Perfil",
+          "profile_success": "¡Perfil Creado Exitosamente!",
+          "profile_success_desc": "Ahora puede acceder a todas las funcionalidades de Dieta Fácil",
+          "unexpected_error": "Error Inesperado",
+          "unexpected_error_desc": "Ocurrió un error. Inténtelo de nuevo."
+        },
+        "dashboard": {
+          "welcome_team": "🎉 ¡Bienvenido al equipo!",
+          "welcome_team_desc": "¡Su suscripción se ha activado exitosamente! Vamos a alcanzar sus objetivos juntos.",
+          "process_canceled": "Proceso Cancelado",
+          "process_canceled_desc": "¡Sin problemas! Aún puede continuar usando el plan gratuito."
+        }
       }
     }
   }

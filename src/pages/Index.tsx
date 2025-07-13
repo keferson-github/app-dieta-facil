@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, CheckCircle, Users, Target, Zap, Heart, Apple, Dumbbell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -65,12 +66,10 @@ const Index = () => {
             <span className="text-2xl font-bold text-gray-900">{t('brand')}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/auth')}>
-              {t('nav.login')}
-            </Button>
             <Button className="health-gradient shadow-health" onClick={() => navigate('/auth')}>
               {t('nav.start_now')}
             </Button>
+            <LanguageSwitcher fixed={false} />
           </div>
         </nav>
       </header>

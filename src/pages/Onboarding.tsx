@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,7 @@ import type { User as AuthUser } from "@supabase/supabase-js";
 const Onboarding = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(1);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [formData, setFormData] = useState({
@@ -112,21 +114,21 @@ const Onboarding = () => {
       if (error) {
         toast({
           variant: "destructive",
-          title: "Erro ao salvar perfil",
+          title: t('notifications.onboarding.profile_error'),
           description: error.message,
         });
       } else {
         toast({
-          title: "Perfil criado com sucesso!",
-          description: "Agora você pode acessar todas as funcionalidades do Dieta Fácil",
+          title: t('notifications.onboarding.profile_success'),
+          description: t('notifications.onboarding.profile_success_desc'),
         });
         navigate('/dashboard');
       }
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Erro inesperado",
-        description: "Ocorreu um erro. Tente novamente.",
+        title: t('notifications.onboarding.unexpected_error'),
+        description: t('notifications.onboarding.unexpected_error_desc'),
       });
     }
   };
