@@ -413,8 +413,8 @@ const Dashboard = () => {
         <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-health p-6 mb-8">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 health-gradient rounded-2xl flex items-center justify-center shadow-lg">
-                <Apple className="w-8 h-8 text-white" />
+              <div className="w-12 h-12 lg:w-16 lg:h-16 health-gradient rounded-2xl flex items-center justify-center shadow-lg">
+                <Apple className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
               </div>
           <div>
                 <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
@@ -437,31 +437,37 @@ const Dashboard = () => {
               </div>
           </div>
             
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
               {!subscription?.subscribed && (
               <Button 
                 onClick={() => setShowPricing(true)}
-                  className="health-gradient shadow-health hover:shadow-lg transition-all"
+                  className="health-gradient shadow-health hover:shadow-lg transition-all flex-1 sm:w-auto text-sm sm:text-base px-2 sm:px-4"
+                  size="sm"
                 >
-                  <Zap className="w-4 h-4 mr-2" />
-                  {t('dashboard.upgrade')}
+                  <Zap className="w-4 h-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">{t('dashboard.upgrade')}</span>
+                  <span className="inline sm:hidden">Up</span>
               </Button>
             )}
             <Button 
               onClick={() => navigate('/settings')}
               variant="outline"
-                className="border-health-200 hover:bg-health-50"
+                className="border-health-200 hover:bg-health-50 flex-1 sm:w-auto text-sm sm:text-base px-2 sm:px-4"
+                size="sm"
             >
-                <Settings className="w-4 h-4 mr-2" />
-                {t('dashboard.settings')}
+                <Settings className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">{t('dashboard.settings')}</span>
+                <span className="inline sm:hidden">Config</span>
             </Button>
             <Button 
               onClick={handleLogout}
               variant="outline"
-              className="border-red-200 hover:bg-red-50 text-red-600 hover:text-red-700"
+              className="border-red-200 hover:bg-red-50 text-red-600 hover:text-red-700 flex-1 sm:w-auto text-sm sm:text-base px-2 sm:px-4"
+              size="sm"
             >
-              <LogOut className="w-4 h-4 mr-2" />
-              {t('dashboard.logout')}
+              <LogOut className="w-4 h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">{t('dashboard.logout')}</span>
+              <span className="inline sm:hidden">Sair</span>
             </Button>
             </div>
           </div>

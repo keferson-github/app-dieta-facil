@@ -66,7 +66,7 @@ const Index = () => {
             <span className="text-2xl font-bold text-gray-900">{t('brand')}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <Button className="health-gradient shadow-health" onClick={() => navigate('/auth')}>
+            <Button className="health-gradient shadow-health hidden lg:block" onClick={() => navigate('/auth')}>
               {t('nav.start_now')}
             </Button>
             <LanguageSwitcher fixed={false} />
@@ -96,7 +96,7 @@ const Index = () => {
               className="health-gradient shadow-health text-lg px-8 py-6"
               onClick={() => navigate('/auth')}
             >
-              {t('hero.cta')}
+              Criar Minha Dieta Agora
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <div className="flex items-center text-sm text-gray-500">
@@ -231,7 +231,7 @@ const Index = () => {
             className="health-gradient shadow-health text-lg px-8 py-6"
             onClick={() => navigate('/auth')}
           >
-            {t('cta.button')}
+            Criar Minha Dieta Agora
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
