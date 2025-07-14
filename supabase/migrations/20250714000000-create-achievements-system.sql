@@ -106,25 +106,79 @@ ALTER TABLE public.user_achievements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_stats ENABLE ROW LEVEL SECURITY;
 
 -- Achievements can be read by anyone
-CREATE POLICY "Achievements are viewable by everyone" ON public.achievements
-  FOR SELECT USING (true);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'achievements' 
+    AND policyname = 'Achievements are viewable by everyone'
+  ) THEN
+    CREATE POLICY "Achievements are viewable by everyone" ON public.achievements
+    FOR SELECT USING (true);
+  END IF;
+END $$;
 
 -- User achievements are only viewable by the user
-CREATE POLICY "Users can view own achievements" ON public.user_achievements
-  FOR SELECT USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'user_achievements' 
+    AND policyname = 'Users can view own achievements'
+  ) THEN
+    CREATE POLICY "Users can view own achievements" ON public.user_achievements
+    FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
-CREATE POLICY "Users can insert own achievements" ON public.user_achievements
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'user_achievements' 
+    AND policyname = 'Users can insert own achievements'
+  ) THEN
+    CREATE POLICY "Users can insert own achievements" ON public.user_achievements
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
 
 -- User stats are only viewable by the user
-CREATE POLICY "Users can view own stats" ON public.user_stats
-  FOR SELECT USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'user_stats' 
+    AND policyname = 'Users can view own stats'
+  ) THEN
+    CREATE POLICY "Users can view own stats" ON public.user_stats
+    FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
-CREATE POLICY "Users can update own stats" ON public.user_stats
-  FOR UPDATE USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'user_stats' 
+    AND policyname = 'Users can update own stats'
+  ) THEN
+    CREATE POLICY "Users can update own stats" ON public.user_stats
+    FOR UPDATE USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
-CREATE POLICY "Users can insert own stats" ON public.user_stats
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'user_stats' 
+    AND policyname = 'Users can insert own stats'
+  ) THEN
+    CREATE POLICY "Users can insert own stats" ON public.user_stats
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
 
 -- Create function to award achievements
 CREATE OR REPLACE FUNCTION public.award_achievement(

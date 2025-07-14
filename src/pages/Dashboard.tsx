@@ -369,28 +369,48 @@ const Dashboard = () => {
     // 3. Nutrition (últimos 7 dias) via view meal_nutrition
     const { data: nutritionRows } = await supabase
       .from('meal_nutrition')
-      .select('total_calories, total_protein, total_carbs, total_fats, day_of_week')
+      .select('total_calories, total_protein, total_carbs, total_fats, meal_date')
       .eq('user_id', userId)
-      .gte('day_of_week', since7.getDay());
+      .gte('meal_date', since7.toISOString().split('T')[0])
+      .order('meal_date');
 
     const dailyNutritionData: DailyNutritionDatum[] = [];
+    const nutritionMap: Record<string, { calories: number; protein: number; carbs: number; fat: number }> = {};
+    
+    // Inicializar com os últimos 7 dias
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(today.getDate() - i);
+      const dayKey = date.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' });
+      const isoDate = date.toISOString().split('T')[0];
+      nutritionMap[isoDate] = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    }
+    
     if (nutritionRows) {
-      // aggregate by day_of_week (0-6)
-      const today = new Date();
+      // Agregar dados por data real das refeições
       nutritionRows.forEach(r => {
-        const date = new Date();
-        const diff = today.getDay() - (r.day_of_week ?? 0);
-        const d = new Date();
-        d.setDate(today.getDate() - diff);
-        dailyNutritionData.push({
-          date: d.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }),
-          calories: r.total_calories || 0,
-          protein: r.total_protein || 0,
-          carbs: r.total_carbs || 0,
-          fat: r.total_fats || 0,
-        });
+        const mealDate = r.meal_date;
+        if (mealDate && nutritionMap[mealDate]) {
+          nutritionMap[mealDate].calories += r.total_calories || 0;
+          nutritionMap[mealDate].protein += r.total_protein || 0;
+          nutritionMap[mealDate].carbs += r.total_carbs || 0;
+          nutritionMap[mealDate].fat += r.total_fats || 0;
+        }
       });
     }
+
+    // Converter para array com formato correto de data
+    Object.entries(nutritionMap).forEach(([isoDate, data]) => {
+      const date = new Date(isoDate);
+      dailyNutritionData.push({
+        date: date.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }),
+        calories: data.calories,
+        protein: data.protein,
+        carbs: data.carbs,
+        fat: data.fat,
+      });
+    });
 
     // macros para hoje (pie chart)
     const todayData = dailyNutritionData[dailyNutritionData.length - 1];
@@ -641,6 +661,147 @@ const Dashboard = () => {
                   </p>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Métricas Nutricionais */}
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">📊 Alimentação - Seus dados nutricionais</h2>
+              </div>
+
+              {/* Dados de Hoje */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                  <Apple className="w-5 h-5 text-green-600" />
+                  Hoje
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Calorias Hoje */}
+                  <Card className="glass-effect hover:shadow-health transition-all duration-300">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-600">Calorias</CardTitle>
+                      <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                        <Zap className="h-4 w-4 text-red-600" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {Math.round(sampleData.nutritionMacros.reduce((acc, macro) => acc + (macro.value || 0), 0) * 4) || 0}
+                      </div>
+                      <p className="text-xs text-gray-500">kcal consumidas</p>
+                      <Progress value={Math.min(100, ((sampleData.nutritionMacros.reduce((acc, macro) => acc + (macro.value || 0), 0) * 4) / 2000) * 100)} className="mt-2 h-1.5" />
+                    </CardContent>
+                  </Card>
+
+                  {/* Proteínas Hoje */}
+                  <Card className="glass-effect hover:shadow-health transition-all duration-300">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-600">Proteínas</CardTitle>
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <Target className="h-4 w-4 text-blue-600" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || 0)}g
+                      </div>
+                      <p className="text-xs text-gray-500">de 150g meta</p>
+                      <Progress value={Math.min(100, ((sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || 0) / 150) * 100)} className="mt-2 h-1.5" />
+                    </CardContent>
+                  </Card>
+
+                  {/* Carboidratos Hoje */}
+                  <Card className="glass-effect hover:shadow-health transition-all duration-300">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-600">Carboidratos</CardTitle>
+                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                        <Activity className="h-4 w-4 text-green-600" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {Math.round(sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || 0)}g
+                      </div>
+                      <p className="text-xs text-gray-500">de 250g meta</p>
+                      <Progress value={Math.min(100, ((sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || 0) / 250) * 100)} className="mt-2 h-1.5" />
+                    </CardContent>
+                  </Card>
+
+                  {/* Gorduras Hoje */}
+                  <Card className="glass-effect hover:shadow-health transition-all duration-300">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-600">Gorduras</CardTitle>
+                      <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <Heart className="h-4 w-4 text-yellow-600" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {Math.round(sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || 0)}g
+                      </div>
+                      <p className="text-xs text-gray-500">de 65g meta</p>
+                      <Progress value={Math.min(100, ((sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || 0) / 65) * 100)} className="mt-2 h-1.5" />
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+
+              {/* Dados Semanais */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-purple-600" />
+                  Semanal
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Média de Calorias Semanais */}
+                  <Card className="glass-effect hover:shadow-health transition-all duration-300">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-600">Média Diária de Calorias</CardTitle>
+                      <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <BarChart3 className="h-4 w-4 text-orange-600" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {Math.round(sampleData.dailyNutritionData.reduce((acc, day) => acc + day.calories, 0) / Math.max(1, sampleData.dailyNutritionData.length)) || 0}
+                      </div>
+                      <p className="text-xs text-gray-500">kcal/dia (últimos 7 dias)</p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Consistência Alimentar */}
+                  <Card className="glass-effect hover:shadow-health transition-all duration-300">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-600">Consistência</CardTitle>
+                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                        <TrendingUp className="h-4 w-4 text-green-600" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {Math.round((sampleData.dailyNutritionData.filter(day => day.calories > 0).length / 7) * 100)}%
+                      </div>
+                      <p className="text-xs text-gray-500">dias com registros</p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Equilíbrio Nutricional */}
+                  <Card className="glass-effect hover:shadow-health transition-all duration-300">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-600">Equilíbrio</CardTitle>
+                      <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <Trophy className="h-4 w-4 text-purple-600" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {sampleData.nutritionMacros.length > 0 ? 'Bom' : 'Sem dados'}
+                      </div>
+                      <p className="text-xs text-gray-500">distribuição de macros</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </div>
 
             {/* Seções de Recursos por Plano */}

@@ -873,6 +873,7 @@ export type Database = {
         Row: {
           day_of_week: number | null
           diet_plan_name: string | null
+          meal_date: string | null
           meal_id: string | null
           meal_name: string | null
           meal_type: string | null

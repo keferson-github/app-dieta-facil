@@ -1,4 +1,4 @@
-CREATE TABLE public.foods_free (
+CREATE TABLE IF NOT EXISTS public.foods_free (
   id BIGSERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   calories_per_100g NUMERIC NOT NULL,
@@ -8,6 +8,18 @@ CREATE TABLE public.foods_free (
   fiber_per_100g NUMERIC NOT NULL,
   category TEXT NOT NULL
 );
+
+-- Add unique constraint to foods_free name if it doesn't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints 
+    WHERE constraint_name = 'foods_free_name_unique' 
+    AND table_name = 'foods_free'
+  ) THEN
+    ALTER TABLE public.foods_free ADD CONSTRAINT foods_free_name_unique UNIQUE (name);
+  END IF;
+END $$;
 
 INSERT INTO public.foods_free (name, calories_per_100g, protein_per_100g, carbs_per_100g, fats_per_100g, fiber_per_100g, category) VALUES
   ('Peito de Frango Grelhado', 165, 31.0, 0.0, 3.6, 0.0, 'Proteínas'),
@@ -19,14 +31,18 @@ INSERT INTO public.foods_free (name, calories_per_100g, protein_per_100g, carbs_
   ('Arroz Integral Cozido', 111, 2.6, 22.0, 0.9, 1.8, 'Carboidratos'),
   ('Arroz Branco Cozido', 111, 2.6, 22.0, 0.9, 1.8, 'Carboidratos'),
   ('Batata Doce Cozida', 86, 1.6, 20.1, 0.1, 3.0, 'Carboidratos'),
-  ('Aveia', 389, 16.9, 66.3, 6.9, 10.6, 'Carboidratos'),
-  ('Quinoa Cozida', 120, 4.4, 21.3, 1.9, 2.8, 'Carboidratos'),
+  ('Batata Inglesa Cozida', 77, 2.0, 17.5, 0.1, 2.2, 'Carboidratos'),
   ('Pão Integral', 247, 13.0, 41.0, 4.2, 9.0, 'Carboidratos'),
+  ('Macarrão Integral Cozido', 124, 5.0, 25.0, 1.1, 3.2, 'Carboidratos'),
+  ('Quinoa Cozida', 120, 4.4, 21.3, 1.9, 2.8, 'Carboidratos'),
+  ('Aveia', 389, 16.9, 66.3, 6.9, 10.6, 'Carboidratos'),
   ('Brócolis', 34, 2.8, 7.0, 0.4, 2.6, 'Vegetais'),
   ('Espinafre', 23, 2.9, 3.6, 0.4, 2.2, 'Vegetais'),
-  ('Alface', 15, 1.4, 2.9, 0.2, 1.3, 'Vegetais'),
-  ('Tomate', 18, 0.9, 3.9, 0.2, 1.2, 'Vegetais'),
+  ('Couve-flor', 25, 1.9, 5.0, 0.3, 2.0, 'Vegetais'),
   ('Cenoura', 41, 0.9, 9.6, 0.2, 2.8, 'Vegetais'),
+  ('Tomate', 18, 0.9, 3.9, 0.2, 1.2, 'Vegetais'),
+  ('Pepino', 16, 0.7, 3.6, 0.1, 0.5, 'Vegetais'),
+  ('Alface', 14, 1.4, 2.9, 0.1, 1.3, 'Vegetais'),
   ('Abobrinha', 17, 1.2, 3.1, 0.3, 1.0, 'Vegetais'),
   ('Abacate', 160, 2.0, 8.5, 14.7, 6.7, 'Gorduras'),
   ('Azeite de Oliva', 884, 0.0, 0.0, 100.0, 0.0, 'Gorduras'),
@@ -48,4 +64,5 @@ INSERT INTO public.foods_free (name, calories_per_100g, protein_per_100g, carbs_
   ('Sal', 0, 0.0, 0.0, 0.0, 0.0, 'Temperos'),
   ('Pimenta do Reino', 251, 10.4, 63.9, 3.3, 25.3, 'Temperos'),
   ('Alho', 149, 6.4, 33.1, 0.5, 2.1, 'Temperos'),
-  ('Cebola', 40, 1.1, 9.3, 0.1, 1.7, 'Temperos');
+  ('Cebola', 40, 1.1, 9.3, 0.1, 1.7, 'Temperos')
+ON CONFLICT (name) DO NOTHING;

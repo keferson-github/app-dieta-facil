@@ -1,5 +1,5 @@
 -- Criar tabela de planos de assinatura
-CREATE TABLE public.subscription_plans (
+CREATE TABLE IF NOT EXISTS public.subscription_plans (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   description TEXT,
@@ -14,10 +14,11 @@ CREATE TABLE public.subscription_plans (
 INSERT INTO public.subscription_plans (name, description, price_monthly, stripe_price_id, stripe_product_id, features) VALUES
 ('Plano Nutri', 'Monte refeições personalizadas para sua rotina alimentar', 19.90, 'price_1RjrkJDCD1mjfeBCXpBNOFba', 'prod_SfC8LDMcRQXlE3', ARRAY['Refeições personalizadas', 'Cardápio semanal', 'Lista de compras']),
 ('Plano Energia', 'Crie refeições e treinos para manter o corpo ativo e saudável', 39.90, 'price_1RjrlkDCD1mjfeBCuRzOM1tm', 'prod_SfCACY54r9Cl4m', ARRAY['Refeições personalizadas', 'Cardápio semanal', 'Lista de compras', 'Treinos personalizados', 'Acompanhamento de progresso']),
-('Plano Performance', 'Alimentação, treinos e progresso em um só lugar. Evolua de verdade', 59.90, 'price_1RjrmdDCD1mjfeBC1QmPn7gN', 'prod_SfCAJzVEEwIbsM', ARRAY['Refeições personalizadas', 'Cardápio semanal', 'Lista de compras', 'Treinos personalizados', 'Acompanhamento de progresso', 'Relatórios avançados', 'Suporte prioritário']);
+('Plano Performance', 'Alimentação, treinos e progresso em um só lugar. Evolua de verdade', 59.90, 'price_1RjrmdDCD1mjfeBC1QmPn7gN', 'prod_SfCAJzVEEwIbsM', ARRAY['Refeições personalizadas', 'Cardápio semanal', 'Lista de compras', 'Treinos personalizados', 'Acompanhamento de progresso', 'Relatórios avançados', 'Suporte prioritário'])
+ON CONFLICT (stripe_price_id) DO NOTHING;
 
 -- Criar tabela de assinaturas de usuários
-CREATE TABLE public.user_subscriptions (
+CREATE TABLE IF NOT EXISTS public.user_subscriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   plan_id UUID REFERENCES public.subscription_plans(id),
@@ -28,7 +29,7 @@ CREATE TABLE public.user_subscriptions (
 );
 
 -- Criar tabela de notificações
-CREATE TABLE public.notifications (
+CREATE TABLE IF NOT EXISTS public.notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
@@ -38,7 +39,7 @@ CREATE TABLE public.notifications (
 );
 
 -- Criar tabela de metas/objetivos
-CREATE TABLE public.goals (
+CREATE TABLE IF NOT EXISTS public.goals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   type TEXT NOT NULL,
@@ -50,7 +51,7 @@ CREATE TABLE public.goals (
 );
 
 -- Criar tabela de conquistas
-CREATE TABLE public.achievements (
+CREATE TABLE IF NOT EXISTS public.achievements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   code TEXT NOT NULL UNIQUE,
   title TEXT NOT NULL,
@@ -64,10 +65,11 @@ INSERT INTO public.achievements (code, title, description, icon) VALUES
 ('first_workout', 'Primeiro Treino', 'Completou seu primeiro treino', '💪'),
 ('weight_goal_achieved', 'Meta de Peso', 'Alcançou sua meta de peso', '🎯'),
 ('7_day_streak', 'Sequência de 7 Dias', 'Registrou dados por 7 dias consecutivos', '🔥'),
-('30_day_streak', 'Sequência de 30 Dias', 'Registrou dados por 30 dias consecutivos', '🏆');
+('30_day_streak', 'Sequência de 30 Dias', 'Registrou dados por 30 dias consecutivos', '🏆')
+ON CONFLICT (code) DO NOTHING;
 
 -- Criar tabela de conquistas dos usuários
-CREATE TABLE public.user_achievements (
+CREATE TABLE IF NOT EXISTS public.user_achievements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   achievement_id UUID REFERENCES public.achievements(id),
@@ -83,46 +85,163 @@ ALTER TABLE public.achievements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_achievements ENABLE ROW LEVEL SECURITY;
 
 -- Políticas para subscription_plans (todos podem ver)
-CREATE POLICY "Anyone can view subscription plans" ON public.subscription_plans
-FOR SELECT USING (true);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'subscription_plans' 
+    AND policyname = 'Anyone can view subscription plans'
+  ) THEN
+    CREATE POLICY "Anyone can view subscription plans" ON public.subscription_plans
+    FOR SELECT USING (true);
+  END IF;
+END $$;
 
 -- Políticas para user_subscriptions (usuários só veem suas próprias)
-CREATE POLICY "Users can view own subscriptions" ON public.user_subscriptions
-FOR SELECT USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'user_subscriptions' 
+    AND policyname = 'Users can view own subscriptions'
+  ) THEN
+    CREATE POLICY "Users can view own subscriptions" ON public.user_subscriptions
+    FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
-CREATE POLICY "Users can insert own subscriptions" ON public.user_subscriptions
-FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'user_subscriptions' 
+    AND policyname = 'Users can insert own subscriptions'
+  ) THEN
+    CREATE POLICY "Users can insert own subscriptions" ON public.user_subscriptions
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
 
-CREATE POLICY "Users can update own subscriptions" ON public.user_subscriptions
-FOR UPDATE USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'user_subscriptions' 
+    AND policyname = 'Users can update own subscriptions'
+  ) THEN
+    CREATE POLICY "Users can update own subscriptions" ON public.user_subscriptions
+    FOR UPDATE USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
 -- Políticas para notifications
-CREATE POLICY "Users can view own notifications" ON public.notifications
-FOR SELECT USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'notifications' 
+    AND policyname = 'Users can view own notifications'
+  ) THEN
+    CREATE POLICY "Users can view own notifications" ON public.notifications
+    FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
-CREATE POLICY "Users can update own notifications" ON public.notifications
-FOR UPDATE USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'notifications' 
+    AND policyname = 'Users can update own notifications'
+  ) THEN
+    CREATE POLICY "Users can update own notifications" ON public.notifications
+    FOR UPDATE USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
 -- Políticas para goals
-CREATE POLICY "Users can view own goals" ON public.goals
-FOR SELECT USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'goals' 
+    AND policyname = 'Users can view own goals'
+  ) THEN
+    CREATE POLICY "Users can view own goals" ON public.goals
+    FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
-CREATE POLICY "Users can insert own goals" ON public.goals
-FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'goals' 
+    AND policyname = 'Users can insert own goals'
+  ) THEN
+    CREATE POLICY "Users can insert own goals" ON public.goals
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
 
-CREATE POLICY "Users can update own goals" ON public.goals
-FOR UPDATE USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'goals' 
+    AND policyname = 'Users can update own goals'
+  ) THEN
+    CREATE POLICY "Users can update own goals" ON public.goals
+    FOR UPDATE USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
-CREATE POLICY "Users can delete own goals" ON public.goals
-FOR DELETE USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'goals' 
+    AND policyname = 'Users can delete own goals'
+  ) THEN
+    CREATE POLICY "Users can delete own goals" ON public.goals
+    FOR DELETE USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
 -- Políticas para achievements (todos podem ver)
-CREATE POLICY "Anyone can view achievements" ON public.achievements
-FOR SELECT USING (true);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'achievements' 
+    AND policyname = 'Anyone can view achievements'
+  ) THEN
+    CREATE POLICY "Anyone can view achievements" ON public.achievements
+    FOR SELECT USING (true);
+  END IF;
+END $$;
 
 -- Políticas para user_achievements
-CREATE POLICY "Users can view own user achievements" ON public.user_achievements
-FOR SELECT USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'user_achievements' 
+    AND policyname = 'Users can view own user achievements'
+  ) THEN
+    CREATE POLICY "Users can view own user achievements" ON public.user_achievements
+    FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
-CREATE POLICY "Users can insert own user achievements" ON public.user_achievements
-FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'user_achievements' 
+    AND policyname = 'Users can insert own user achievements'
+  ) THEN
+    CREATE POLICY "Users can insert own user achievements" ON public.user_achievements
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
