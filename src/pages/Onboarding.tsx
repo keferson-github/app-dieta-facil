@@ -13,6 +13,7 @@ import { Apple, ArrowRight, ArrowLeft, Target, User as UserIcon, Activity } from
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { User as AuthUser } from "@supabase/supabase-js";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -315,15 +316,19 @@ const Onboarding = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-health-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 relative">
+          <div className="absolute top-0 right-0">
+            <ThemeToggle />
+          </div>
+          
           <div className="flex items-center justify-center space-x-2 mb-6">
             <div className="w-12 h-12 health-gradient rounded-xl flex items-center justify-center">
               <Apple className="w-7 h-7 text-white" />
             </div>
-            <span className="text-3xl font-bold text-gray-900">Dieta Fácil</span>
+            <span className="text-3xl font-bold text-primary-dark">Dieta Fácil</span>
           </div>
           
           <div className="mb-6">

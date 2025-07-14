@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Apple, ArrowLeft, Loader2, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -211,7 +212,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-health-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -224,13 +225,17 @@ const Auth = () => {
             Voltar
           </Button>
           
+          <div className="absolute top-4 right-4">
+            <ThemeToggle />
+          </div>
+          
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-12 h-12 health-gradient rounded-xl flex items-center justify-center">
               <Apple className="w-7 h-7 text-white" />
             </div>
-            <span className="text-3xl font-bold text-gray-900">Dieta Fácil</span>
+            <span className="text-3xl font-bold text-primary-dark">Dieta Fácil</span>
           </div>
-          <p className="text-gray-600">Sua jornada de transformação começa aqui</p>
+          <p className="text-secondary-dark">Sua jornada de transformação começa aqui</p>
         </div>
 
         {/* Auth Form */}

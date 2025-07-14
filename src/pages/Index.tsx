@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, CheckCircle, Users, Target, Zap, Heart, Apple, Dumbbell, Utensils, Clock, Calendar, TrendingUp, Star, Shield, Flame, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -109,7 +110,7 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-health-100">
+    <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
@@ -117,7 +118,7 @@ const Index = () => {
             <div className="w-10 h-10 health-gradient rounded-xl flex items-center justify-center">
               <Apple className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">{t('brand')}</span>
+            <span className="text-2xl font-bold text-primary-dark">{t('brand')}</span>
           </div>
           <div className="flex items-center space-x-4">
             <Button className="health-gradient shadow-health px-4 py-2" onClick={() => navigate('/auth?mode=login')}>
@@ -127,6 +128,7 @@ const Index = () => {
               {t('nav.start_now')}
             </Button>
             <LanguageSwitcher fixed={false} />
+            <ThemeToggle />
           </div>
         </nav>
       </header>
@@ -138,12 +140,12 @@ const Index = () => {
             {t('hero.badge')}
           </Badge>
           
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-bold text-primary-dark mb-6 leading-tight">
             {t('hero.title')}{' '}
             <span className="health-gradient bg-clip-text text-transparent">{t('hero.title_highlight')}</span>
           </h1>
           
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-secondary-dark mb-8 max-w-2xl mx-auto">
             {t('hero.subtitle')}
           </p>
           
@@ -156,7 +158,7 @@ const Index = () => {
               Iniciar Plano Fitness
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            <div className="flex items-center text-sm text-gray-500">
+            <div className="flex items-center text-sm text-secondary-dark">
               <Users className="w-4 h-4 mr-2" />
               <span>{t('hero.users_count')}</span>
             </div>
@@ -172,7 +174,7 @@ const Index = () => {
             ].map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="text-3xl font-bold text-health-600">{stat.number}</div>
-                <div className="text-sm text-gray-600">{stat.label}</div>
+                <div className="text-sm text-secondary-dark">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -182,10 +184,10 @@ const Index = () => {
       {/* Features Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-primary-dark mb-4">
             {t('features.title')}
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-secondary-dark max-w-2xl mx-auto">
             {t('features.subtitle')}
           </p>
         </div>
@@ -272,7 +274,7 @@ const Index = () => {
       </section>
 
       {/* How it Works */}
-      <section className="bg-gradient-to-r from-health-500 to-health-600 py-20 text-white">
+      <section className="bg-gradient-to-r from-health-600 to-health-700 py-20 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">{t('how_it_works.title')}</h2>
@@ -300,10 +302,10 @@ const Index = () => {
       {/* Testimonials */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-primary-dark mb-4">
             {t('testimonials.title')}
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-secondary-dark">
             {t('testimonials.subtitle')}
           </p>
         </div>
@@ -323,7 +325,7 @@ const Index = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 italic">"{testimonial.text}"</p>
+                <p className="text-secondary-dark italic">"{testimonial.text}"</p>
               </CardContent>
             </Card>
           ))}
@@ -331,12 +333,12 @@ const Index = () => {
       </section>
 
       {/* CTA Final */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-slate-50 dark:bg-slate-900 py-20">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl font-bold text-primary-dark mb-6">
             {t('cta.title')}
           </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-secondary-dark mb-8 max-w-2xl mx-auto">
             {t('cta.subtitle')}
           </p>
           <Button 
@@ -351,7 +353,7 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-slate-900 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">

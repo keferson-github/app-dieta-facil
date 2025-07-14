@@ -1,5 +1,6 @@
 
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -63,18 +64,44 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Cores específicas para o Dieta Fácil
+				// Cores específicas para o Dieta Fácil - Inspirado no MyFitnessPal
 				health: {
-					50: '#f0fdf4',
-					100: '#dcfce7',
-					200: '#bbf7d0',
-					300: '#86efac',
-					400: '#4ade80',
-					500: '#22c55e',
-					600: '#16a34a',
-					700: '#15803d',
-					800: '#166534',
-					900: '#14532d',
+					50: '#f0f9ff',   // Azul muito claro
+					100: '#e0f2fe',  // Azul claro
+					200: '#bae6fd',  // Azul suave
+					300: '#7dd3fc',  // Azul médio claro
+					400: '#38bdf8',  // Azul vibrante
+					500: '#0ea5e9',  // Azul principal
+					600: '#0284c7',  // Azul escuro
+					700: '#0369a1',  // Azul mais escuro
+					800: '#075985',  // Azul profundo
+					900: '#0c4a6e',  // Azul muito escuro
+				},
+				// Cores secundárias para fitness
+				fitness: {
+					50: '#f0fdf4',   // Verde muito claro
+					100: '#dcfce7',  // Verde claro
+					200: '#bbf7d0',  // Verde suave
+					300: '#86efac',  // Verde médio
+					400: '#4ade80',  // Verde vibrante
+					500: '#22c55e',  // Verde principal
+					600: '#16a34a',  // Verde escuro
+					700: '#15803d',  // Verde mais escuro
+					800: '#166534',  // Verde profundo
+					900: '#14532d',  // Verde muito escuro
+				},
+				// Tons neutros sofisticados
+				slate: {
+					50: '#f8fafc',   // Cinza muito claro
+					100: '#f1f5f9',  // Cinza claro
+					200: '#e2e8f0',  // Cinza suave
+					300: '#cbd5e1',  // Cinza médio claro
+					400: '#94a3b8',  // Cinza médio
+					500: '#64748b',  // Cinza principal
+					600: '#475569',  // Cinza escuro
+					700: '#334155',  // Cinza mais escuro
+					800: '#1e293b',  // Cinza profundo
+					900: '#0f172a',  // Cinza muito escuro
 				}
 			},
 			borderRadius: {
@@ -116,5 +143,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [tailwindcssAnimate],
 } satisfies Config;

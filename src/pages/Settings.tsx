@@ -13,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import MobileNavigation from "@/components/MobileNavigation";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -150,46 +152,70 @@ const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-health-100">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-white/20 sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/dashboard')}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                {t('settings.back_to_dashboard')}
-              </Button>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="hidden sm:flex items-center space-x-2">
-                <div className="w-8 h-8 health-gradient rounded-lg flex items-center justify-center">
-                  <Apple className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-gray-900">Dieta Fácil</span>
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-health-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 pb-20 md:pb-0">
+        {/* Desktop Header - Hidden on Mobile */}
+        <div className="hidden md:block bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-white/20 dark:border-gray-800/20 sticky top-0 z-50">
+          <div className="max-w-4xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/dashboard')}
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  {t('settings.back_to_dashboard')}
+                </Button>
               </div>
               
-              <div className="ml-4">
-                <LanguageSwitcher fixed={false} />
+              <div className="flex items-center space-x-4">
+                <div className="hidden sm:flex items-center space-x-2">
+                  <div className="w-8 h-8 health-gradient rounded-lg flex items-center justify-center">
+                    <Apple className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-xl font-bold text-primary-dark">Dieta Fácil</span>
+                </div>
+                
+                <div className="ml-4 flex items-center gap-2">
+                  <LanguageSwitcher fixed={false} />
+                  <ThemeToggle />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('settings.title')}</h1>
-          <p className="text-gray-600">{t('settings.subtitle')}</p>
+        {/* Mobile Header */}
+        <div className="md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-health-200/50 dark:border-slate-700/50 sticky top-0 z-40">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 health-gradient rounded-xl flex items-center justify-center shadow-lg">
+                  <Apple className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-lg font-bold text-primary-dark">
+                    Configurações
+                  </h1>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <LanguageSwitcher fixed={false} />
+                <ThemeToggle />
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="grid gap-6">
+        <div className="max-w-4xl mx-auto p-4 md:p-6">
+          <div className="mb-6 md:mb-8 hidden md:block">
+            <h1 className="text-3xl font-bold text-primary-dark mb-2">{t('settings.title')}</h1>
+            <p className="text-secondary-dark">{t('settings.subtitle')}</p>
+          </div>
+
+          <div className="grid gap-6">
           {/* Informações Pessoais */}
           <Card className="glass-effect shadow-health">
             <CardHeader>
@@ -386,9 +412,13 @@ const Settings = () => {
               </div>
             </CardContent>
           </Card>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Mobile Navigation - Only show on mobile/tablet */}
+      <MobileNavigation />
+    </>
   );
 };
 
