@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import ReactCountryFlag from 'react-country-flag';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LanguageSwitcherProps {
   fixed?: boolean;
@@ -9,12 +11,15 @@ interface LanguageSwitcherProps {
 
 const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ fixed = true }) => {
   const { i18n, t } = useTranslation();
+  const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
 
   const changeLanguage = (lng: string) => {
     console.log('Changing language to:', lng);
     i18n.changeLanguage(lng).then(() => {
       console.log('Language changed successfully to:', lng);
       localStorage.setItem('i18nextLng', lng);
+      setOpen(false); // Fechar modal após seleção
     }).catch((error) => {
       console.error('Error changing language:', error);
     });
@@ -34,43 +39,68 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ fixed = true }) => 
   console.log('Current language:', i18n.language);
   console.log('Available languages:', Object.keys(i18n.store.data));
 
-  const containerClass = fixed ? "fixed top-4 right-2 z-50" : "";
+  const containerClass = fixed ? "fixed top-4 right-4 z-50" : "";
 
+  const triggerButton = (
+    <Button
+      variant="outline"
+      className="flex items-center gap-2 px-3 py-1.5 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white/90 transition-colors border"
+    >
+      <ReactCountryFlag 
+        countryCode={getCurrentLanguage().countryCode} 
+        svg 
+        style={{ width: '1.2em', height: '1.2em' }}
+      />
+      <span className="text-sm font-semibold text-gray-600">
+        {getCurrentLanguage().label}
+      </span>
+    </Button>
+  );
+
+  // Renderizar modal para todos os dispositivos (mobile, tablet, desktop)
   return (
     <div className={containerClass}>
-      <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-2 border rounded-md px-3 py-1.5 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white/90 transition-colors w-full">
-          <ReactCountryFlag 
-            countryCode={getCurrentLanguage().countryCode} 
-            svg 
-            style={{ width: '1.2em', height: '1.2em' }}
-          />
-          <span className="text-sm font-semibold text-gray-600">
-            {getCurrentLanguage().label}
-          </span>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align={fixed ? "end" : "start"} className="w-[140px]">
-          {languages.map(({ code, label, countryCode }) => (
-            <DropdownMenuItem
-              key={code}
-              onClick={() => changeLanguage(code)}
-              className={`flex items-center gap-2 cursor-pointer ${
-                code === i18n.language ? 'bg-health-50 text-health-700' : ''
-              }`}
-            >
-              <ReactCountryFlag 
-                countryCode={countryCode} 
-                svg 
-                style={{ width: '1.2em', height: '1.2em' }}
-              />
-              <span className="flex-1">{label}</span>
-              {code === i18n.language && (
-                <div className="w-2 h-2 rounded-full bg-health-500"></div>
-              )}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          {triggerButton}
+        </DialogTrigger>
+        <DialogContent className={`${isMobile ? 'max-w-xs' : 'max-w-sm'} rounded-[10px]`}>
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              {isMobile ? 'Idioma' : 'Selecionar Idioma'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className={`space-y-2 ${isMobile ? 'pt-2' : 'pt-4'}`}>
+            {languages.map(({ code, label, countryCode }) => (
+              <Button
+                key={code}
+                variant={code === i18n.language ? "default" : "ghost"}
+                onClick={() => changeLanguage(code)}
+                className={`w-full justify-start gap-3 ${isMobile ? 'h-10' : 'h-12'} ${
+                  code === i18n.language 
+                    ? 'health-gradient text-white' 
+                    : 'hover:bg-health-50'
+                }`}
+              >
+                <ReactCountryFlag 
+                  countryCode={countryCode} 
+                  svg 
+                  style={{ 
+                    width: isMobile ? '1.2em' : '1.5em', 
+                    height: isMobile ? '1.2em' : '1.5em' 
+                  }}
+                />
+                <span className={`flex-1 text-left ${isMobile ? 'text-sm' : ''}`}>
+                  {label}
+                </span>
+                {code === i18n.language && (
+                  <div className="w-2 h-2 rounded-full bg-white"></div>
+                )}
+              </Button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
