@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS user_hydration_goals (
 -- Índices para performance
 CREATE INDEX IF NOT EXISTS idx_water_logs_user_id ON water_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_water_logs_logged_at ON water_logs(logged_at);
-CREATE INDEX IF NOT EXISTS idx_water_logs_user_date ON water_logs(user_id, DATE(logged_at));
+-- Removido índice problemático que usa DATE()
 
 -- RLS (Row Level Security)
 ALTER TABLE water_logs ENABLE ROW LEVEL SECURITY;

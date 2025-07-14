@@ -8,7 +8,16 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "supabase:start": "npx supabase start",
+    "supabase:stop": "npx supabase stop",
+    "supabase:status": "npx supabase status",
+    "supabase:studio": "npx supabase studio",
+    "supabase:reset": "npx supabase db reset",
+    "supabase:push": "npx supabase db push",
+    "test:connection": "node test-direct-connection.js",
+    "test:connection:local": "USE_LOCAL=true node test-direct-connection.js",
+    "setup:docker": "powershell -ExecutionPolicy Bypass -File setup-docker.ps1"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

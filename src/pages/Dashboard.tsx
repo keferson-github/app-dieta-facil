@@ -41,6 +41,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import MobileNavigation from "@/components/MobileNavigation";
 import MetricsGrid from "@/components/MetricsGrid";
 import MacroNutrientsCarousel from "@/components/MacroNutrientsCarousel";
+import { useDashboardData } from "@/hooks/useDashboardData";
 
 interface Plan {
   id: string;
@@ -69,6 +70,34 @@ const Dashboard = () => {
   const [userProfile, setUserProfile] = useState<Tables<"user_profiles"> | null>(null);
   const [loading, setLoading] = useState(true);
   const [welcomeMessage, setWelcomeMessage] = useState("");
+
+  // Hook para dados reais do dashboard
+  const { 
+    metrics, 
+    weeklySteps, 
+    loading: dashboardLoading, 
+    error: dashboardError,
+    logWaterIntake,
+    logDailySteps,
+    updateActivitySummary,
+    refetch: refetchDashboard
+  } = useDashboardData();
+
+  // Dados mockados para fallback - Valores realistas para demonstração
+  const mockData = {
+    calories: { current: 1420, target: 2000 }, // 71% da meta
+    protein: { current: 98, target: 150 }, // 65% da meta
+    carbs: { current: 180, target: 250 }, // 72% da meta
+    fat: { current: 52, target: 65 }, // 80% da meta
+    water: { current: 1.8, target: 2.5 }, // 72% da meta
+    steps: { current: 7240, target: 10000 }, // 72% da meta
+    nutritionTargets: {
+      calories: 2000,
+      protein: 150,
+      carbs: 250,
+      fat: 65
+    }
+  };
 
   // ----- CHART DATA STATE (deve vir antes do retorno condicional) -----
   type WeightDatum = { date: string; weight: number };
@@ -227,11 +256,23 @@ const Dashboard = () => {
   }, [toast, refetchSubscription, t]);
 
   const calculateBMI = () => {
+    if (metrics?.bmi) return metrics.bmi;
     if (!userProfile?.weight || !userProfile?.height) return 25.2; // Valor padrão para demonstração
     return (userProfile.weight / Math.pow(userProfile.height / 100, 2));
   };
 
   const getBMICategory = (bmi: number) => {
+    if (metrics?.bmi_category && metrics.bmi_category !== 'unknown') {
+      const categoryMap: Record<string, { category: string, color: string }> = {
+        'underweight': { category: t('dashboard.bmi_categories.underweight'), color: 'text-blue-600' },
+        'normal': { category: t('dashboard.bmi_categories.normal'), color: 'text-health-600' },
+        'overweight': { category: t('dashboard.bmi_categories.overweight'), color: 'text-yellow-600' },
+        'obese': { category: t('dashboard.bmi_categories.obese'), color: 'text-red-600' }
+      };
+      return categoryMap[metrics.bmi_category] || { category: 'Normal', color: 'text-health-600' };
+    }
+    
+    // Fallback para cálculo manual
     if (bmi < 18.5) return { category: t('dashboard.bmi_categories.underweight'), color: 'text-blue-600' };
     if (bmi < 25) return { category: t('dashboard.bmi_categories.normal'), color: 'text-health-600' };
     if (bmi < 30) return { category: t('dashboard.bmi_categories.overweight'), color: 'text-yellow-600' };
@@ -239,34 +280,138 @@ const Dashboard = () => {
   };
 
   const getProgressPercentage = () => {
+    if (metrics?.progress_percentage) return metrics.progress_percentage;
     if (!userProfile?.weight || !userProfile?.target_weight) return 63; // Valor padrão para demonstração
     const initialWeight = userProfile.weight + 10; // Assumindo que começou 10kg acima do atual
     const progress = ((initialWeight - userProfile.weight) / (initialWeight - userProfile.target_weight)) * 100;
     return Math.min(Math.max(progress, 0), 100);
   };
 
-  // Mock data for demonstration when no real data is available
-  const getMockData = () => {
+  // Função para obter dados reais ou fallback para mock
+  const getRealData = () => {
+    // Usar dados reais quando disponíveis, senão fallback para mock
+    const hasRealData = metrics && (
+      metrics.today_water_ml > 0 || 
+      metrics.today_steps > 0 || 
+      metrics.today_meals_count > 0 || 
+      metrics.today_workouts_count > 0
+    );
+
     return {
-      calories: { current: 1250, target: 2000 },
-      protein: { current: 65, target: 150 },
-      carbs: { current: 140, target: 250 },
-      fat: { current: 45, target: 65 },
-      water: { current: 1.2, target: 2.5 },
-      steps: { current: 6500, target: 10000 },
-      weight: { current: userProfile?.weight || 75, target: userProfile?.target_weight || 70 },
-      activityDays: { active: 5, total: 7 },
-      weeklyActivityHeights: [60, 80, 40, 90, 70, 35, 50], // Percentage heights for each day
-      nutritionTargets: {
-        calories: 2000,
-        protein: 150,
-        carbs: 250,
-        fat: 65,
-      }
+      calories: { 
+        current: hasRealData ? 0 : mockData.calories.current, // TODO: Calcular calorias reais
+        target: metrics?.calories_target || mockData.calories.target 
+      },
+      protein: { 
+        current: hasRealData ? 0 : mockData.protein.current, // TODO: Calcular proteínas reais
+        target: metrics?.protein_target || mockData.protein.target 
+      },
+      carbs: { 
+        current: hasRealData ? 0 : mockData.carbs.current, // TODO: Calcular carboidratos reais
+        target: metrics?.carbs_target || mockData.carbs.target 
+      },
+      fat: { 
+        current: hasRealData ? 0 : mockData.fat.current, // TODO: Calcular gorduras reais
+        target: metrics?.fat_target || mockData.fat.target 
+      },
+      water: { 
+        current: metrics?.today_water_ml ? metrics.today_water_ml / 1000 : mockData.water.current,
+        target: metrics?.water_target_ml ? metrics.water_target_ml / 1000 : mockData.water.target
+      },
+      steps: { 
+        current: metrics?.today_steps || mockData.steps.current,
+        target: metrics?.steps_target || mockData.steps.target
+      },
+      weight: { 
+        current: metrics?.current_weight || userProfile?.weight || mockData.calories.current, // Reutilizando valor
+        target: metrics?.target_weight || userProfile?.target_weight || 70
+      },
+      activityDays: { 
+        active: metrics?.week_active_days || 5, // Fallback inteligente
+        total: 7 
+      },
+      weeklyActivityHeights: weeklySteps.length > 0 
+        ? weeklySteps.slice(0, 7).reverse().map(step => 
+            Math.min((step.completion_percentage || 0), 100)
+          ).concat(Array(7 - Math.min(weeklySteps.length, 7)).fill(0))
+        : [60, 80, 40, 90, 70, 35, 50], // Dados demonstrativos
+      isUsingMockData: !hasRealData // Flag para identificar quando está usando dados mock
     };
   };
 
+  // Handlers para ações com dados reais
+  const handleWaterLog = async (amount: number) => {
+    try {
+      await logWaterIntake(amount);
+      await updateActivitySummary({ water_logged: true });
+      toast({
+        title: "Água registrada!",
+        description: `${amount}ml adicionados ao seu consumo diário.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível registrar o consumo de água.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleStepsLog = async (steps: number) => {
+    try {
+      await logDailySteps(steps);
+      await updateActivitySummary({ steps_recorded: true });
+      toast({
+        title: "Passos registrados!",
+        description: `${steps} passos registrados para hoje.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível registrar os passos.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleMealLog = async () => {
+    try {
+      await updateActivitySummary({ 
+        meals_logged: (metrics?.today_meals_count || 0) + 1 
+      });
+      toast({
+        title: "Refeição registrada!",
+        description: "Refeição adicionada ao seu log diário.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível registrar a refeição.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleWorkoutLog = async () => {
+    try {
+      await updateActivitySummary({ 
+        workouts_completed: (metrics?.today_workouts_count || 0) + 1 
+      });
+      toast({
+        title: "Treino registrado!",
+        description: "Treino adicionado ao seu log diário.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível registrar o treino.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleFeatureClick = (feature: string, requiredPlan: string) => {
+    // Liberar recursos do Plano Nutri gratuitamente
     // Liberar recursos do Plano Nutri gratuitamente
     if (requiredPlan === 'Nutri') {
       // Navegação específica para cada recurso do Plano Nutri
@@ -541,7 +686,7 @@ const Dashboard = () => {
   };
 
   // Early return after all hooks
-  if (loading || subscriptionLoading) {
+  if (loading || subscriptionLoading || dashboardLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
         <div className="text-center">
@@ -559,7 +704,7 @@ const Dashboard = () => {
   const bmi = calculateBMI();
   const bmiData = getBMICategory(bmi);
   const progressPercentage = getProgressPercentage();
-  const mockData = getMockData();
+  const realData = getRealData();
 
   // Se ainda não há dados, mostrar vazio para evitar erros nos gráficos
   const sampleData = chartData;
@@ -672,14 +817,29 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <div className="container mx-auto px-4 py-4 md:py-6 max-w-7xl space-y-6">
+          {/* Demo Data Indicator - Show when using mock data */}
+          {realData.isUsingMockData && (
+            <Card className="glass-effect border-0 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200/50">
+              <CardContent className="py-3">
+                <div className="flex items-center justify-center gap-3 text-sm">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                  <span className="text-blue-700 dark:text-blue-300 font-medium">
+                    📊 Exibindo dados demonstrativos - Comece a registrar suas atividades para ver seus dados reais!
+                  </span>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Mobile/Tablet: MyFitnessPal Style Layout */}
           <div className="md:hidden space-y-6">
             {/* Daily Metrics Grid */}
             <MetricsGrid
               metrics={{
                 calories: { 
-                  current: Math.round(sampleData.nutritionMacros.reduce((acc, macro) => acc + (macro.value || 0), 0) * 4) || mockData.calories.current, 
-                  target: mockData.calories.target 
+                  current: realData.calories.current, 
+                  target: realData.calories.target 
                 },
                 protein: { 
                   current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || mockData.protein.current), 
@@ -796,12 +956,7 @@ const Dashboard = () => {
                   <Button
                     variant="outline"
                     className="h-10 flex items-center gap-1"
-                    onClick={() => {
-                      toast({
-                        title: "Registro de Água",
-                        description: "Adicionando 250ml...",
-                      });
-                    }}
+                    onClick={() => handleWaterLog(250)}
                   >
                     <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                     <span className="text-xs">+250ml</span>
@@ -907,26 +1062,33 @@ const Dashboard = () => {
                       target: mockData.calories.target 
                     },
                     protein: { 
-                      current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || mockData.protein.current), 
-                      target: mockData.protein.target 
+                      current: realData.protein.current, 
+                      target: realData.protein.target 
                     },
                     carbs: { 
-                      current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || mockData.carbs.current), 
-                      target: mockData.carbs.target 
+                      current: realData.carbs.current, 
+                      target: realData.carbs.target 
                     },
                     fat: { 
-                      current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || mockData.fat.current), 
-                      target: mockData.fat.target 
+                      current: realData.fat.current, 
+                      target: realData.fat.target 
                     },
-                    water: mockData.water,
-                    steps: mockData.steps
+                    water: realData.water,
+                    steps: realData.steps
                   }}
-                  onAddMeal={() => navigate('/create-meal')}
+                  onAddMeal={() => {
+                    handleMealLog();
+                    navigate('/create-meal');
+                  }}
                   onQuickLog={(type) => {
-                    toast({
-                      title: "Registro Rápido",
-                      description: `Registrando ${type}...`,
-                    });
+                    if (type === 'water') {
+                      handleWaterLog(250);
+                    } else {
+                      toast({
+                        title: "Registro Rápido",
+                        description: `Registrando ${type}...`,
+                      });
+                    }
                   }}
                 />
               </div>
@@ -936,16 +1098,16 @@ const Dashboard = () => {
                 <MacroNutrientsCarousel
                   macros={{
                     protein: { 
-                      current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || mockData.protein.current), 
-                      target: mockData.protein.target 
+                      current: realData.protein.current, 
+                      target: realData.protein.target 
                     },
                     carbs: { 
-                      current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || mockData.carbs.current), 
-                      target: mockData.carbs.target 
+                      current: realData.carbs.current, 
+                      target: realData.carbs.target 
                     },
                     fat: { 
-                      current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || mockData.fat.current), 
-                      target: mockData.fat.target 
+                      current: realData.fat.current, 
+                      target: realData.fat.target 
                     }
                   }}
                 />
@@ -1023,8 +1185,8 @@ const Dashboard = () => {
                       <div className="flex items-center justify-between">
                         <div className="text-2xl font-bold text-blue-600">{progressPercentage > 0 ? progressPercentage.toFixed(0) : '63'}%</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 text-right">
-                          <div className="font-medium">Meta: {mockData.weight.target}kg</div>
-                          <div>Atual: {mockData.weight.current}kg</div>
+                          <div className="font-medium">Meta: {realData.weight.target}kg</div>
+                          <div>Atual: {realData.weight.current}kg</div>
                         </div>
                       </div>
                       <div className="relative">
@@ -1065,13 +1227,13 @@ const Dashboard = () => {
                       <div className="flex items-center justify-between">
                         <div className="text-sm font-bold text-green-600">{getActivityLevelText()}</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          <span className="font-medium">{mockData.activityDays.active}/{mockData.activityDays.total} dias</span>
+                          <span className="font-medium">{realData.activityDays.active}/{realData.activityDays.total} dias</span>
                         </div>
                       </div>
                       <div className="flex items-end justify-between gap-1 h-16 px-1">
                         {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day, i) => {
-                          const heights = mockData.weeklyActivityHeights;
-                          const isActive = i < mockData.activityDays.active;
+                          const heights = realData.weeklyActivityHeights;
+                          const isActive = i < realData.activityDays.active;
                           return (
                             <div key={i} className="flex flex-col items-center gap-1 flex-1">
                               <div 
@@ -1355,6 +1517,7 @@ const Dashboard = () => {
                     </div>
                     <div className="text-center">
                       <Button 
+
                         onClick={() => navigate('/create-meal')}
                         className="health-gradient w-full"
                       >
@@ -1388,7 +1551,7 @@ const Dashboard = () => {
                             <div className="text-xs text-gray-600 dark:text-gray-400">Dias consecutivos</div>
                           </div>
                         </div>
-                        <div className="text-2xl font-bold text-yellow-600">7</div>
+                        <div className="text-2xl font-bold text-yellow-600">{metrics?.overall_streak || 0}</div>
                       </div>
                       
                       <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
@@ -1401,7 +1564,7 @@ const Dashboard = () => {
                             <div className="text-xs text-gray-600 dark:text-gray-400">Desta semana</div>
                           </div>
                         </div>
-                        <div className="text-2xl font-bold text-green-600">{mockData.activityDays.active}/{mockData.activityDays.total}</div>
+                        <div className="text-2xl font-bold text-green-600">{realData.activityDays.active}/{realData.activityDays.total}</div>
                       </div>
 
                       <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">

@@ -99,7 +99,8 @@ CREATE TABLE IF NOT EXISTS public.daily_activity_summary (
 -- Índices para water_intake_logs
 CREATE INDEX IF NOT EXISTS idx_water_intake_logs_user_id ON public.water_intake_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_water_intake_logs_logged_at ON public.water_intake_logs(logged_at);
-CREATE INDEX IF NOT EXISTS idx_water_intake_logs_user_date ON public.water_intake_logs(user_id, DATE(logged_at));
+-- Removido índice problemático
+-- CREATE INDEX IF NOT EXISTS idx_water_intake_logs_user_date ON public.water_intake_logs(user_id, (logged_at::date));
 
 -- Índices para daily_step_logs
 CREATE INDEX IF NOT EXISTS idx_daily_step_logs_user_id ON public.daily_step_logs(user_id);
