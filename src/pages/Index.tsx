@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -194,81 +195,157 @@ const Index = () => {
 
         <div ref={featuresRef} className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
-            <Card 
+            <motion.div 
               key={index}
-              className={`cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 group relative overflow-hidden rounded-xl h-96 ${
-                activeFeature === index ? 'ring-4 ring-health-500 shadow-2xl' : ''
-              }`}
-              onMouseEnter={() => setActiveFeature(-1)}
-              onClick={() => setActiveFeature(activeFeature === index ? -1 : index)}
+              layout
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              {/* Imagem ocupando todo o container */}
-              <div className="absolute inset-0">
-                <img 
-                  src={
-                    index === 0 ? "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=500&h=400&fit=crop&crop=center" :
-                    index === 1 ? "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=400&fit=crop&crop=center" :
-                    index === 2 ? "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=500&h=400&fit=crop&crop=center" :
-                    "https://images.unsplash.com/photo-1517963628607-235ccdd5476c?w=500&h=400&fit=crop&crop=center"
-                  }
-                  alt={feature.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
+              <Card 
+                className={`cursor-pointer relative overflow-hidden rounded-xl h-[420px] ${
+                  activeFeature === index ? 'ring-4 ring-health-500 shadow-2xl' : ''
+                }`}
+                onMouseEnter={() => setActiveFeature(index)}
+                onMouseLeave={() => setActiveFeature(-1)}
+                onClick={() => setActiveFeature(activeFeature === index ? -1 : index)}
+              >
+                {/* Imagem com animação */}
+                <motion.div 
+                  className="absolute inset-0"
+                  animate={{ 
+                    scale: activeFeature === index ? 1.02 : 1,
+                    filter: activeFeature === index ? 'blur(1px)' : 'blur(0px)'
+                  }}
+                  transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                >
+                  <img 
+                    src={
+                      index === 0 ? "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=500&h=400&fit=crop&crop=center" :
+                      index === 1 ? "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=400&fit=crop&crop=center" :
+                      index === 2 ? "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=500&h=400&fit=crop&crop=center" :
+                      "https://images.unsplash.com/photo-1517963628607-235ccdd5476c?w=500&h=400&fit=crop&crop=center"
+                    }
+                    alt={feature.title}
+                    className="w-full h-full object-cover"
+                  />
+                </motion.div>
 
-              {/* Overlay escuro permanente com gradiente */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                {/* Overlay escuro permanente com gradiente */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 
-              {/* Ícone e título sempre visíveis - ocultos quando slide up está ativo */}
-              <div className={`absolute top-6 left-6 z-10 transition-all duration-500 ${
-                activeFeature === index ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
-              }`}>
-                <div className="w-14 h-14 health-gradient rounded-2xl flex items-center justify-center shadow-lg mb-3">
-                  <feature.icon className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-white font-bold text-lg">{feature.title}</h3>
-              </div>
+                {/* Ícone e título sempre visíveis */}
+                <motion.div 
+                  className="absolute top-6 left-6 z-20"
+                  animate={{ 
+                    opacity: activeFeature === index ? 0 : 1,
+                    y: activeFeature === index ? 10 : 0
+                  }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                >
+                  <motion.div 
+                    className="w-12 h-12 health-gradient rounded-2xl flex items-center justify-center shadow-lg mb-2"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <feature.icon className="w-6 h-6 text-white" />
+                  </motion.div>
+                  <h3 className="text-white font-bold text-lg">{feature.title}</h3>
+                </motion.div>
 
-              {/* Overlay com slide up - aparece quando clicado */}
-              <div className={`absolute inset-0 bg-gradient-to-t from-health-600/95 via-health-500/85 to-health-400/75 backdrop-blur-sm transition-all duration-700 ${
-                activeFeature === index ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
-              }`}>
-                <div className="absolute inset-0 flex flex-col justify-between items-center p-4 sm:p-6 text-white">
-                  <div className="flex-shrink-0 text-center pt-2 sm:pt-4">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                      <feature.icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                    </div>
-                    <h3 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">{feature.overlayContent.title}</h3>
-                    <p className="text-white/90 text-xs sm:text-sm">{feature.overlayContent.subtitle}</p>
-                  </div>
-                  
-                  <div className="flex-1 flex items-center justify-center w-full">
-                    <div className="space-y-2 sm:space-y-3 w-full max-w-xs">
-                      {feature.overlayContent.items.map((item, itemIndex) => (
-                        <div key={itemIndex} className="flex items-center gap-2 sm:gap-3 bg-white/10 rounded-lg p-2 sm:p-3 backdrop-blur-sm">
-                          <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <item.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                          </div>
-                          <span className="text-white font-medium text-xs sm:text-sm">{item.text}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="flex-shrink-0 pb-2 sm:pb-4">
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveFeature(-1);
+                {/* Overlay com slide up - aparece quando clicado ou hover */}
+                <AnimatePresence>
+                  {activeFeature === index && (
+                    <motion.div 
+                      className="absolute inset-0 bg-gradient-to-t from-health-600/95 via-health-500/85 to-health-400/75 backdrop-blur-sm"
+                      initial={{ y: "100%" }}
+                      animate={{ y: 0 }}
+                      exit={{ y: "100%" }}
+                      transition={{ 
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 20,
+                        mass: 1
                       }}
-                      className="bg-white/20 hover:bg-white/30 text-white font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/30 hover:border-white/50 text-sm"
                     >
-                      Fechar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </Card>
+                      <div className="h-full flex flex-col justify-between items-center p-4 lg:p-5 text-white">
+                        <motion.div 
+                          className="flex-shrink-0 text-center pt-2 lg:pt-3"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.2, duration: 0.4 }}
+                        >
+                          <motion.div 
+                            className="w-14 h-14 lg:w-16 lg:h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-2 lg:mb-3 backdrop-blur-sm"
+                            whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.3)" }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <feature.icon className="w-7 h-7 lg:w-8 lg:h-8 text-white" />
+                          </motion.div>
+                          <h3 className="text-lg lg:text-xl font-bold mb-1">{feature.overlayContent.title}</h3>
+                          <p className="text-white/90 text-sm">{feature.overlayContent.subtitle}</p>
+                        </motion.div>
+                        
+                        <div className="flex-1 flex items-center justify-center w-full my-2">
+                          <div className="space-y-2 w-full max-w-xs">
+                            {feature.overlayContent.items.map((item, itemIndex) => (
+                              <motion.div 
+                                key={itemIndex}
+                                className="flex items-center gap-2 bg-white/10 rounded-lg p-2 backdrop-blur-sm"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ 
+                                  delay: 0.3 + itemIndex * 0.1,
+                                  duration: 0.4,
+                                  ease: "easeOut"
+                                }}
+                                whileHover={{ 
+                                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                                  scale: 1.02,
+                                  transition: { duration: 0.2 }
+                                }}
+                              >
+                                <motion.div 
+                                  className="w-7 h-7 lg:w-8 lg:h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0"
+                                  whileHover={{ scale: 1.1 }}
+                                  whileTap={{ scale: 0.95 }}
+                                >
+                                  <item.icon className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                                </motion.div>
+                                <span className="text-white font-medium text-sm">{item.text}</span>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <motion.div 
+                          className="flex-shrink-0 pb-2"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.5, duration: 0.4 }}
+                        >
+                          <motion.button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveFeature(-1);
+                            }}
+                            className="bg-white/20 text-white font-medium px-4 py-1.5 rounded-lg backdrop-blur-sm border border-white/30 text-sm"
+                            whileHover={{ 
+                              scale: 1.05,
+                              backgroundColor: "rgba(255, 255, 255, 0.3)",
+                              borderColor: "rgba(255, 255, 255, 0.5)"
+                            }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            Fechar
+                          </motion.button>
+                        </motion.div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </Card>
+            </motion.div>
           ))}
         </div>
       </section>
