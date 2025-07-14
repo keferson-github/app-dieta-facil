@@ -245,6 +245,27 @@ const Dashboard = () => {
     return Math.min(Math.max(progress, 0), 100);
   };
 
+  // Mock data for demonstration when no real data is available
+  const getMockData = () => {
+    return {
+      calories: { current: 1250, target: 2000 },
+      protein: { current: 65, target: 150 },
+      carbs: { current: 140, target: 250 },
+      fat: { current: 45, target: 65 },
+      water: { current: 1.2, target: 2.5 },
+      steps: { current: 6500, target: 10000 },
+      weight: { current: userProfile?.weight || 75, target: userProfile?.target_weight || 70 },
+      activityDays: { active: 5, total: 7 },
+      weeklyActivityHeights: [60, 80, 40, 90, 70, 35, 50], // Percentage heights for each day
+      nutritionTargets: {
+        calories: 2000,
+        protein: 150,
+        carbs: 250,
+        fat: 65,
+      }
+    };
+  };
+
   const handleFeatureClick = (feature: string, requiredPlan: string) => {
     // Liberar recursos do Plano Nutri gratuitamente
     if (requiredPlan === 'Nutri') {
@@ -538,6 +559,7 @@ const Dashboard = () => {
   const bmi = calculateBMI();
   const bmiData = getBMICategory(bmi);
   const progressPercentage = getProgressPercentage();
+  const mockData = getMockData();
 
   // Se ainda não há dados, mostrar vazio para evitar erros nos gráficos
   const sampleData = chartData;
@@ -656,23 +678,23 @@ const Dashboard = () => {
             <MetricsGrid
               metrics={{
                 calories: { 
-                  current: Math.round(sampleData.nutritionMacros.reduce((acc, macro) => acc + (macro.value || 0), 0) * 4) || 1250, 
-                  target: 2000 
+                  current: Math.round(sampleData.nutritionMacros.reduce((acc, macro) => acc + (macro.value || 0), 0) * 4) || mockData.calories.current, 
+                  target: mockData.calories.target 
                 },
                 protein: { 
-                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || 65), 
-                  target: 150 
+                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || mockData.protein.current), 
+                  target: mockData.protein.target 
                 },
                 carbs: { 
-                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || 140), 
-                  target: 250 
+                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || mockData.carbs.current), 
+                  target: mockData.carbs.target 
                 },
                 fat: { 
-                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || 45), 
-                  target: 65 
+                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || mockData.fat.current), 
+                  target: mockData.fat.target 
                 },
-                water: { current: 1.2, target: 2.5 },
-                steps: { current: 6500, target: 10000 }
+                water: mockData.water,
+                steps: mockData.steps
               }}
               onAddMeal={() => navigate('/create-meal')}
               onQuickLog={(type) => {
@@ -687,16 +709,16 @@ const Dashboard = () => {
             <MacroNutrientsCarousel
               macros={{
                 protein: { 
-                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || 65), 
-                  target: 150 
+                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || mockData.protein.current), 
+                  target: mockData.protein.target 
                 },
                 carbs: { 
-                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || 140), 
-                  target: 250 
+                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || mockData.carbs.current), 
+                  target: mockData.carbs.target 
                 },
                 fat: { 
-                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || 45), 
-                  target: 65 
+                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || mockData.fat.current), 
+                  target: mockData.fat.target 
                 }
               }}
             />
@@ -730,12 +752,7 @@ const Dashboard = () => {
               <NutritionChart 
                 macros={sampleData.nutritionMacros}
                 dailyData={sampleData.dailyNutritionData}
-                targets={{
-                  calories: 2000,
-                  protein: 150,
-                  carbs: 250,
-                  fat: 65,
-                }}
+                targets={mockData.nutritionTargets}
               />
 
               {/* Achievements Card */}
@@ -752,6 +769,9 @@ const Dashboard = () => {
                 <CardTitle className="text-lg font-semibold text-primary-dark">
                   🚀 Ações Rápidas
                 </CardTitle>
+                <CardDescription className="text-sm text-secondary-dark">
+                  Adicione dados ou comece um treino
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
@@ -770,6 +790,34 @@ const Dashboard = () => {
                   >
                     <Dumbbell className="w-5 h-5" />
                     <span className="text-xs">Treino</span>
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    variant="outline"
+                    className="h-10 flex items-center gap-1"
+                    onClick={() => {
+                      toast({
+                        title: "Registro de Água",
+                        description: "Adicionando 250ml...",
+                      });
+                    }}
+                  >
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <span className="text-xs">+250ml</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-10 flex items-center gap-1"
+                    onClick={() => {
+                      toast({
+                        title: "Registro de Peso",
+                        description: "Abrindo formulário...",
+                      });
+                    }}
+                  >
+                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                    <span className="text-xs">Peso</span>
                   </Button>
                 </div>
                 <Button
@@ -848,9 +896,61 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Desktop Layout */}
           <div className="hidden md:block">
             <div className="space-y-8">
+              {/* Daily Metrics Grid for Desktop */}
+              <div className="block lg:hidden">
+                <MetricsGrid
+                  metrics={{
+                    calories: { 
+                      current: Math.round(sampleData.nutritionMacros.reduce((acc, macro) => acc + (macro.value || 0), 0) * 4) || mockData.calories.current, 
+                      target: mockData.calories.target 
+                    },
+                    protein: { 
+                      current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || mockData.protein.current), 
+                      target: mockData.protein.target 
+                    },
+                    carbs: { 
+                      current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || mockData.carbs.current), 
+                      target: mockData.carbs.target 
+                    },
+                    fat: { 
+                      current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || mockData.fat.current), 
+                      target: mockData.fat.target 
+                    },
+                    water: mockData.water,
+                    steps: mockData.steps
+                  }}
+                  onAddMeal={() => navigate('/create-meal')}
+                  onQuickLog={(type) => {
+                    toast({
+                      title: "Registro Rápido",
+                      description: `Registrando ${type}...`,
+                    });
+                  }}
+                />
+              </div>
+
+              {/* Macro Nutrients Carousel for Tablet */}
+              <div className="block lg:hidden">
+                <MacroNutrientsCarousel
+                  macros={{
+                    protein: { 
+                      current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || mockData.protein.current), 
+                      target: mockData.protein.target 
+                    },
+                    carbs: { 
+                      current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || mockData.carbs.current), 
+                      target: mockData.carbs.target 
+                    },
+                    fat: { 
+                      current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || mockData.fat.current), 
+                      target: mockData.fat.target 
+                    }
+                  }}
+                />
+              </div>
+
               {/* Modern Dashboard Metrics with Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* BMI Card with Donut Chart */}
@@ -923,8 +1023,8 @@ const Dashboard = () => {
                       <div className="flex items-center justify-between">
                         <div className="text-2xl font-bold text-blue-600">{progressPercentage > 0 ? progressPercentage.toFixed(0) : '63'}%</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 text-right">
-                          <div className="font-medium">Meta: {userProfile?.target_weight || '70'}kg</div>
-                          <div>Atual: {userProfile?.weight || '75'}kg</div>
+                          <div className="font-medium">Meta: {mockData.weight.target}kg</div>
+                          <div>Atual: {mockData.weight.current}kg</div>
                         </div>
                       </div>
                       <div className="relative">
@@ -965,13 +1065,13 @@ const Dashboard = () => {
                       <div className="flex items-center justify-between">
                         <div className="text-sm font-bold text-green-600">{getActivityLevelText()}</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          <span className="font-medium">5/7 dias</span>
+                          <span className="font-medium">{mockData.activityDays.active}/{mockData.activityDays.total} dias</span>
                         </div>
                       </div>
                       <div className="flex items-end justify-between gap-1 h-16 px-1">
                         {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day, i) => {
-                          const heights = [60, 80, 40, 90, 70, 35, 50]; // Alturas fixas para demonstração
-                          const isActive = i < 5; // Primeiros 5 dias são ativos
+                          const heights = mockData.weeklyActivityHeights;
+                          const isActive = i < mockData.activityDays.active;
                           return (
                             <div key={i} className="flex flex-col items-center gap-1 flex-1">
                               <div 
@@ -1094,16 +1194,248 @@ const Dashboard = () => {
                 />
               </div>
               
+              {/* Additional Mock Data Cards for Desktop */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Daily Calories Card */}
+                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Apple className="w-4 h-4 text-orange-500" />
+                      Calorias Hoje
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-2xl font-bold text-orange-600">{mockData.calories.current}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="font-medium">Meta: {mockData.calories.target}</span>
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full transition-all duration-1000 ease-out" 
+                            style={{width: `${Math.min((mockData.calories.current / mockData.calories.target) * 100, 100)}%`}}
+                          ></div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                        {Math.round((mockData.calories.current / mockData.calories.target) * 100)}% da meta diária
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Water Intake Card */}
+                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                      Hidratação
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-2xl font-bold text-blue-600">{mockData.water.current}L</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="font-medium">Meta: {mockData.water.target}L</span>
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all duration-1000 ease-out" 
+                            style={{width: `${Math.min((mockData.water.current / mockData.water.target) * 100, 100)}%`}}
+                          ></div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                        {Math.round((mockData.water.current / mockData.water.target) * 100)}% hidratado
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Steps Card */}
+                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-green-500" />
+                      Passos Hoje
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-2xl font-bold text-green-600">{mockData.steps.current.toLocaleString()}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="font-medium">Meta: {mockData.steps.target.toLocaleString()}</span>
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-1000 ease-out" 
+                            style={{width: `${Math.min((mockData.steps.current / mockData.steps.target) * 100, 100)}%`}}
+                          ></div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                        {Math.round((mockData.steps.current / mockData.steps.target) * 100)}% da meta
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Protein Card */}
+                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                      Proteínas
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-2xl font-bold text-red-600">{mockData.protein.current}g</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="font-medium">Meta: {mockData.protein.target}g</span>
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-red-400 to-red-600 h-2 rounded-full transition-all duration-1000 ease-out" 
+                            style={{width: `${Math.min((mockData.protein.current / mockData.protein.target) * 100, 100)}%`}}
+                          ></div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                        {Math.round((mockData.protein.current / mockData.protein.target) * 100)}% da meta
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              {/* Additional Mock Data Summary Cards */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Daily Summary Card */}
+                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
+                      <Calendar className="w-5 h-5 text-blue-500" />
+                      📊 Resumo do Dia
+                    </CardTitle>
+                    <CardDescription>
+                      Suas principais métricas de hoje
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">{mockData.calories.current}</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">Calorias consumidas</div>
+                      </div>
+                      <div className="text-center p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+                        <div className="text-2xl font-bold text-green-600">{mockData.steps.current.toLocaleString()}</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">Passos dados</div>
+                      </div>
+                      <div className="text-center p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
+                        <div className="text-2xl font-bold text-purple-600">{mockData.water.current}L</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">Água consumida</div>
+                      </div>
+                      <div className="text-center p-3 bg-orange-50 dark:bg-orange-950/30 rounded-lg">
+                        <div className="text-2xl font-bold text-orange-600">3</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">Refeições registradas</div>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <Button 
+                        onClick={() => navigate('/create-meal')}
+                        className="health-gradient w-full"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Registrar Nova Refeição
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Weekly Streak & Goals Card */}
+                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-yellow-500" />
+                      🔥 Streak & Metas
+                    </CardTitle>
+                    <CardDescription>
+                      Seu progresso semanal e sequência
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-950/30 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                            🔥
+                          </div>
+                          <div>
+                            <div className="font-semibold text-yellow-700 dark:text-yellow-400">Sequência Atual</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">Dias consecutivos</div>
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-yellow-600">7</div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            🎯
+                          </div>
+                          <div>
+                            <div className="font-semibold text-green-700 dark:text-green-400">Metas Concluídas</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">Desta semana</div>
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-green-600">{mockData.activityDays.active}/{mockData.activityDays.total}</div>
+                      </div>
+
+                      <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            💪
+                          </div>
+                          <div>
+                            <div className="font-semibold text-blue-700 dark:text-blue-400">Treinos Realizados</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">Esta semana</div>
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-600">4</div>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <Button 
+                        onClick={() => navigate('/create-workout-plan')}
+                        variant="outline"
+                        className="w-full border-health-200 hover:bg-health-50"
+                      >
+                        <Dumbbell className="w-4 h-4 mr-2" />
+                        Iniciar Treino
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <NutritionChart
                   macros={sampleData.nutritionMacros}
                   dailyData={sampleData.dailyNutritionData}
-                  targets={{
-                    calories: 2000,
-                    protein: 150,
-                    carbs: 250,
-                    fat: 65,
-                  }}
+                  targets={mockData.nutritionTargets}
                 />
                 
                 <AchievementsCard
