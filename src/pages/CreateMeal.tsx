@@ -117,14 +117,17 @@ const CreateMeal = () => {
       if (!user) throw new Error("Usuário não autenticado");
 
       // Criar ou buscar um plano de dieta padrão para o usuário
-      let { data: dietPlan } = await supabase
+      const { data: dietPlanData, error: dietPlanError } = await supabase
         .from('diet_plans')
         .select('id')
         .eq('user_id', user.id)
         .eq('name', 'Plano Pessoal')
         .single();
 
-      if (!dietPlan) {
+      let dietPlan = dietPlanData;
+
+      if (dietPlanError && dietPlanError.code === 'PGRST116') {
+        // Plano não existe, criar um novo
         const { data: newPlan, error: planError } = await supabase
           .from('diet_plans')
           .insert({
@@ -137,6 +140,12 @@ const CreateMeal = () => {
         
         if (planError) throw planError;
         dietPlan = newPlan;
+      } else if (dietPlanError) {
+        throw dietPlanError;
+      }
+
+      if (!dietPlan) {
+        throw new Error("Erro ao criar ou buscar plano de dieta");
       }
 
       // Criar a refeição
@@ -144,10 +153,10 @@ const CreateMeal = () => {
         .from('meals')
         .insert({
           diet_plan_id: dietPlan.id,
-          name: mealName,
+          name: mealName.trim(),
           meal_type: mealType || null,
           meal_time: mealTime || null,
-          instructions: instructions || null,
+          instructions: instructions.trim() || null,
         })
         .select()
         .single();
@@ -172,12 +181,31 @@ const CreateMeal = () => {
         description: "Refeição criada com sucesso!",
       });
 
+      // Limpar formulário após sucesso
+      setMealName("");
+      setMealType("");
+      setMealTime("");
+      setInstructions("");
+      setSelectedIngredients([]);
+
       navigate('/dashboard');
     } catch (error) {
       console.error('Erro ao salvar refeição:', error);
+      
+      // Verificar se é erro de tabela não existente
+      let errorMessage = "Não foi possível salvar a refeição. Tente novamente.";
+      
+      if (error instanceof Error) {
+        if (error.message.includes('relation') && error.message.includes('does not exist')) {
+          errorMessage = "As tabelas de refeições ainda não foram criadas no banco de dados. Entre em contato com o suporte.";
+        } else if (error.message.includes('Usuário não autenticado')) {
+          errorMessage = "Você precisa estar logado para salvar uma refeição.";
+        }
+      }
+      
       toast({
         title: "Erro",
-        description: "Não foi possível salvar a refeição. Tente novamente.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

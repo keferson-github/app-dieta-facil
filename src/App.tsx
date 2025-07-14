@@ -11,6 +11,11 @@ import Onboarding from "./pages/Onboarding";
 import Settings from "./pages/Settings";
 import CreateMeal from "./pages/CreateMeal";
 import WeeklyMenu from "./pages/WeeklyMenu";
+import CreateWorkoutPlan from "./pages/CreateWorkoutPlan";
+import ExerciseLibrary from "./pages/ExerciseLibrary";
+import DetailedReports from "./pages/DetailedReports";
+import BodyMeasurements from "./pages/BodyMeasurements";
+import ProgressPhotos from "./pages/ProgressPhotos";
 import NotFound from "./pages/NotFound";
 import './i18n';
 
@@ -30,6 +35,11 @@ const App = () => (
           <Route path="/settings" element={<Settings />} />
           <Route path="/create-meal" element={<CreateMeal />} />
           <Route path="/weekly-menu" element={<WeeklyMenu />} />
+          <Route path="/create-workout-plan" element={<CreateWorkoutPlan />} />
+          <Route path="/exercise-library" element={<ExerciseLibrary />} />
+          <Route path="/detailed-reports" element={<DetailedReports />} />
+          <Route path="/body-measurements" element={<BodyMeasurements />} />
+          <Route path="/progress-photos" element={<ProgressPhotos />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

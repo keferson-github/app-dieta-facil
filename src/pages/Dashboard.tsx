@@ -244,7 +244,35 @@ const Dashboard = () => {
       return;
     }
 
-    // Implementar navegação para a funcionalidade
+    // Navegação específica para funcionalidades do Plano Energia
+    if (requiredPlan === 'Energia') {
+      if (feature.includes('workout') || feature.includes('treino') || feature === t('dashboard.exercises.start_workout')) {
+        navigate('/exercise-library');
+        return;
+      }
+      if (feature.includes('workout_sheet') || feature.includes('ficha') || feature === t('dashboard.exercises.workout_sheet')) {
+        navigate('/create-workout-plan');
+        return;
+      }
+    }
+
+    // Navegação específica para funcionalidades do Plano Performance
+    if (requiredPlan === 'Performance') {
+      if (feature.includes('detailed_reports') || feature.includes('relatórios') || feature === t('dashboard.progress.detailed_reports')) {
+        navigate('/detailed-reports');
+        return;
+      }
+      if (feature.includes('body_measurements') || feature.includes('medidas') || feature === t('dashboard.progress.body_measurements')) {
+        navigate('/body-measurements');
+        return;
+      }
+      if (feature.includes('progress_photos') || feature.includes('fotos') || feature === t('dashboard.progress.progress_photos')) {
+        navigate('/progress-photos');
+        return;
+      }
+    }
+
+    // Fallback para outras funcionalidades
     toast({
       title: t('dashboard.coming_soon'),
       description: feature,

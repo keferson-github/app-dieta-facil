@@ -707,6 +707,81 @@ export type Database = {
           user_id?: string
           workouts_per_week?: number | null
         }
+        Relationships: [        ]
+      }
+      body_measurements: {
+        Row: {
+          arms_cm: number | null
+          chest_cm: number | null
+          created_at: string
+          hips_cm: number | null
+          id: string
+          measured_at: string
+          neck_cm: number | null
+          thighs_cm: number | null
+          updated_at: string
+          user_id: string
+          waist_cm: number | null
+        }
+        Insert: {
+          arms_cm?: number | null
+          chest_cm?: number | null
+          created_at?: string
+          hips_cm?: number | null
+          id?: string
+          measured_at?: string
+          neck_cm?: number | null
+          thighs_cm?: number | null
+          updated_at?: string
+          user_id: string
+          waist_cm?: number | null
+        }
+        Update: {
+          arms_cm?: number | null
+          chest_cm?: number | null
+          created_at?: string
+          hips_cm?: number | null
+          id?: string
+          measured_at?: string
+          neck_cm?: number | null
+          thighs_cm?: number | null
+          updated_at?: string
+          user_id?: string
+          waist_cm?: number | null
+        }
+        Relationships: []
+      }
+      progress_photos: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          photo_type: string
+          photo_url: string
+          taken_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          photo_type: string
+          photo_url: string
+          taken_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          photo_type?: string
+          photo_url?: string
+          taken_at?: string
+          updated_at?: string
+          user_id?: string
+        }
         Relationships: []
       }
       workout_sessions: {
