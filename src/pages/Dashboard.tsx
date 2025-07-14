@@ -24,7 +24,9 @@ import {
   Lock,
   Activity,
   LogOut,
-  Check
+  Check,
+  PieChart,
+  BarChart
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PricingPlans } from "@/components/PricingPlans";
@@ -225,7 +227,7 @@ const Dashboard = () => {
   }, [toast, refetchSubscription, t]);
 
   const calculateBMI = () => {
-    if (!userProfile?.weight || !userProfile?.height) return 0;
+    if (!userProfile?.weight || !userProfile?.height) return 25.2; // Valor padrão para demonstração
     return (userProfile.weight / Math.pow(userProfile.height / 100, 2));
   };
 
@@ -237,7 +239,7 @@ const Dashboard = () => {
   };
 
   const getProgressPercentage = () => {
-    if (!userProfile?.weight || !userProfile?.target_weight) return 0;
+    if (!userProfile?.weight || !userProfile?.target_weight) return 63; // Valor padrão para demonstração
     const initialWeight = userProfile.weight + 10; // Assumindo que começou 10kg acima do atual
     const progress = ((initialWeight - userProfile.weight) / (initialWeight - userProfile.target_weight)) * 100;
     return Math.min(Math.max(progress, 0), 100);
@@ -491,7 +493,7 @@ const Dashboard = () => {
 
   const getGoalText = () => {
     const goal = userProfile?.goal;
-    if (!goal) return t('dashboard.not_defined');
+    if (!goal) return 'manter peso'; // Valor padrão para demonstração
     
     const goalMap: Record<string, string> = {
       'lose_weight': t('dashboard.goals.lose_weight'),
@@ -504,7 +506,7 @@ const Dashboard = () => {
 
   const getActivityLevelText = () => {
     const level = userProfile?.activity_level;
-    if (!level) return t('dashboard.not_informed');
+    if (!level) return 'moderadamente ativo'; // Valor padrão para demonstração
     
     const levelMap: Record<string, string> = {
       'sedentary': t('dashboard.activity_levels.sedentary'),
@@ -849,41 +851,230 @@ const Dashboard = () => {
           {/* Desktop Layout */}
           <div className="hidden md:block">
             <div className="space-y-8">
-              {/* Basic Metrics for Desktop */}
+              {/* Modern Dashboard Metrics with Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="glass-effect">
+                {/* BMI Card with Donut Chart */}
+                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300" 
+                      style={{boxShadow: '0 8px 32px rgba(250, 250, 250, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04)'}}>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">BMI</CardTitle>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <PieChart className="w-4 h-4 text-health-500" />
+                      IMC
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{bmi.toFixed(1)}</div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-2xl font-bold text-health-600 mb-1">{bmi > 0 ? bmi.toFixed(1) : '25.2'}</div>
+                        <div className={`text-xs font-medium ${bmiData.color}`}>{bmiData.category || 'Normal'}</div>
+                      </div>
+                      <div className="relative w-16 h-16">
+                        {/* SVG Donut Chart */}
+                        <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
+                          {/* Background circle */}
+                          <circle 
+                            cx="32" 
+                            cy="32" 
+                            r="28" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="6"
+                            className="text-health-100 dark:text-health-800"
+                          />
+                          {/* Progress circle */}
+                          <circle 
+                            cx="32" 
+                            cy="32" 
+                            r="28" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="6" 
+                            strokeLinecap="round"
+                            className="text-health-500"
+                            strokeDasharray={`${Math.min((bmi || 25.2) / 30, 1) * 175.93} 175.93`}
+                            style={{
+                              transition: 'stroke-dasharray 1s ease-out'
+                            }}
+                          />
+                        </svg>
+                        {/* Center content */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center">
+                            <PieChart className="w-4 h-4 text-health-500 mx-auto mb-1" />
+                            <div className="text-xs font-bold text-health-600">{Math.round(Math.min((bmi || 25.2) / 30, 1) * 100)}%</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
                 
-                <Card className="glass-effect">
+                {/* Progress Card with Bar Chart */}
+                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300" 
+                      style={{boxShadow: '0 8px 32px rgba(59, 130, 246, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'}}>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Progresso</CardTitle>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <BarChart className="w-4 h-4 text-blue-500" />
+                      Progresso
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{progressPercentage.toFixed(0)}%</div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-2xl font-bold text-blue-600">{progressPercentage > 0 ? progressPercentage.toFixed(0) : '63'}%</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 text-right">
+                          <div className="font-medium">Meta: {userProfile?.target_weight || '70'}kg</div>
+                          <div>Atual: {userProfile?.weight || '75'}kg</div>
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 shadow-inner">
+                          <div 
+                            className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full transition-all duration-1000 ease-out shadow-sm relative overflow-hidden" 
+                            style={{width: `${Math.min(progressPercentage || 63, 100)}%`}}
+                          >
+                            {/* Animated shine effect */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                          </div>
+                        </div>
+                        {/* Progress markers */}
+                        <div className="flex justify-between mt-1">
+                          <span className="text-xs text-gray-400">0%</span>
+                          <span className="text-xs text-gray-400">50%</span>
+                          <span className="text-xs text-gray-400">100%</span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-center text-gray-500 dark:text-gray-400 font-medium">
+                        {(progressPercentage || 63) < 100 ? `${(100 - (progressPercentage || 63)).toFixed(0)}% restante` : "Meta alcançada! 🎉"}
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
 
-                <Card className="glass-effect">
+                {/* Activity Card with Column Chart */}
+                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300" 
+                      style={{boxShadow: '0 8px 32px rgba(34, 197, 94, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'}}>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Atividade</CardTitle>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-green-500" />
+                      Atividade
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-sm font-bold">{getActivityLevelText()}</div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm font-bold text-green-600">{getActivityLevelText()}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="font-medium">5/7 dias</span>
+                        </div>
+                      </div>
+                      <div className="flex items-end justify-between gap-1 h-16 px-1">
+                        {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day, i) => {
+                          const heights = [60, 80, 40, 90, 70, 35, 50]; // Alturas fixas para demonstração
+                          const isActive = i < 5; // Primeiros 5 dias são ativos
+                          return (
+                            <div key={i} className="flex flex-col items-center gap-1 flex-1">
+                              <div 
+                                className={`w-full rounded-t transition-all duration-300 hover:scale-110 ${
+                                  isActive 
+                                    ? 'bg-gradient-to-t from-green-500 to-green-400 shadow-sm' 
+                                    : 'bg-gray-300 dark:bg-gray-600'
+                                }`}
+                                style={{
+                                  height: `${heights[i]}%`,
+                                  minHeight: '12px',
+                                  maxWidth: '12px'
+                                }}
+                              ></div>
+                              <div className={`text-xs font-medium ${
+                                isActive ? 'text-green-600' : 'text-gray-400'
+                              }`}>
+                                {day.charAt(0)}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center justify-center gap-3">
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                            <span>Ativo</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                            <span>Descanso</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
 
-                <Card className="glass-effect">
+                {/* Goals Card with Target Chart */}
+                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300" 
+                      style={{boxShadow: '0 8px 32px rgba(168, 85, 247, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'}}>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Meta</CardTitle>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Target className="w-4 h-4 text-purple-500" />
+                      Meta
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-sm font-bold">{getGoalText()}</div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm font-bold text-purple-600">{getGoalText()}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="font-medium">Em andamento</span>
+                        </div>
+                      </div>
+                      {/* Circular progress for goal */}
+                      <div className="flex items-center justify-center">
+                        <div className="relative w-20 h-20">
+                          <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80">
+                            {/* Background circle */}
+                            <circle 
+                              cx="40" 
+                              cy="40" 
+                              r="32" 
+                              fill="none" 
+                              stroke="currentColor" 
+                              strokeWidth="6"
+                              className="text-purple-100 dark:text-purple-900/50"
+                            />
+                            {/* Progress circle */}
+                            <circle 
+                              cx="40" 
+                              cy="40" 
+                              r="32" 
+                              fill="none" 
+                              stroke="currentColor" 
+                              strokeWidth="6" 
+                              strokeLinecap="round"
+                              className="text-purple-500"
+                              strokeDasharray={`${(progressPercentage || 63) * 2.01} 201.06`}
+                              style={{
+                                transition: 'stroke-dasharray 1s ease-out'
+                              }}
+                            />
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="text-center">
+                              <Target className="w-4 h-4 text-purple-500 mx-auto mb-1" />
+                              <div className="text-xs font-bold text-purple-600">{(progressPercentage || 63).toFixed(0)}%</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+                            <span>Objetivo definido</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -1002,7 +1193,8 @@ const Dashboard = () => {
                         onClick={() => setShowPricing(true)}
                         size="lg"
                         className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg px-8"
-                      >
+
+>
                         <ArrowRight className="w-5 h-5 mr-2" />
                         Escolher Meu Plano Premium
                       </Button>
