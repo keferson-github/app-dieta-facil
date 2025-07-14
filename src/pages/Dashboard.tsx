@@ -33,6 +33,7 @@ import WeightProgressChart from "@/components/WeightProgressChart";
 import ActivityChart from "@/components/ActivityChart";
 import NutritionChart from "@/components/NutritionChart";
 import AchievementsCard from "@/components/AchievementsCard";
+import { getUserAchievements, type UserAchievement } from "@/lib/achievements";
 import type { Tables } from "@/integrations/supabase/types";
 
 interface Plan {
@@ -73,7 +74,16 @@ const Dashboard = () => {
     activityData: ActivityDatum[];
     nutritionMacros: MacroDatum[];
     dailyNutritionData: DailyNutritionDatum[];
-    achievements: Tables<"achievements">[];
+    achievements: UserAchievement[];
+    userStats: {
+      total_points: number;
+      current_level: number;
+      meals_logged: number;
+      workouts_completed: number;
+      streak_days: number;
+      photos_uploaded: number;
+      weight_logs_count: number;
+    };
     currentWeight: number;
     targetWeight: number;
     goal: 'lose_weight' | 'maintain_weight' | 'gain_muscle';
@@ -83,6 +93,15 @@ const Dashboard = () => {
     nutritionMacros: [],
     dailyNutritionData: [],
     achievements: [],
+    userStats: {
+      total_points: 0,
+      current_level: 1,
+      meals_logged: 0,
+      workouts_completed: 0,
+      streak_days: 0,
+      photos_uploaded: 0,
+      weight_logs_count: 0,
+    },
     currentWeight: 0,
     targetWeight: 0,
     goal: 'lose_weight',
@@ -381,13 +400,8 @@ const Dashboard = () => {
       { name: 'Gorduras', value: todayData.fat, color: '#f59e0b' },
     ] : [];
 
-    // 4. Achievements do usuário
-    const { data: userAchievements } = await supabase
-      .from('user_achievements')
-      .select('achievement_id, awarded_at, achievements(*)')
-      .eq('user_id', userId);
-
-    const achievements = (userAchievements || []).map(ua => ua.achievements);
+    // 4. Achievements e stats do usuário
+    const { achievements, stats } = await getUserAchievements(userId);
 
     setChartData({
       weightData,
@@ -395,6 +409,7 @@ const Dashboard = () => {
       nutritionMacros,
       dailyNutritionData,
       achievements,
+      userStats: stats,
       currentWeight: userProfile?.weight || 0,
       targetWeight: userProfile?.target_weight || 0,
       goal: (userProfile?.goal as 'lose_weight' | 'maintain_weight' | 'gain_muscle') || 'lose_weight',
@@ -851,22 +866,9 @@ const Dashboard = () => {
                 
                 {/* Card de Conquistas */}
                 <AchievementsCard
-                  achievements={(sampleData.achievements || []).map((a: Tables<"achievements">) => {
-                    const category: 'weight' | 'exercise' | 'nutrition' | 'streak' = 
-                      a.code?.startsWith('first_meal') || a.code?.includes('nutrition') ? 'nutrition' :
-                      a.code?.includes('workout') ? 'exercise' :
-                      a.code?.includes('weight') ? 'weight' : 'streak';
-                    return {
-                      id: a.id,
-                      title: a.title,
-                      description: a.description || '',
-                      icon: a.icon || '🏆',
-                      achieved: true,
-                      category
-                    };
-                  })}
-                  totalPoints={750}
-                  level={3}
+                  achievements={sampleData.achievements || []}
+                  totalPoints={sampleData.userStats?.total_points || 0}
+                  level={sampleData.userStats?.current_level || 1}
                 />
               </div>
             </div>

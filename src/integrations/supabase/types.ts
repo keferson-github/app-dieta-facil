@@ -16,24 +16,33 @@ export type Database = {
     Tables: {
       achievements: {
         Row: {
+          category: string | null
           code: string
+          created_at: string
           description: string | null
           icon: string | null
           id: string
+          points: number | null
           title: string
         }
         Insert: {
+          category?: string | null
           code: string
+          created_at?: string
           description?: string | null
           icon?: string | null
           id?: string
+          points?: number | null
           title: string
         }
         Update: {
+          category?: string | null
           code?: string
+          created_at?: string
           description?: string | null
           icon?: string | null
           id?: string
+          points?: number | null
           title?: string
         }
         Relationships: []
@@ -121,7 +130,7 @@ export type Database = {
       }
       food_logs: {
         Row: {
-          food_id: string
+          food_id: number
           id: string
           logged_at: string
           meal_type: string | null
@@ -129,7 +138,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          food_id: string
+          food_id: number
           id?: string
           logged_at?: string
           meal_type?: string | null
@@ -137,7 +146,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          food_id?: string
+          food_id?: number
           id?: string
           logged_at?: string
           meal_type?: string | null
@@ -149,50 +158,41 @@ export type Database = {
             foreignKeyName: "food_logs_food_id_fkey"
             columns: ["food_id"]
             isOneToOne: false
-            referencedRelation: "foods"
+            referencedRelation: "foods_free"
             referencedColumns: ["id"]
           },
         ]
       }
-      foods: {
+      foods_free: {
         Row: {
           calories_per_100g: number
-          carbs_per_100g: number | null
-          category: string | null
-          created_at: string
-          fats_per_100g: number | null
-          fiber_per_100g: number | null
-          id: string
+          carbs_per_100g: number
+          category: string
+          fats_per_100g: number
+          fiber_per_100g: number
+          id: number
           name: string
-          protein_per_100g: number | null
-          sodium_per_100g: number | null
-          updated_at: string
+          protein_per_100g: number
         }
         Insert: {
           calories_per_100g: number
-          carbs_per_100g?: number | null
-          category?: string | null
-          created_at?: string
-          fats_per_100g?: number | null
-          fiber_per_100g?: number | null
-          id?: string
+          carbs_per_100g: number
+          category: string
+          fats_per_100g: number
+          fiber_per_100g: number
+          id?: number
           name: string
-          protein_per_100g?: number | null
-          sodium_per_100g?: number | null
-          updated_at?: string
+          protein_per_100g: number
         }
         Update: {
           calories_per_100g?: number
-          carbs_per_100g?: number | null
-          category?: string | null
-          created_at?: string
-          fats_per_100g?: number | null
-          fiber_per_100g?: number | null
-          id?: string
+          carbs_per_100g?: number
+          category?: string
+          fats_per_100g?: number
+          fiber_per_100g?: number
+          id?: number
           name?: string
-          protein_per_100g?: number | null
-          sodium_per_100g?: number | null
-          updated_at?: string
+          protein_per_100g?: number
         }
         Relationships: []
       }
@@ -232,21 +232,21 @@ export type Database = {
       meal_ingredients: {
         Row: {
           created_at: string
-          food_id: string
+          food_id: number
           id: string
           meal_id: string
           quantity_grams: number
         }
         Insert: {
           created_at?: string
-          food_id: string
+          food_id: number
           id?: string
           meal_id: string
           quantity_grams: number
         }
         Update: {
           created_at?: string
-          food_id?: string
+          food_id?: number
           id?: string
           meal_id?: string
           quantity_grams?: number
@@ -256,7 +256,7 @@ export type Database = {
             foreignKeyName: "meal_ingredients_food_id_fkey"
             columns: ["food_id"]
             isOneToOne: false
-            referencedRelation: "foods"
+            referencedRelation: "foods_free"
             referencedColumns: ["id"]
           },
           {
@@ -477,6 +477,51 @@ export type Database = {
           updated_at?: string
           user_id?: string
           weight?: number | null
+        }
+        Relationships: []
+      }
+      user_stats: {
+        Row: {
+          created_at: string
+          current_level: number | null
+          id: string
+          max_streak_days: number | null
+          meals_logged: number | null
+          photos_uploaded: number | null
+          streak_days: number | null
+          total_points: number | null
+          updated_at: string
+          user_id: string
+          weight_logs_count: number | null
+          workouts_completed: number | null
+        }
+        Insert: {
+          created_at?: string
+          current_level?: number | null
+          id?: string
+          max_streak_days?: number | null
+          meals_logged?: number | null
+          photos_uploaded?: number | null
+          streak_days?: number | null
+          total_points?: number | null
+          updated_at?: string
+          user_id: string
+          weight_logs_count?: number | null
+          workouts_completed?: number | null
+        }
+        Update: {
+          created_at?: string
+          current_level?: number | null
+          id?: string
+          max_streak_days?: number | null
+          meals_logged?: number | null
+          photos_uploaded?: number | null
+          streak_days?: number | null
+          total_points?: number | null
+          updated_at?: string
+          user_id?: string
+          weight_logs_count?: number | null
+          workouts_completed?: number | null
         }
         Relationships: []
       }

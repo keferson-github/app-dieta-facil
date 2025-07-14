@@ -25,7 +25,7 @@ CREATE TABLE public.meals (
 CREATE TABLE public.meal_ingredients (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   meal_id UUID REFERENCES public.meals(id) ON DELETE CASCADE,
-  food_id TEXT REFERENCES public.foods(id) ON DELETE CASCADE,
+  food_id BIGINT REFERENCES public.foods_free(id) ON DELETE CASCADE,
   quantity_grams NUMERIC NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now()
 );

@@ -13,7 +13,7 @@ import { ArrowLeft, Plus, Trash2, ChefHat, Clock, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
 
-type Food = Tables<"foods">;
+type Food = Tables<"foods_free">;
 interface SelectedIngredient {
   food: Food;
   quantity: number;
@@ -36,7 +36,7 @@ const CreateMeal = () => {
   const loadFoods = useCallback(async () => {
     try {
       const { data, error } = await supabase
-        .from('foods')
+        .from('foods_free')
         .select('*')
         .order('name');
       

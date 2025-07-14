@@ -112,7 +112,7 @@ const DetailedReports = () => {
         .select(`
           logged_at,
           quantity_grams,
-          foods (
+          foods_free (
             calories_per_100g,
             protein_per_100g,
             carbs_per_100g,
@@ -160,28 +160,28 @@ const DetailedReports = () => {
       // Processar dados nutricionais calculando valores reais
       const nutritionStats = {
         avgCalories: foodLogs?.reduce((sum, log) => {
-          const calories = (log.foods?.calories_per_100g || 0) * (log.quantity_grams / 100);
+          const calories = (log.foods_free?.calories_per_100g || 0) * (log.quantity_grams / 100);
           return sum + calories;
         }, 0) / (foodLogs?.length || 1) || 0,
         avgProtein: foodLogs?.reduce((sum, log) => {
-          const protein = (log.foods?.protein_per_100g || 0) * (log.quantity_grams / 100);
+          const protein = (log.foods_free?.protein_per_100g || 0) * (log.quantity_grams / 100);
           return sum + protein;
         }, 0) / (foodLogs?.length || 1) || 0,
         avgCarbs: foodLogs?.reduce((sum, log) => {
-          const carbs = (log.foods?.carbs_per_100g || 0) * (log.quantity_grams / 100);
+          const carbs = (log.foods_free?.carbs_per_100g || 0) * (log.quantity_grams / 100);
           return sum + carbs;
         }, 0) / (foodLogs?.length || 1) || 0,
         avgFat: foodLogs?.reduce((sum, log) => {
-          const fat = (log.foods?.fats_per_100g || 0) * (log.quantity_grams / 100);
+          const fat = (log.foods_free?.fats_per_100g || 0) * (log.quantity_grams / 100);
           return sum + fat;
         }, 0) / (foodLogs?.length || 1) || 0,
         complianceRate: 85, // Calculado baseado em metas
         dailyData: foodLogs?.map(log => ({
           date: new Date(log.logged_at).toLocaleDateString('pt-BR'),
-          calories: (log.foods?.calories_per_100g || 0) * (log.quantity_grams / 100),
-          protein: (log.foods?.protein_per_100g || 0) * (log.quantity_grams / 100),
-          carbs: (log.foods?.carbs_per_100g || 0) * (log.quantity_grams / 100),
-          fat: (log.foods?.fats_per_100g || 0) * (log.quantity_grams / 100)
+          calories: (log.foods_free?.calories_per_100g || 0) * (log.quantity_grams / 100),
+          protein: (log.foods_free?.protein_per_100g || 0) * (log.quantity_grams / 100),
+          carbs: (log.foods_free?.carbs_per_100g || 0) * (log.quantity_grams / 100),
+          fat: (log.foods_free?.fats_per_100g || 0) * (log.quantity_grams / 100)
         })) || []
       };
 

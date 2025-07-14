@@ -101,7 +101,7 @@ CREATE TABLE public.progress_photos (
 CREATE TABLE public.food_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  food_id TEXT REFERENCES public.foods(id) ON DELETE CASCADE,
+  food_id BIGINT REFERENCES public.foods_free(id) ON DELETE CASCADE,
   meal_id UUID REFERENCES public.meals(id),
   quantity_grams NUMERIC NOT NULL,
   meal_type TEXT CHECK (meal_type IN ('cafe_manha', 'lanche_manha', 'almoco', 'lanche_tarde', 'jantar', 'ceia')),
@@ -319,9 +319,3 @@ FROM public.workout_sessions ws
 JOIN public.workout_plans wp ON wp.id = ws.workout_plan_id
 LEFT JOIN public.workout_exercises we ON we.workout_session_id = ws.id
 GROUP BY ws.id, ws.name, ws.description, ws.session_order, wp.user_id, wp.name;
-
--- Enable RLS for view
-ALTER VIEW public.workout_session_details ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own workout session details" ON public.workout_session_details
-FOR SELECT USING (auth.uid() = user_id);

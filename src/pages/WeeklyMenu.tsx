@@ -30,7 +30,7 @@ const mealTypes = [
 
 type Meal = Tables<"meals"> & {
   meal_ingredients: Array<Tables<"meal_ingredients"> & {
-    foods: Tables<"foods">;
+    foods_free: Tables<"foods_free">;
   }>;
 };
 
@@ -59,7 +59,7 @@ const WeeklyMenu = () => {
           *,
           meal_ingredients (
             *,
-            foods (*)
+            foods_free (*)
           )
         `)
         .eq('diet_plan_id', (
@@ -97,7 +97,7 @@ const WeeklyMenu = () => {
           *,
           meal_ingredients (
             *,
-            foods (*)
+            foods_free (*)
           )
         `)
         .eq('diet_plan_id', dietPlan.id)
@@ -186,8 +186,8 @@ const WeeklyMenu = () => {
     return meal.meal_ingredients.reduce((total, ingredient) => {
       const multiplier = ingredient.quantity_grams / 100;
       return {
-        calories: total.calories + (ingredient.foods.calories_per_100g * multiplier),
-        protein: total.protein + ((ingredient.foods.protein_per_100g || 0) * multiplier),
+        calories: total.calories + (ingredient.foods_free.calories_per_100g * multiplier),
+        protein: total.protein + ((ingredient.foods_free.protein_per_100g || 0) * multiplier),
       };
     }, { calories: 0, protein: 0 });
   };

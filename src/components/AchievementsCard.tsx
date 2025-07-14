@@ -11,7 +11,7 @@ interface Achievement {
   achieved: boolean;
   progress?: number;
   maxProgress?: number;
-  category: 'weight' | 'exercise' | 'nutrition' | 'streak';
+  category: 'weight' | 'exercise' | 'nutrition' | 'streak' | 'milestone' | 'special' | 'health';
 }
 
 interface AchievementsCardProps {
@@ -32,6 +32,9 @@ const AchievementsCard = ({ achievements, totalPoints, level }: AchievementsCard
       case 'exercise': return <Flame className="w-4 h-4" />;
       case 'nutrition': return <Star className="w-4 h-4" />;
       case 'streak': return <Trophy className="w-4 h-4" />;
+      case 'milestone': return <Award className="w-4 h-4" />;
+      case 'special': return <Star className="w-4 h-4" />;
+      case 'health': return <Target className="w-4 h-4" />;
       default: return <Award className="w-4 h-4" />;
     }
   };
@@ -42,6 +45,9 @@ const AchievementsCard = ({ achievements, totalPoints, level }: AchievementsCard
       case 'exercise': return 'bg-red-100 text-red-800';
       case 'nutrition': return 'bg-green-100 text-green-800';
       case 'streak': return 'bg-orange-100 text-orange-800';
+      case 'milestone': return 'bg-purple-100 text-purple-800';
+      case 'special': return 'bg-yellow-100 text-yellow-800';
+      case 'health': return 'bg-teal-100 text-teal-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
