@@ -23,7 +23,8 @@ import {
   ArrowRight,
   Lock,
   Activity,
-  LogOut
+  LogOut,
+  Check
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PricingPlans } from "@/components/PricingPlans";
@@ -37,7 +38,7 @@ import { getUserAchievements, type UserAchievement } from "@/lib/achievements";
 import type { Tables } from "@/integrations/supabase/types";
 import MobileNavigation from "@/components/MobileNavigation";
 import MetricsGrid from "@/components/MetricsGrid";
-import ChartsCarousel from "@/components/ChartsCarousel";
+import MacroNutrientsCarousel from "@/components/MacroNutrientsCarousel";
 
 interface Plan {
   id: string;
@@ -680,68 +681,68 @@ const Dashboard = () => {
               }}
             />
 
-            {/* Charts Carousel */}
-            <ChartsCarousel
-              items={[
-                {
-                  id: 'weight',
-                  title: '⚖️ Progresso de Peso',
-                  content: (
-                    <div className="h-64">
-                      <WeightProgressChart 
-                        data={sampleData.weightData} 
-                        currentWeight={sampleData.currentWeight}
-                        targetWeight={sampleData.targetWeight}
-                        goal={sampleData.goal}
-                      />
-                    </div>
-                  )
+            {/* Macro Nutrients Carousel (Pie Charts) */}
+            <MacroNutrientsCarousel
+              macros={{
+                protein: { 
+                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || 65), 
+                  target: 150 
                 },
-                {
-                  id: 'activity',
-                  title: '🏋️ Atividade Física',
-                  content: (
-                    <div className="h-64">
-                      <ActivityChart 
-                        data={sampleData.activityData} 
-                        weeklyGoal={5}
-                      />
-                    </div>
-                  )
+                carbs: { 
+                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || 140), 
+                  target: 250 
                 },
-                {
-                  id: 'nutrition',
-                  title: '🍎 Distribuição Nutricional',
-                  content: (
-                    <div className="h-64">
-                      <NutritionChart 
-                        macros={sampleData.nutritionMacros}
-                        dailyData={sampleData.dailyNutritionData}
-                        targets={{
-                          calories: 2000,
-                          protein: 150,
-                          carbs: 250,
-                          fat: 65,
-                        }}
-                      />
-                    </div>
-                  )
-                },
-                {
-                  id: 'achievements',
-                  title: '🏆 Conquistas',
-                  content: (
-                    <div className="h-64">
-                      <AchievementsCard 
-                        achievements={sampleData.achievements}
-                        totalPoints={sampleData.userStats?.total_points || 0}
-                        level={sampleData.userStats?.current_level || 1}
-                      />
-                    </div>
-                  )
+                fat: { 
+                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || 45), 
+                  target: 65 
                 }
-              ]}
+              }}
             />
+
+            {/* Charts Section - Static Layout */}
+            <div className="space-y-6">
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-primary-dark mb-2">
+                  📊 Seus Dados e Progresso
+                </h3>
+                <p className="text-sm text-secondary-dark">
+                  Acompanhe sua evolução com gráficos detalhados
+                </p>
+              </div>
+
+              {/* Weight Progress Chart */}
+              <WeightProgressChart 
+                data={sampleData.weightData} 
+                currentWeight={sampleData.currentWeight}
+                targetWeight={sampleData.targetWeight}
+                goal={sampleData.goal}
+              />
+
+              {/* Activity Chart */}
+              <ActivityChart 
+                data={sampleData.activityData} 
+                weeklyGoal={5}
+              />
+
+              {/* Nutrition Chart */}
+              <NutritionChart 
+                macros={sampleData.nutritionMacros}
+                dailyData={sampleData.dailyNutritionData}
+                targets={{
+                  calories: 2000,
+                  protein: 150,
+                  carbs: 250,
+                  fat: 65,
+                }}
+              />
+
+              {/* Achievements Card */}
+              <AchievementsCard 
+                achievements={sampleData.achievements}
+                totalPoints={sampleData.userStats?.total_points || 0}
+                level={sampleData.userStats?.current_level || 1}
+              />
+            </div>
 
             {/* Quick Actions Card */}
             <Card className="glass-effect border-0 shadow-sm">
@@ -778,6 +779,71 @@ const Dashboard = () => {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Premium Plans Promotion - Only show for non-subscribers */}
+            {!subscription?.subscribed && (
+              <Card className="glass-effect border-0 shadow-sm bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-blue-500" />
+                    ⚡ Planos Premium
+                  </CardTitle>
+                  <CardDescription className="text-sm text-secondary-dark">
+                    Desbloqueie todo o potencial da sua jornada fitness
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Plano Energia Preview */}
+                  <div className="bg-white/70 dark:bg-slate-800/70 rounded-lg p-3 border border-blue-200/50">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-2">
+                        <Zap className="w-4 h-4" />
+                        Plano Energia
+                      </h4>
+                      <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 text-xs">
+                        Popular
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                      Nutrição + Treinos personalizados
+                    </p>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                      <div>✓ Fichas de treino completas</div>
+                      <div>✓ Exercícios para casa e academia</div>
+                    </div>
+                  </div>
+
+                  {/* Plano Performance Preview */}
+                  <div className="bg-white/70 dark:bg-slate-800/70 rounded-lg p-3 border border-purple-200/50">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-purple-700 dark:text-purple-400 flex items-center gap-2">
+                        <Target className="w-4 h-4" />
+                        Plano Performance
+                      </h4>
+                      <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 text-xs">
+                        Completo
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                      Acompanhamento completo + relatórios avançados
+                    </p>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                      <div>✓ Tudo do Plano Energia</div>
+                      <div>✓ Relatórios detalhados de progresso</div>
+                      <div>✓ Suporte prioritário</div>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => setShowPricing(true)}
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg"
+                  >
+                    <ArrowRight className="w-4 h-4 mr-2" />
+                    Ver Planos Premium
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Desktop Layout */}
@@ -855,6 +921,98 @@ const Dashboard = () => {
                   level={sampleData.userStats?.current_level || 1}
                 />
               </div>
+
+              {/* Premium Plans Promotion for Desktop - Only show for non-subscribers */}
+              {!subscription?.subscribed && (
+                <Card className="glass-effect bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50">
+                  <CardHeader className="text-center pb-4">
+                    <CardTitle className="text-xl font-bold text-primary-dark flex items-center justify-center gap-3">
+                      <Zap className="w-6 h-6 text-blue-500" />
+                      ⚡ Desbloqueie Todo Seu Potencial
+                    </CardTitle>
+                    <CardDescription className="text-secondary-dark">
+                      Escolha o plano ideal para acelerar seus resultados
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid md:grid-cols-2 gap-4 mb-6">
+                      {/* Plano Energia Desktop */}
+                      <div className="bg-white/70 dark:bg-slate-800/70 rounded-xl p-4 border border-blue-200/50">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-2">
+                            <Zap className="w-5 h-5" />
+                            Plano Energia
+                          </h4>
+                          <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                            Mais Popular
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                          Nutrição completa + treinos personalizados para resultados acelerados
+                        </p>
+                        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-2">
+                            <Check className="w-4 h-4 text-green-500" />
+                            Fichas de treino completas
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="w-4 h-4 text-green-500" />
+                            Exercícios para casa e academia
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="w-4 h-4 text-green-500" />
+                            Cardápios personalizados
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Plano Performance Desktop */}
+                      <div className="bg-white/70 dark:bg-slate-800/70 rounded-xl p-4 border border-purple-200/50">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-semibold text-purple-700 dark:text-purple-400 flex items-center gap-2">
+                            <Target className="w-5 h-5" />
+                            Plano Performance
+                          </h4>
+                          <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
+                            Completo
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                          Acompanhamento premium com relatórios avançados e suporte prioritário
+                        </p>
+                        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-2">
+                            <Check className="w-4 h-4 text-green-500" />
+                            Tudo do Plano Energia
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="w-4 h-4 text-green-500" />
+                            Relatórios detalhados de progresso
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="w-4 h-4 text-green-500" />
+                            Suporte prioritário 24/7
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-center">
+                      <Button
+                        onClick={() => setShowPricing(true)}
+                        size="lg"
+                        className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg px-8"
+                      >
+                        <ArrowRight className="w-5 h-5 mr-2" />
+                        Escolher Meu Plano Premium
+                      </Button>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                        Cancele a qualquer momento • Sem compromisso
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>
