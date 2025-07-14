@@ -19,7 +19,6 @@ import {
   Trophy,
   Zap,
   Heart,
-  Clock,
   Plus,
   ArrowRight,
   Lock,
@@ -62,6 +61,7 @@ const Dashboard = () => {
   const { t } = useTranslation();
   const [userProfile, setUserProfile] = useState<Tables<"user_profiles"> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [welcomeMessage, setWelcomeMessage] = useState("");
 
   // ----- CHART DATA STATE (deve vir antes do retorno condicional) -----
   type WeightDatum = { date: string; weight: number };
@@ -176,6 +176,28 @@ const Dashboard = () => {
     checkUserProfile();
     loadPlans();
   }, [checkUserProfile, loadPlans]);
+
+  useEffect(() => {
+    // Carregar saudação personalizada
+    const loadWelcomeMessage = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const greeting = getWelcomeMessage();
+        
+        if (session?.user?.user_metadata?.full_name) {
+          const firstName = session.user.user_metadata.full_name.split(' ')[0];
+          setWelcomeMessage(`${greeting}, ${firstName}`);
+        } else {
+          setWelcomeMessage(greeting);
+        }
+      } catch (error) {
+        console.error('Erro ao obter saudação personalizada:', error);
+        setWelcomeMessage(getWelcomeMessage());
+      }
+    };
+    
+    loadWelcomeMessage();
+  }, []);
 
   useEffect(() => {
     // Verificar se voltou do Stripe
@@ -444,9 +466,22 @@ const Dashboard = () => {
 
   // Helper functions (moved after hooks)
   const getWelcomeMessage = () => {
-    return userProfile?.gender === 'male' 
-      ? t('dashboard.welcome_champion') 
-      : t('dashboard.welcome_champion_female');
+    // Obter horário atual no timezone de São Paulo
+    const now = new Date();
+    const saoPauloTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
+    const hour = saoPauloTime.getHours();
+    
+    // Determinar saudação baseada no horário
+    let greeting = "";
+    if (hour >= 5 && hour < 12) {
+      greeting = "Bom dia";
+    } else if (hour >= 12 && hour < 18) {
+      greeting = "Boa tarde";
+    } else {
+      greeting = "Boa noite";
+    }
+    
+    return greeting;
   };
 
   const getGoalText = () => {
@@ -512,7 +547,7 @@ const Dashboard = () => {
               </div>
           <div>
                 <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-                  {getWelcomeMessage()} 💪
+                  {welcomeMessage || "Olá"} 💪
             </h1>
                 <p className="text-gray-600 mt-1">
                   {t('dashboard.ready_evolution')}
@@ -1055,10 +1090,6 @@ const Dashboard = () => {
                     >
                       <Zap className="w-5 h-5 mr-2" />
                       {t('dashboard.cta_upgrade.button')}
-                    </Button>
-                    <Button variant="outline" className="border-health-200">
-                      <Clock className="w-4 h-4 mr-2" />
-                      {t('dashboard.cta_upgrade.trial')}
                     </Button>
                   </div>
                 </CardContent>

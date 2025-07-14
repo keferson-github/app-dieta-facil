@@ -1,1 +1,1 @@
-Este app permitirá criar refeições, fichas de treinos e acompanhar o progresso, através de planos dietéticos e periodização de trienos personalizados. O usuário poderá se cadastrar e utilizar o serviço por 7 dias grátis. E após o periodo de teste, será cobrado o valor do plano contratado.
+Este app permitirá criar refeições, fichas de treinos e acompanhar o progresso, através de planos dietéticos e periodização de treinos personalizados. O usuário poderá se cadastrar e utilizar o serviço completo.

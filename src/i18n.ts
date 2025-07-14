@@ -133,8 +133,7 @@ const resources = {
         "cta_upgrade": {
           "title": "🚀 Acelere seus resultados!",
           "description": "Desbloqueie treinos personalizados e acompanhamento completo de progresso. Transforme seu corpo mais rápido!",
-          "button": "Fazer Upgrade Agora",
-          "trial": "7 dias grátis"
+          "button": "Fazer Upgrade Agora"
         },
         "loading": "Carregando seu painel...",
         "premium_feature": "🔒 Recurso Premium",
@@ -442,8 +441,7 @@ const resources = {
         "cta_upgrade": {
           "title": "🚀 Accelerate your results!",
           "description": "Unlock personalized workouts and complete progress tracking. Transform your body faster!",
-          "button": "Upgrade Now",
-          "trial": "7 days free"
+          "button": "Upgrade Now"
         },
         "loading": "Loading your dashboard...",
         "premium_feature": "🔒 Premium Feature",
@@ -751,8 +749,7 @@ const resources = {
         "cta_upgrade": {
           "title": "🚀 ¡Acelera tus resultados!",
           "description": "Desbloquea entrenamientos personalizados y seguimiento completo de progreso. ¡Transforma tu cuerpo más rápido!",
-          "button": "Actualizar Ahora",
-          "trial": "7 días gratis"
+          "button": "Actualizar Ahora"
         },
         "loading": "Cargando tu panel...",
         "premium_feature": "🔒 Característica Premium",
