@@ -83,22 +83,6 @@ const Dashboard = () => {
     refetch: refetchDashboard
   } = useDashboardData();
 
-  // Dados mockados para fallback - Valores realistas para demonstração
-  const mockData = {
-    calories: { current: 1420, target: 2000 }, // 71% da meta
-    protein: { current: 98, target: 150 }, // 65% da meta
-    carbs: { current: 180, target: 250 }, // 72% da meta
-    fat: { current: 52, target: 65 }, // 80% da meta
-    water: { current: 1.8, target: 2.5 }, // 72% da meta
-    steps: { current: 7240, target: 10000 }, // 72% da meta
-    nutritionTargets: {
-      calories: 2000,
-      protein: 150,
-      carbs: 250,
-      fat: 65
-    }
-  };
-
   // ----- CHART DATA STATE (deve vir antes do retorno condicional) -----
   type WeightDatum = { date: string; weight: number };
   type ActivityDatum = { day: string; workouts: number; duration: number };
@@ -257,7 +241,7 @@ const Dashboard = () => {
 
   const calculateBMI = () => {
     if (metrics?.bmi) return metrics.bmi;
-    if (!userProfile?.weight || !userProfile?.height) return 25.2; // Valor padrão para demonstração
+    if (!userProfile?.weight || !userProfile?.height) return null; // Retorna null se não houver dados
     return (userProfile.weight / Math.pow(userProfile.height / 100, 2));
   };
 
@@ -272,7 +256,7 @@ const Dashboard = () => {
       return categoryMap[metrics.bmi_category] || { category: 'Normal', color: 'text-health-600' };
     }
     
-    // Fallback para cálculo manual
+    // Fallback para cálculo manual do BMI
     if (bmi < 18.5) return { category: t('dashboard.bmi_categories.underweight'), color: 'text-blue-600' };
     if (bmi < 25) return { category: t('dashboard.bmi_categories.normal'), color: 'text-health-600' };
     if (bmi < 30) return { category: t('dashboard.bmi_categories.overweight'), color: 'text-yellow-600' };
@@ -281,61 +265,52 @@ const Dashboard = () => {
 
   const getProgressPercentage = () => {
     if (metrics?.progress_percentage) return metrics.progress_percentage;
-    if (!userProfile?.weight || !userProfile?.target_weight) return 63; // Valor padrão para demonstração
+    if (!userProfile?.weight || !userProfile?.target_weight) return null; // Retorna null se não houver dados
     const initialWeight = userProfile.weight + 10; // Assumindo que começou 10kg acima do atual
     const progress = ((initialWeight - userProfile.weight) / (initialWeight - userProfile.target_weight)) * 100;
     return Math.min(Math.max(progress, 0), 100);
   };
 
-  // Função para obter dados reais ou fallback para mock
+  // Função para obter dados reais do dashboard
   const getRealData = () => {
-    // Usar dados reais quando disponíveis, senão fallback para mock
-    const hasRealData = metrics && (
-      metrics.today_water_ml > 0 || 
-      metrics.today_steps > 0 || 
-      metrics.today_meals_count > 0 || 
-      metrics.today_workouts_count > 0
-    );
-
     return {
       calories: { 
-        current: hasRealData ? 0 : mockData.calories.current, // TODO: Calcular calorias reais
-        target: metrics?.calories_target || mockData.calories.target 
+        current: 0, // TODO: Calcular calorias reais dos logs de refeições
+        target: metrics?.calories_target || 2000
       },
       protein: { 
-        current: hasRealData ? 0 : mockData.protein.current, // TODO: Calcular proteínas reais
-        target: metrics?.protein_target || mockData.protein.target 
+        current: 0, // TODO: Calcular proteínas reais dos logs de refeições
+        target: metrics?.protein_target || 150
       },
       carbs: { 
-        current: hasRealData ? 0 : mockData.carbs.current, // TODO: Calcular carboidratos reais
-        target: metrics?.carbs_target || mockData.carbs.target 
+        current: 0, // TODO: Calcular carboidratos reais dos logs de refeições
+        target: metrics?.carbs_target || 250
       },
       fat: { 
-        current: hasRealData ? 0 : mockData.fat.current, // TODO: Calcular gorduras reais
-        target: metrics?.fat_target || mockData.fat.target 
+        current: 0, // TODO: Calcular gorduras reais dos logs de refeições
+        target: metrics?.fat_target || 67
       },
       water: { 
-        current: metrics?.today_water_ml ? metrics.today_water_ml / 1000 : mockData.water.current,
-        target: metrics?.water_target_ml ? metrics.water_target_ml / 1000 : mockData.water.target
+        current: metrics?.today_water_ml ? metrics.today_water_ml / 1000 : 0,
+        target: metrics?.water_target_ml ? metrics.water_target_ml / 1000 : 2.5
       },
       steps: { 
-        current: metrics?.today_steps || mockData.steps.current,
-        target: metrics?.steps_target || mockData.steps.target
+        current: metrics?.today_steps || 0,
+        target: metrics?.steps_target || 10000
       },
       weight: { 
-        current: metrics?.current_weight || userProfile?.weight || mockData.calories.current, // Reutilizando valor
+        current: metrics?.current_weight || userProfile?.weight || 0,
         target: metrics?.target_weight || userProfile?.target_weight || 70
       },
       activityDays: { 
-        active: metrics?.week_active_days || 5, // Fallback inteligente
+        active: metrics?.week_active_days || 0,
         total: 7 
       },
       weeklyActivityHeights: weeklySteps.length > 0 
         ? weeklySteps.slice(0, 7).reverse().map(step => 
             Math.min((step.completion_percentage || 0), 100)
           ).concat(Array(7 - Math.min(weeklySteps.length, 7)).fill(0))
-        : [60, 80, 40, 90, 70, 35, 50], // Dados demonstrativos
-      isUsingMockData: !hasRealData // Flag para identificar quando está usando dados mock
+        : Array(7).fill(0) // Array vazio para 7 dias se não houver dados
     };
   };
 
@@ -659,7 +634,7 @@ const Dashboard = () => {
 
   const getGoalText = () => {
     const goal = userProfile?.goal;
-    if (!goal) return 'manter peso'; // Valor padrão para demonstração
+    if (!goal) return null; // Retorna null se não houver dados
     
     const goalMap: Record<string, string> = {
       'lose_weight': t('dashboard.goals.lose_weight'),
@@ -672,7 +647,7 @@ const Dashboard = () => {
 
   const getActivityLevelText = () => {
     const level = userProfile?.activity_level;
-    if (!level) return 'moderadamente ativo'; // Valor padrão para demonstração
+    if (!level) return null; // Retorna null se não houver dados
     
     const levelMap: Record<string, string> = {
       'sedentary': t('dashboard.activity_levels.sedentary'),
@@ -705,9 +680,6 @@ const Dashboard = () => {
   const bmiData = getBMICategory(bmi);
   const progressPercentage = getProgressPercentage();
   const realData = getRealData();
-
-  // Se ainda não há dados, mostrar vazio para evitar erros nos gráficos
-  const sampleData = chartData;
 
   return (
     <>
@@ -817,20 +789,6 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <div className="container mx-auto px-4 py-4 md:py-6 max-w-7xl space-y-6">
-          {/* Demo Data Indicator - Show when using mock data */}
-          {realData.isUsingMockData && (
-            <Card className="glass-effect border-0 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200/50">
-              <CardContent className="py-3">
-                <div className="flex items-center justify-center gap-3 text-sm">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                  <span className="text-blue-700 dark:text-blue-300 font-medium">
-                    📊 Exibindo dados demonstrativos - Comece a registrar suas atividades para ver seus dados reais!
-                  </span>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Mobile/Tablet: MyFitnessPal Style Layout */}
           <div className="md:hidden space-y-6">
@@ -842,26 +800,30 @@ const Dashboard = () => {
                   target: realData.calories.target 
                 },
                 protein: { 
-                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || mockData.protein.current), 
-                  target: mockData.protein.target 
+                  current: realData.protein.current,
+                  target: realData.protein.target 
                 },
                 carbs: { 
-                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || mockData.carbs.current), 
-                  target: mockData.carbs.target 
+                  current: realData.carbs.current,
+                  target: realData.carbs.target 
                 },
                 fat: { 
-                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || mockData.fat.current), 
-                  target: mockData.fat.target 
+                  current: realData.fat.current,
+                  target: realData.fat.target 
                 },
-                water: mockData.water,
-                steps: mockData.steps
+                water: realData.water,
+                steps: realData.steps
               }}
               onAddMeal={() => navigate('/create-meal')}
               onQuickLog={(type) => {
-                toast({
-                  title: "Registro Rápido",
-                  description: `Registrando ${type}...`,
-                });
+                if (type === 'water') {
+                  handleWaterLog(250);
+                } else {
+                  toast({
+                    title: "Registro Rápido",
+                    description: `Registrando ${type}...`,
+                  });
+                }
               }}
             />
 
@@ -869,16 +831,16 @@ const Dashboard = () => {
             <MacroNutrientsCarousel
               macros={{
                 protein: { 
-                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Proteínas')?.value || mockData.protein.current), 
-                  target: mockData.protein.target 
+                  current: realData.protein.current,
+                  target: realData.protein.target 
                 },
                 carbs: { 
-                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Carboidratos')?.value || mockData.carbs.current), 
-                  target: mockData.carbs.target 
+                  current: realData.carbs.current,
+                  target: realData.carbs.target 
                 },
                 fat: { 
-                  current: Math.round(sampleData.nutritionMacros.find(m => m.name === 'Gorduras')?.value || mockData.fat.current), 
-                  target: mockData.fat.target 
+                  current: realData.fat.current,
+                  target: realData.fat.target 
                 }
               }}
             />
@@ -896,30 +858,35 @@ const Dashboard = () => {
 
               {/* Weight Progress Chart */}
               <WeightProgressChart 
-                data={sampleData.weightData} 
-                currentWeight={sampleData.currentWeight}
-                targetWeight={sampleData.targetWeight}
-                goal={sampleData.goal}
+                data={chartData.weightData} 
+                currentWeight={chartData.currentWeight}
+                targetWeight={chartData.targetWeight}
+                goal={chartData.goal}
               />
 
               {/* Activity Chart */}
               <ActivityChart 
-                data={sampleData.activityData} 
+                data={chartData.activityData} 
                 weeklyGoal={5}
               />
 
               {/* Nutrition Chart */}
               <NutritionChart 
-                macros={sampleData.nutritionMacros}
-                dailyData={sampleData.dailyNutritionData}
-                targets={mockData.nutritionTargets}
+                macros={chartData.nutritionMacros}
+                dailyData={chartData.dailyNutritionData}
+                targets={{
+                  calories: realData.calories.target,
+                  protein: realData.protein.target,
+                  carbs: realData.carbs.target,
+                  fat: realData.fat.target
+                }}
               />
 
               {/* Achievements Card */}
               <AchievementsCard 
-                achievements={sampleData.achievements}
-                totalPoints={sampleData.userStats?.total_points || 0}
-                level={sampleData.userStats?.current_level || 1}
+                achievements={chartData.achievements}
+                totalPoints={chartData.userStats?.total_points || 0}
+                level={chartData.userStats?.current_level || 1}
               />
             </div>
 
@@ -1058,8 +1025,8 @@ const Dashboard = () => {
                 <MetricsGrid
                   metrics={{
                     calories: { 
-                      current: Math.round(sampleData.nutritionMacros.reduce((acc, macro) => acc + (macro.value || 0), 0) * 4) || mockData.calories.current, 
-                      target: mockData.calories.target 
+                      current: realData.calories.current,
+                      target: realData.calories.target 
                     },
                     protein: { 
                       current: realData.protein.current, 
@@ -1344,19 +1311,19 @@ const Dashboard = () => {
               {/* Charts for Desktop */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <WeightProgressChart
-                  data={sampleData.weightData}
-                  currentWeight={sampleData.currentWeight}
-                  targetWeight={sampleData.targetWeight}
-                  goal={sampleData.goal}
+                  data={chartData.weightData}
+                  currentWeight={chartData.currentWeight}
+                  targetWeight={chartData.targetWeight}
+                  goal={chartData.goal}
                 />
                 
                 <ActivityChart
-                  data={sampleData.activityData}
+                  data={chartData.activityData}
                   weeklyGoal={5}
                 />
               </div>
               
-              {/* Additional Mock Data Cards for Desktop */}
+              {/* Additional Real Data Cards for Desktop */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Daily Calories Card */}
                 <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300">
@@ -1369,21 +1336,21 @@ const Dashboard = () => {
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <div className="text-2xl font-bold text-orange-600">{mockData.calories.current}</div>
+                        <div className="text-2xl font-bold text-orange-600">{realData.calories.current}</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          <span className="font-medium">Meta: {mockData.calories.target}</span>
+                          <span className="font-medium">Meta: {realData.calories.target}</span>
                         </div>
                       </div>
                       <div className="relative">
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div 
                             className="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full transition-all duration-1000 ease-out" 
-                            style={{width: `${Math.min((mockData.calories.current / mockData.calories.target) * 100, 100)}%`}}
+                            style={{width: `${Math.min((realData.calories.current / realData.calories.target) * 100, 100)}%`}}
                           ></div>
                         </div>
                       </div>
                       <div className="text-xs text-center text-gray-500 dark:text-gray-400">
-                        {Math.round((mockData.calories.current / mockData.calories.target) * 100)}% da meta diária
+                        {Math.round((realData.calories.current / realData.calories.target) * 100)}% da meta diária
                       </div>
                     </div>
                   </CardContent>
@@ -1400,21 +1367,21 @@ const Dashboard = () => {
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <div className="text-2xl font-bold text-blue-600">{mockData.water.current}L</div>
+                        <div className="text-2xl font-bold text-blue-600">{realData.water.current}L</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          <span className="font-medium">Meta: {mockData.water.target}L</span>
+                          <span className="font-medium">Meta: {realData.water.target}L</span>
                         </div>
                       </div>
                       <div className="relative">
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div 
                             className="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all duration-1000 ease-out" 
-                            style={{width: `${Math.min((mockData.water.current / mockData.water.target) * 100, 100)}%`}}
+                            style={{width: `${Math.min((realData.water.current / realData.water.target) * 100, 100)}%`}}
                           ></div>
                         </div>
                       </div>
                       <div className="text-xs text-center text-gray-500 dark:text-gray-400">
-                        {Math.round((mockData.water.current / mockData.water.target) * 100)}% hidratado
+                        {Math.round((realData.water.current / realData.water.target) * 100)}% hidratado
                       </div>
                     </div>
                   </CardContent>
@@ -1431,21 +1398,21 @@ const Dashboard = () => {
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <div className="text-2xl font-bold text-green-600">{mockData.steps.current.toLocaleString()}</div>
+                        <div className="text-2xl font-bold text-green-600">{realData.steps.current.toLocaleString()}</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          <span className="font-medium">Meta: {mockData.steps.target.toLocaleString()}</span>
+                          <span className="font-medium">Meta: {realData.steps.target.toLocaleString()}</span>
                         </div>
                       </div>
                       <div className="relative">
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div 
                             className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-1000 ease-out" 
-                            style={{width: `${Math.min((mockData.steps.current / mockData.steps.target) * 100, 100)}%`}}
+                            style={{width: `${Math.min((realData.steps.current / realData.steps.target) * 100, 100)}%`}}
                           ></div>
                         </div>
                       </div>
                       <div className="text-xs text-center text-gray-500 dark:text-gray-400">
-                        {Math.round((mockData.steps.current / mockData.steps.target) * 100)}% da meta
+                        {Math.round((realData.steps.current / realData.steps.target) * 100)}% da meta
                       </div>
                     </div>
                   </CardContent>
@@ -1462,21 +1429,21 @@ const Dashboard = () => {
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <div className="text-2xl font-bold text-red-600">{mockData.protein.current}g</div>
+                        <div className="text-2xl font-bold text-red-600">{realData.protein.current}g</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          <span className="font-medium">Meta: {mockData.protein.target}g</span>
+                          <span className="font-medium">Meta: {realData.protein.target}g</span>
                         </div>
                       </div>
                       <div className="relative">
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div 
                             className="bg-gradient-to-r from-red-400 to-red-600 h-2 rounded-full transition-all duration-1000 ease-out" 
-                            style={{width: `${Math.min((mockData.protein.current / mockData.protein.target) * 100, 100)}%`}}
+                            style={{width: `${Math.min((realData.protein.current / realData.protein.target) * 100, 100)}%`}}
                           ></div>
                         </div>
                       </div>
                       <div className="text-xs text-center text-gray-500 dark:text-gray-400">
-                        {Math.round((mockData.protein.current / mockData.protein.target) * 100)}% da meta
+                        {Math.round((realData.protein.current / realData.protein.target) * 100)}% da meta
                       </div>
                     </div>
                   </CardContent>
@@ -1499,19 +1466,19 @@ const Dashboard = () => {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                        <div className="text-2xl font-bold text-blue-600">{mockData.calories.current}</div>
+                        <div className="text-2xl font-bold text-blue-600">{realData.calories.current}</div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">Calorias consumidas</div>
                       </div>
                       <div className="text-center p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
-                        <div className="text-2xl font-bold text-green-600">{mockData.steps.current.toLocaleString()}</div>
+                        <div className="text-2xl font-bold text-green-600">{realData.steps.current.toLocaleString()}</div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">Passos dados</div>
                       </div>
                       <div className="text-center p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                        <div className="text-2xl font-bold text-purple-600">{mockData.water.current}L</div>
+                        <div className="text-2xl font-bold text-purple-600">{realData.water.current}L</div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">Água consumida</div>
                       </div>
                       <div className="text-center p-3 bg-orange-50 dark:bg-orange-950/30 rounded-lg">
-                        <div className="text-2xl font-bold text-orange-600">3</div>
+                        <div className="text-2xl font-bold text-orange-600">{metrics?.today_meals_count || 0}</div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">Refeições registradas</div>
                       </div>
                     </div>
@@ -1596,15 +1563,20 @@ const Dashboard = () => {
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <NutritionChart
-                  macros={sampleData.nutritionMacros}
-                  dailyData={sampleData.dailyNutritionData}
-                  targets={mockData.nutritionTargets}
+                  macros={chartData.nutritionMacros}
+                  dailyData={chartData.dailyNutritionData}
+                  targets={{
+                    calories: realData.calories.target,
+                    protein: realData.protein.target,
+                    carbs: realData.carbs.target,
+                    fat: realData.fat.target
+                  }}
                 />
                 
                 <AchievementsCard
-                  achievements={sampleData.achievements || []}
-                  totalPoints={sampleData.userStats?.total_points || 0}
-                  level={sampleData.userStats?.current_level || 1}
+                  achievements={chartData.achievements || []}
+                  totalPoints={chartData.userStats?.total_points || 0}
+                  level={chartData.userStats?.current_level || 1}
                 />
               </div>
 

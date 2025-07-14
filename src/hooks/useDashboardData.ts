@@ -121,6 +121,49 @@ export const useDashboardData = () => {
 
       const today = new Date().toISOString().split('T')[0];
 
+      // Calcular dias ativos da semana baseado em dados reais
+      let weekActiveDays = 0;
+      try {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 6);
+        const weekAgoString = weekAgo.toISOString().split('T')[0];
+
+        // Buscar atividades da semana (água, passos, treinos, refeições)
+        const [waterLogs, stepsLogs, workoutLogs, mealLogs] = await Promise.all([
+          supabaseUntyped.from('water_logs').select('logged_at').eq('user_id', user.id).gte('logged_at', weekAgoString),
+          supabaseUntyped.from('daily_steps').select('recorded_date').eq('user_id', user.id).gte('recorded_date', weekAgoString),
+          supabaseUntyped.from('workout_logs').select('logged_at').eq('user_id', user.id).gte('logged_at', weekAgoString),
+          supabaseUntyped.from('meal_logs').select('meal_date').eq('user_id', user.id).gte('meal_date', weekAgoString)
+        ]);
+
+        const activeDates = new Set<string>();
+        
+        // Adicionar datas com água
+        waterLogs.data?.forEach(log => {
+          if (log.logged_at) activeDates.add(log.logged_at.split('T')[0]);
+        });
+        
+        // Adicionar datas com passos
+        stepsLogs.data?.forEach(log => {
+          if (log.recorded_date) activeDates.add(log.recorded_date);
+        });
+        
+        // Adicionar datas com treinos
+        workoutLogs.data?.forEach(log => {
+          if (log.logged_at) activeDates.add(log.logged_at.split('T')[0]);
+        });
+        
+        // Adicionar datas com refeições
+        mealLogs.data?.forEach(log => {
+          if (log.meal_date) activeDates.add(log.meal_date);
+        });
+
+        weekActiveDays = activeDates.size;
+      } catch (error) {
+        console.warn('Erro ao calcular dias ativos da semana:', error);
+        weekActiveDays = 0;
+      }
+
       // Buscar dados reais de hidratação de hoje
       let todayWaterMl = 0;
       try {
@@ -137,10 +180,8 @@ export const useDashboardData = () => {
           todayWaterMl = waterData.reduce((total: number, log: WaterLog) => total + (log.amount_ml || 0), 0);
         }
       } catch (error) {
-        console.warn('Tabela water_logs não disponível:', error);
-        // Fallback: usar dados simulados baseados na hora do dia
-        const currentHour = new Date().getHours();
-        todayWaterMl = Math.max(0, (currentHour - 6) * 200); // 200ml por hora após 6h
+        console.warn('Erro ao buscar water_logs:', error);
+        // Mantém o valor 0 para hidratação se não houver dados
       }
 
       // Buscar passos de hoje
@@ -159,19 +200,17 @@ export const useDashboardData = () => {
           todaySteps = stepsData.step_count;
         }
       } catch (error) {
-        console.warn('Tabela daily_steps não disponível:', error);
-        // Fallback: usar dados simulados baseados na hora do dia
-        const currentHour = new Date().getHours();
-        todaySteps = Math.max(0, (currentHour - 6) * 800); // 800 passos por hora após 6h
+        console.warn('Erro ao buscar daily_steps:', error);
+        // Mantém o valor 0 para passos se não houver dados
       }
 
       // Buscar streaks do usuário
       const streaks = {
-        overall_streak: 5,
-        workout_streak: 3,
-        nutrition_streak: 2,
-        water_streak: 1,
-        login_streak: 7
+        overall_streak: 0,
+        workout_streak: 0,
+        nutrition_streak: 0,
+        water_streak: 0,
+        login_streak: 0
       };
       try {
         const { data: streaksData, error: streaksError } = await supabaseUntyped
@@ -188,16 +227,21 @@ export const useDashboardData = () => {
               streaks.workout_streak = streak.current_count || 0;
             } else if (streak.streak_type === 'hydration') {
               streaks.water_streak = streak.current_count || 0;
+            } else if (streak.streak_type === 'nutrition') {
+              streaks.nutrition_streak = streak.current_count || 0;
             } else if (streak.streak_type === 'overall') {
               streaks.overall_streak = streak.current_count || 0;
+            } else if (streak.streak_type === 'login') {
+              streaks.login_streak = streak.current_count || 0;
             }
           });
         }
       } catch (error) {
-        console.warn('Tabela user_streaks não disponível:', error);
+        console.warn('Erro ao buscar user_streaks:', error);
+        // Mantém todos os streaks em 0 se não houver dados
       }
 
-      // Buscar refeições de hoje (se tabela existir)
+      // Buscar refeições de hoje
       let mealsToday: MealLog[] = [];
       try {
         const { data: mealsData, error: mealsError } = await supabaseUntyped
@@ -208,15 +252,12 @@ export const useDashboardData = () => {
 
         if (mealsError) throw mealsError;
         mealsToday = mealsData || [];
-      } catch {
-        // Fallback para dados simulados se tabela não existir
-        const currentHour = new Date().getHours();
-        if (currentHour >= 8) mealsToday.push({ id: 'breakfast' } as MealLog);
-        if (currentHour >= 12) mealsToday.push({ id: 'lunch' } as MealLog);
-        if (currentHour >= 18) mealsToday.push({ id: 'dinner' } as MealLog);
+      } catch (error) {
+        console.warn('Erro ao buscar meal_logs:', error);
+        // Mantém array vazio se não houver dados de refeições
       }
 
-      // Buscar treinos desta semana (se tabela existir)
+      // Buscar treinos de hoje
       let workoutsToday: WorkoutLog[] = [];
       try {
         const { data: workoutsData, error: workoutsError } = await supabaseUntyped
@@ -228,13 +269,9 @@ export const useDashboardData = () => {
 
         if (workoutsError) throw workoutsError;
         workoutsToday = workoutsData || [];
-      } catch {
-        // Fallback para dados simulados
-        const currentHour = new Date().getHours();
-        const dayOfWeek = new Date().getDay();
-        if (currentHour >= 17 || dayOfWeek === 0 || dayOfWeek === 6) {
-          workoutsToday.push({ id: 'workout_1' } as WorkoutLog);
-        }
+      } catch (error) {
+        console.warn('Erro ao buscar workout_logs:', error);
+        // Mantém array vazio se não houver dados de treinos
       }
 
       // Construir métricas manualmente
@@ -271,14 +308,14 @@ export const useDashboardData = () => {
         protein_target: 150,
         carbs_target: 250,
         fat_target: 67,
-        today_meals_count: mealsToday?.length || 0,
-        today_workouts_count: workoutsToday?.length || 0,
-        overall_streak: streaks.overall_streak, // Dados reais
-        workout_streak: streaks.workout_streak, // Dados reais
+        today_meals_count: mealsToday.length,
+        today_workouts_count: workoutsToday.length,
+        overall_streak: streaks.overall_streak,
+        workout_streak: streaks.workout_streak,
         nutrition_streak: streaks.nutrition_streak,
-        water_streak: streaks.water_streak, // Dados reais
+        water_streak: streaks.water_streak,
         login_streak: streaks.login_streak,
-        week_active_days: 4, // Placeholder
+        week_active_days: weekActiveDays, // Dados reais calculados
         bmi: bmi,
         bmi_category: bmiCategory,
         progress_percentage: targetWeight && currentWeight ? 
@@ -333,29 +370,14 @@ export const useDashboardData = () => {
             });
           }
           
-          setWeeklySteps(completeWeekData);
-        } else {
-          throw new Error('Dados não encontrados');
-        }
+          setWeeklySteps(completeWeekData);          } else {
+            // Usa array vazio se não houver dados da semana
+            setWeeklySteps([]);
+          }
       } catch (stepsError) {
-        console.warn('Usando dados simulados para passos da semana:', stepsError);
-        // Fallback para dados simulados
-        const weeklyStepsData: WeeklyStepData[] = [];
-        for (let i = 6; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          const dateString = date.toISOString().split('T')[0];
-          
-          weeklyStepsData.push({
-            user_id: user.id,
-            recorded_date: dateString,
-            step_count: Math.floor(Math.random() * 5000) + 5000,
-            daily_target: 10000,
-            completion_percentage: Math.floor(Math.random() * 50) + 50,
-            day_of_week: date.getDay()
-          });
-        }
-        setWeeklySteps(weeklyStepsData);
+        console.warn('Erro ao buscar dados de passos da semana:', stepsError);
+        // Usa array vazio se não houver dados de passos
+        setWeeklySteps([]);
       }
 
     } catch (err) {
@@ -381,7 +403,8 @@ export const useDashboardData = () => {
         });
 
       if (error) {
-        console.warn('Erro ao inserir em water_logs, usando fallback:', error);
+        console.error('Erro ao inserir em water_logs:', error);
+        throw new Error(`Falha ao registrar água: ${error.message}`);
       } else {
         console.log(`✅ Água registrada: ${amountMl}ml para usuário ${user.id}`);
       }
@@ -415,7 +438,8 @@ export const useDashboardData = () => {
         });
 
       if (error) {
-        console.warn('Erro ao inserir em daily_steps, usando fallback:', error);
+        console.error('Erro ao inserir em daily_steps:', error);
+        throw new Error(`Falha ao registrar passos: ${error.message}`);
       } else {
         console.log(`✅ Passos registrados: ${stepCount} para usuário ${user.id} em ${dateString}`);
       }
@@ -440,10 +464,12 @@ export const useDashboardData = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
-      // Por enquanto, apenas simular o registro e recarregar dados
-      console.log(`Atividade atualizada para usuário ${user.id}:`, activityData);
+      console.log(`✅ Atividade registrada para usuário ${user.id}:`, activityData);
 
-      // Recarregar dados
+      // Não há necessidade de uma tabela de resumo separada
+      // Os dados são calculados dinamicamente pelas outras tabelas
+      
+      // Recarregar dados do dashboard para refletir mudanças
       await fetchDashboardMetrics();
     } catch (err) {
       console.error('Erro ao atualizar atividade:', err);
@@ -451,17 +477,46 @@ export const useDashboardData = () => {
     }
   };
 
-  const logMeal = async (mealData: { calories?: number; protein?: number; carbs?: number; fat?: number }) => {
+  const logMeal = async (mealData: { 
+    meal_type?: string;
+    food_name?: string;
+    quantity?: number;
+    calories?: number; 
+    protein?: number; 
+    carbs?: number; 
+    fat?: number 
+  }) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
-      console.log(`Refeição registrada para usuário ${user.id}:`, mealData);
+      const today = new Date().toISOString().split('T')[0];
       
-      // Atualizar resumo de atividade para incluir a refeição
-      await updateActivitySummary({
-        meals_logged: 1
-      });
+      // Inserir refeição real no banco
+      const { error } = await supabaseUntyped
+        .from('meal_logs')
+        .insert({
+          user_id: user.id,
+          meal_date: today,
+          meal_type: mealData.meal_type || 'snack',
+          food_name: mealData.food_name || 'Alimento não especificado',
+          quantity: mealData.quantity || 1,
+          calories: mealData.calories || 0,
+          protein: mealData.protein || 0,
+          carbohydrates: mealData.carbs || 0,
+          fat: mealData.fat || 0,
+          logged_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Erro ao registrar refeição:', error);
+        throw new Error(`Falha ao registrar refeição: ${error.message}`);
+      }
+
+      console.log(`✅ Refeição registrada para usuário ${user.id}:`, mealData);
+      
+      // Recarregar dados
+      await fetchDashboardMetrics();
 
     } catch (err) {
       console.error('Erro ao registrar refeição:', err);
@@ -469,17 +524,38 @@ export const useDashboardData = () => {
     }
   };
 
-  const logWorkout = async (workoutData: { duration_minutes?: number; exercise_type?: string }) => {
+  const logWorkout = async (workoutData: { 
+    workout_name?: string;
+    duration_minutes?: number; 
+    exercise_type?: string;
+    calories_burned?: number;
+    notes?: string;
+  }) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
-      console.log(`Treino registrado para usuário ${user.id}:`, workoutData);
+      // Inserir treino real no banco
+      const { error } = await supabaseUntyped
+        .from('workout_logs')
+        .insert({
+          user_id: user.id,
+          workout_name: workoutData.workout_name || workoutData.exercise_type || 'Treino não especificado',
+          duration_minutes: workoutData.duration_minutes || 0,
+          calories_burned: workoutData.calories_burned || 0,
+          notes: workoutData.notes || '',
+          logged_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Erro ao registrar treino:', error);
+        throw new Error(`Falha ao registrar treino: ${error.message}`);
+      }
+
+      console.log(`✅ Treino registrado para usuário ${user.id}:`, workoutData);
       
-      // Atualizar resumo de atividade para incluir o treino
-      await updateActivitySummary({
-        workouts_completed: 1
-      });
+      // Recarregar dados
+      await fetchDashboardMetrics();
 
     } catch (err) {
       console.error('Erro ao registrar treino:', err);
