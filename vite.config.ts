@@ -16,13 +16,17 @@ export default defineConfig(() => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react/jsx-runtime'],
+  },
   build: {
     target: 'esnext',
     minify: 'esbuild',
     rollupOptions: {
+      external: [],
       output: {
         manualChunks: (id) => {
-          // React core
+          // React core - manter juntos para evitar problemas de contexto
           if (id.includes('react') || id.includes('react-dom')) {
             return 'vendor-react';
           }
@@ -32,30 +36,7 @@ export default defineConfig(() => ({
             return 'vendor-router';
           }
           
-          // Radix UI Components (dividir em grupos menores)
-          if (id.includes('@radix-ui/react-dialog') || 
-              id.includes('@radix-ui/react-alert-dialog') ||
-              id.includes('@radix-ui/react-popover') ||
-              id.includes('@radix-ui/react-tooltip') ||
-              id.includes('@radix-ui/react-hover-card')) {
-            return 'ui-dialogs';
-          }
-          
-          if (id.includes('@radix-ui/react-dropdown-menu') || 
-              id.includes('@radix-ui/react-menubar') ||
-              id.includes('@radix-ui/react-navigation-menu') ||
-              id.includes('@radix-ui/react-context-menu')) {
-            return 'ui-navigation';
-          }
-          
-          if (id.includes('@radix-ui/react-select') || 
-              id.includes('@radix-ui/react-checkbox') ||
-              id.includes('@radix-ui/react-radio-group') ||
-              id.includes('@radix-ui/react-switch') ||
-              id.includes('@radix-ui/react-slider')) {
-            return 'ui-forms';
-          }
-          
+          // Radix UI Components - manter agrupados por funcionalidade
           if (id.includes('@radix-ui')) {
             return 'ui-radix';
           }
@@ -85,43 +66,11 @@ export default defineConfig(() => ({
             return 'supabase';
           }
           
-          // Date utilities
-          if (id.includes('date-fns') || id.includes('react-day-picker')) {
-            return 'date-utils';
-          }
-          
           // Form utilities
           if (id.includes('react-hook-form') || 
               id.includes('@hookform/resolvers') ||
               id.includes('zod')) {
             return 'form-utils';
-          }
-          
-          // Other utilities
-          if (id.includes('clsx') || 
-              id.includes('tailwind-merge') ||
-              id.includes('class-variance-authority') ||
-              id.includes('cmdk') ||
-              id.includes('input-otp') ||
-              id.includes('sonner') ||
-              id.includes('vaul')) {
-            return 'utils';
-          }
-          
-          // Carousel and panels
-          if (id.includes('embla-carousel') || 
-              id.includes('react-resizable-panels')) {
-            return 'ui-advanced';
-          }
-          
-          // Themes
-          if (id.includes('next-themes')) {
-            return 'themes';
-          }
-          
-          // Country flags
-          if (id.includes('react-country-flag')) {
-            return 'country-utils';
           }
           
           // Node modules default

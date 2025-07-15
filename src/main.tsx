@@ -1,11 +1,19 @@
+import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { ThemeProvider } from './components/ThemeProvider.tsx'
 import './i18n'
 
-createRoot(document.getElementById("root")!).render(
-  <ThemeProvider>
-    <App />
-  </ThemeProvider>
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Root element not found");
+}
+
+createRoot(rootElement).render(
+  <React.StrictMode>
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
+  </React.StrictMode>
 );
