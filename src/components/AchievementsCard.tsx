@@ -102,19 +102,18 @@ const AchievementsCard = ({ achievements, totalPoints, level }: AchievementsCard
             {completedAchievements.slice(0, 3).map((achievement) => (
               <div 
                 key={achievement.id} 
-                className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-200/50 dark:border-green-700/50"
-                style={{
-                  borderImage: 'linear-gradient(135deg, rgb(16 185 129 / 0.3), rgb(34 197 94 / 0.3)) 1'
-                }}
+                className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-green-500 via-transparent to-emerald-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]"
               >
-                <div className="text-2xl">{achievement.icon}</div>
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900">{achievement.title}</div>
-                  <div className="text-sm text-gray-600">{achievement.description}</div>
+                <div className="rounded-[19px] bg-white dark:bg-slate-900 flex items-center gap-3 p-3">
+                  <div className="text-2xl">{achievement.icon}</div>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">{achievement.title}</div>
+                    <div className="text-sm text-gray-600">{achievement.description}</div>
+                  </div>
+                  <Badge className={getCategoryColor(achievement.category)}>
+                    {getCategoryIcon(achievement.category)}
+                  </Badge>
                 </div>
-                <Badge className={getCategoryColor(achievement.category)}>
-                  {getCategoryIcon(achievement.category)}
-                </Badge>
               </div>
             ))}
           </div>
