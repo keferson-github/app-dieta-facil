@@ -98,10 +98,18 @@ export function PricingPlans({ plans, currentPlan, onPlanSelect }: PricingPlansP
         const cardStyle = planColors[plan.name as keyof typeof planColors] || "bg-card";
         const isPopular = plan.name === "Plano Energia";
 
+        const borderGradient = plan.name === "Plano Energia" 
+          ? 'linear-gradient(135deg, rgb(59 130 246 / 0.4), rgb(37 99 235 / 0.4)) 1'
+          : 'linear-gradient(135deg, rgb(147 51 234 / 0.4), rgb(126 34 206 / 0.4)) 1';
+
         return (
           <Card 
             key={plan.id} 
-            className={`relative ${cardStyle} ${isCurrentPlan ? 'ring-2 ring-primary' : ''} ${isPopular ? 'border-primary' : ''}`}
+            className={`relative ${cardStyle} ${isCurrentPlan ? 'ring-2 ring-primary' : ''} ${isPopular ? 'border-primary' : ''} border border-blue-200/50 dark:border-blue-700/50 rounded-[10px]`}
+            style={{
+              borderImage: borderGradient,
+              borderRadius: '10px'
+            }}
           >
             {isPopular && (
               <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground">

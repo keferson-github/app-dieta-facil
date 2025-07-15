@@ -1,1 +1,0 @@
-Este app permitirá criar refeições, fichas de treinos e acompanhar o progresso, através de planos dietéticos e periodização de treinos personalizados. O usuário poderá se cadastrar e utilizar o serviço completo.

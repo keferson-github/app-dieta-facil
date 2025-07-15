@@ -9,10 +9,12 @@ import { ArrowRight, CheckCircle, Users, Target, Zap, Heart, Apple, Dumbbell, Ut
 import { useNavigate } from "react-router-dom";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const [activeFeature, setActiveFeature] = useState(-1);
   const featuresRef = useRef<HTMLDivElement>(null);
 
@@ -119,7 +121,7 @@ const Index = () => {
             <div className="w-10 h-10 health-gradient rounded-xl flex items-center justify-center">
               <Apple className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-primary-dark">{t('brand')}</span>
+            <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-primary-dark`}>{t('brand')}</span>
           </div>
           <div className="flex items-center space-x-4">
             <Button className="health-gradient shadow-health px-4 py-2" onClick={() => navigate('/auth?mode=login')}>
@@ -437,7 +439,7 @@ const Index = () => {
               <div className="w-8 h-8 health-gradient rounded-lg flex items-center justify-center">
                 <Apple className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold">{t('brand')}</span>
+              <span className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold`}>{t('brand')}</span>
             </div>
             <p className="text-gray-400 text-center md:text-right">
               {t('footer.rights')}

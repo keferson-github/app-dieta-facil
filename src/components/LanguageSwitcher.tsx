@@ -9,9 +9,27 @@ interface LanguageSwitcherProps {
   fixed?: boolean;
 }
 
+// Hook customizado para detectar mobile/tablet
+const useIsMobileOrTablet = () => {
+  const [isMobileOrTablet, setIsMobileOrTablet] = React.useState<boolean | undefined>(undefined);
+
+  React.useEffect(() => {
+    const mql = window.matchMedia('(max-width: 1023px)');
+    const onChange = () => {
+      setIsMobileOrTablet(window.innerWidth < 1024);
+    };
+    mql.addEventListener('change', onChange);
+    setIsMobileOrTablet(window.innerWidth < 1024);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
+
+  return !!isMobileOrTablet;
+};
+
 const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ fixed = true }) => {
   const { i18n, t } = useTranslation();
   const isMobile = useIsMobile();
+  const isMobileOrTablet = useIsMobileOrTablet();
   const [open, setOpen] = useState(false);
 
   const changeLanguage = (lng: string) => {
@@ -44,16 +62,20 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ fixed = true }) => 
   const triggerButton = (
     <Button
       variant="outline"
-      className="flex items-center gap-2 px-3 py-1.5 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white/90 transition-colors border"
+      className={`flex items-center gap-2 px-3 py-1.5 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white/90 transition-colors border ${
+        isMobileOrTablet ? 'rounded-full p-2 w-10 h-10' : ''
+      }`}
     >
       <ReactCountryFlag 
         countryCode={getCurrentLanguage().countryCode} 
         svg 
         style={{ width: '1.2em', height: '1.2em' }}
       />
-      <span className="text-sm font-semibold text-gray-600">
-        {getCurrentLanguage().label}
-      </span>
+      {!isMobileOrTablet && (
+        <span className="text-sm font-semibold text-gray-600">
+          {getCurrentLanguage().label}
+        </span>
+      )}
     </Button>
   );
 

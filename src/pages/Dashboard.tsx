@@ -42,6 +42,8 @@ import MobileNavigation from "@/components/MobileNavigation";
 import MetricsGrid from "@/components/MetricsGrid";
 import MacroNutrientsCarousel from "@/components/MacroNutrientsCarousel";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Plan {
   id: string;
@@ -67,6 +69,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const [userProfile, setUserProfile] = useState<Tables<"user_profiles"> | null>(null);
   const [loading, setLoading] = useState(true);
   const [welcomeMessage, setWelcomeMessage] = useState("");
@@ -131,6 +134,26 @@ const Dashboard = () => {
   const [plans, setPlans] = useState<Plan[]>([]);
   const { subscription, loading: subscriptionLoading, refetch: refetchSubscription } = useSubscription();
 
+  // Helper functions (moved after hooks)
+  const getWelcomeMessage = useCallback(() => {
+    // Obter horário atual no timezone de São Paulo
+    const now = new Date();
+    const saoPauloTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
+    const hour = saoPauloTime.getHours();
+    
+    // Determinar saudação baseada no horário
+    let greeting = "";
+    if (hour >= 5 && hour < 12) {
+      greeting = t('dashboard.greetings.good_morning');
+    } else if (hour >= 12 && hour < 18) {
+      greeting = t('dashboard.greetings.good_afternoon');
+    } else {
+      greeting = t('dashboard.greetings.good_evening');
+    }
+    
+    return greeting;
+  }, [t]);
+
   const loadPlans = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -167,8 +190,8 @@ const Dashboard = () => {
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('Erro ao buscar perfil:', profileError);
         toast({
-          title: "Erro",
-          description: "Não foi possível carregar seu perfil.",
+          title: t('notifications.dashboard.error'),
+          description: t('notifications.dashboard.error_profile'),
           variant: "destructive",
         });
         return;
@@ -183,14 +206,14 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Erro inesperado:', error);
       toast({
-        title: "Erro",
-        description: "Ocorreu um erro inesperado.",
+        title: t('notifications.dashboard.error'),
+        description: t('notifications.dashboard.error_unexpected'),
         variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
-  }, [navigate, toast]);
+  }, [navigate, toast, t]);
 
   useEffect(() => {
     checkUserProfile();
@@ -217,7 +240,7 @@ const Dashboard = () => {
     };
     
     loadWelcomeMessage();
-  }, []);
+  }, [getWelcomeMessage]);
 
   useEffect(() => {
     // Verificar se voltou do Stripe
@@ -238,6 +261,21 @@ const Dashboard = () => {
       window.history.replaceState({}, '', '/dashboard');
     }
   }, [toast, refetchSubscription, t]);
+
+  const getActivityLevelText = useCallback(() => {
+    const level = userProfile?.activity_level;
+    if (!level) return null; // Retorna null se não houver dados
+    
+    const levelMap: Record<string, string> = {
+      'sedentary': t('dashboard.activity_levels.sedentary'),
+      'lightly_active': t('dashboard.activity_levels.lightly_active'),
+      'moderately_active': t('dashboard.activity_levels.moderately_active'),
+      'very_active': t('dashboard.activity_levels.very_active'),
+      'extremely_active': t('dashboard.activity_levels.extremely_active'),
+    };
+    
+    return levelMap[level] || level;
+  }, [userProfile?.activity_level, t]);
 
   const calculateBMI = () => {
     if (metrics?.bmi) return metrics.bmi;
@@ -320,13 +358,13 @@ const Dashboard = () => {
       await logWaterIntake(amount);
       await updateActivitySummary({ water_logged: true });
       toast({
-        title: "Água registrada!",
-        description: `${amount}ml adicionados ao seu consumo diário.`,
+        title: t('notifications.dashboard.water_logged'),
+        description: t('notifications.dashboard.water_logged_desc', { amount }),
       });
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Não foi possível registrar o consumo de água.",
+        title: t('notifications.dashboard.error'),
+        description: t('notifications.dashboard.error_water'),
         variant: "destructive",
       });
     }
@@ -337,13 +375,13 @@ const Dashboard = () => {
       await logDailySteps(steps);
       await updateActivitySummary({ steps_recorded: true });
       toast({
-        title: "Passos registrados!",
-        description: `${steps} passos registrados para hoje.`,
+        title: t('notifications.dashboard.steps_logged'),
+        description: t('notifications.dashboard.steps_logged_desc', { steps }),
       });
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Não foi possível registrar os passos.",
+        title: t('notifications.dashboard.error'),
+        description: t('notifications.dashboard.error_steps'),
         variant: "destructive",
       });
     }
@@ -355,13 +393,13 @@ const Dashboard = () => {
         meals_logged: (metrics?.today_meals_count || 0) + 1 
       });
       toast({
-        title: "Refeição registrada!",
-        description: "Refeição adicionada ao seu log diário.",
+        title: t('notifications.dashboard.meal_logged'),
+        description: t('notifications.dashboard.meal_logged_desc'),
       });
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Não foi possível registrar a refeição.",
+        title: t('notifications.dashboard.error'),
+        description: t('notifications.dashboard.error_meal'),
         variant: "destructive",
       });
     }
@@ -373,13 +411,13 @@ const Dashboard = () => {
         workouts_completed: (metrics?.today_workouts_count || 0) + 1 
       });
       toast({
-        title: "Treino registrado!",
-        description: "Treino adicionado ao seu log diário.",
+        title: t('notifications.dashboard.workout_logged'),
+        description: t('notifications.dashboard.workout_logged_desc'),
       });
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Não foi possível registrar o treino.",
+        title: t('notifications.dashboard.error'),
+        description: t('notifications.dashboard.error_workout'),
         variant: "destructive",
       });
     }
@@ -401,8 +439,8 @@ const Dashboard = () => {
       
       // Para outros recursos do Plano Nutri, mostrar "em breve"
       toast({
-        title: "Recurso disponível",
-        description: `${feature} está disponível gratuitamente no Plano Nutri!`,
+        title: t('notifications.dashboard.feature_available'),
+        description: t('notifications.dashboard.feature_available_desc', { feature }),
       });
       return;
     }
@@ -612,27 +650,7 @@ const Dashboard = () => {
     }
   }, [userProfile, fetchChartData]);
 
-  // Helper functions (moved after hooks)
-  const getWelcomeMessage = () => {
-    // Obter horário atual no timezone de São Paulo
-    const now = new Date();
-    const saoPauloTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
-    const hour = saoPauloTime.getHours();
-    
-    // Determinar saudação baseada no horário
-    let greeting = "";
-    if (hour >= 5 && hour < 12) {
-      greeting = "Bom dia";
-    } else if (hour >= 12 && hour < 18) {
-      greeting = "Boa tarde";
-    } else {
-      greeting = "Boa noite";
-    }
-    
-    return greeting;
-  };
-
-  const getGoalText = () => {
+  const getGoalText = useCallback(() => {
     const goal = userProfile?.goal;
     if (!goal) return null; // Retorna null se não houver dados
     
@@ -643,22 +661,7 @@ const Dashboard = () => {
     };
     
     return goalMap[goal] || goal;
-  };
-
-  const getActivityLevelText = () => {
-    const level = userProfile?.activity_level;
-    if (!level) return null; // Retorna null se não houver dados
-    
-    const levelMap: Record<string, string> = {
-      'sedentary': t('dashboard.activity_levels.sedentary'),
-      'lightly_active': t('dashboard.activity_levels.lightly_active'),
-      'moderately_active': t('dashboard.activity_levels.moderately_active'),
-      'very_active': t('dashboard.activity_levels.very_active'),
-      'extremely_active': t('dashboard.activity_levels.extremely_active'),
-    };
-    
-    return levelMap[level] || level;
-  };
+  }, [userProfile?.goal, t]);
 
   // Early return after all hooks
   if (loading || subscriptionLoading || dashboardLoading) {
@@ -694,14 +697,14 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <h1 className="text-2xl lg:text-3xl font-bold text-primary-dark">
-                    {welcomeMessage || "Olá"} 💪
+                    {welcomeMessage || t('dashboard.hello')} 💪
                   </h1>
                   <p className="text-secondary-dark mt-1">
                     {t('dashboard.ready_evolution')}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <Badge className="health-gradient text-white border-0">
-                      Plano Atual - {currentPlan}
+                      {t('dashboard.current_plan')} - {currentPlan}
                     </Badge>
                     {subscription?.subscribed && (
                       <Badge variant="outline" className="border-health-200 text-health-700">
@@ -721,8 +724,8 @@ const Dashboard = () => {
                     size="sm"
                   >
                     <Zap className="w-4 h-4 mr-1 sm:mr-2" />
-                    <span className="hidden sm:inline">Assinatura</span>
-                    <span className="inline sm:hidden">Up</span>
+                    <span className="hidden sm:inline">{t('dashboard.subscription')}</span>
+                    <span className="inline sm:hidden">{t('dashboard.subscription_short')}</span>
                   </Button>
                 )}
                 <Button 
@@ -733,7 +736,7 @@ const Dashboard = () => {
                 >
                   <Settings className="w-4 h-4 mr-1 sm:mr-2" />
                   <span className="hidden sm:inline">{t('dashboard.settings')}</span>
-                  <span className="inline sm:hidden">Config</span>
+                  <span className="inline sm:hidden">{t('dashboard.settings_short')}</span>
                 </Button>
                 <ThemeToggle />
                 <Button 
@@ -744,7 +747,7 @@ const Dashboard = () => {
                 >
                   <LogOut className="w-4 h-4 mr-1 sm:mr-2" />
                   <span className="hidden sm:inline">{t('dashboard.logout')}</span>
-                  <span className="inline sm:hidden">Sair</span>
+                  <span className="inline sm:hidden">{t('dashboard.logout_short')}</span>
                 </Button>
               </div>
             </div>
@@ -761,11 +764,11 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-primary-dark">
-                    {welcomeMessage || "Olá"}
+                    {welcomeMessage || t('dashboard.hello')}
                   </h1>
                   <div className="flex items-center gap-2">
                     <Badge className="health-gradient text-white border-0 text-xs">
-                      Plano Atual - {currentPlan}
+                      {t('dashboard.current_plan')} - {currentPlan}
                     </Badge>
                   </div>
                 </div>
@@ -778,9 +781,10 @@ const Dashboard = () => {
                     className="health-gradient shadow-health h-8 px-3 text-xs"
                   >
                     <Zap className="w-3 h-3 mr-1" />
-                    Assinatura
+                    {t('dashboard.subscription')}
                   </Button>
                 )}
+                <LanguageSwitcher fixed={false} />
                 <ThemeToggle />
               </div>
             </div>
@@ -891,7 +895,13 @@ const Dashboard = () => {
             </div>
 
             {/* Quick Actions Card */}
-            <Card className="glass-effect border-0 shadow-sm">
+            <Card 
+              className="glass-effect shadow-sm border border-health-200/50 dark:border-health-700/50 rounded-[20px]" 
+              style={{
+                borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6, #a855f7) 1',
+                borderRadius: '20px'
+              }}
+            >
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg font-semibold text-primary-dark">
                   🚀 Ações Rápidas
@@ -954,7 +964,13 @@ const Dashboard = () => {
 
             {/* Premium Plans Promotion - Only show for non-subscribers */}
             {!subscription?.subscribed && (
-              <Card className="glass-effect border-0 shadow-sm bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30">
+              <Card 
+                className="glass-effect shadow-sm bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50 dark:border-purple-700/50 rounded-[20px]" 
+                style={{
+                  borderImage: 'linear-gradient(135deg, #3b82f6, #a855f7, #06b6d4) 1',
+                  borderRadius: '20px'
+                }}
+              >
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
                     <Zap className="w-5 h-5 text-blue-500" />
@@ -1083,8 +1099,14 @@ const Dashboard = () => {
               {/* Modern Dashboard Metrics with Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* BMI Card with Donut Chart */}
-                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300" 
-                      style={{boxShadow: '0 8px 32px rgba(250, 250, 250, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04)'}}>
+                <Card 
+                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-health-200/50 dark:border-health-700/50 rounded-[20px]" 
+                  style={{
+                    boxShadow: '0 8px 32px rgba(250, 250, 250, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04)', 
+                    borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6) 1',
+                    borderRadius: '20px'
+                  }}
+                >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <PieChart className="w-4 h-4 text-health-500" />
@@ -1139,8 +1161,14 @@ const Dashboard = () => {
                 </Card>
                 
                 {/* Progress Card with Bar Chart */}
-                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300" 
-                      style={{boxShadow: '0 8px 32px rgba(59, 130, 246, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'}}>
+                <Card 
+                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-blue-200/50 dark:border-blue-700/50 rounded-[20px]" 
+                  style={{
+                    boxShadow: '0 8px 32px rgba(59, 130, 246, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', 
+                    borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4) 1',
+                    borderRadius: '20px'
+                  }}
+                >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <BarChart className="w-4 h-4 text-blue-500" />
@@ -1181,8 +1209,14 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Activity Card with Column Chart */}
-                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300" 
-                      style={{boxShadow: '0 8px 32px rgba(34, 197, 94, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'}}>
+                <Card 
+                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-green-200/50 dark:border-green-700/50 rounded-[20px]" 
+                  style={{
+                    boxShadow: '0 8px 32px rgba(34, 197, 94, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', 
+                    borderImage: 'linear-gradient(135deg, #22c55e, #10b981) 1',
+                    borderRadius: '20px'
+                  }}
+                >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Activity className="w-4 h-4 text-green-500" />
@@ -1241,8 +1275,14 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Goals Card with Target Chart */}
-                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300" 
-                      style={{boxShadow: '0 8px 32px rgba(168, 85, 247, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'}}>
+                <Card 
+                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-purple-200/50 dark:border-purple-700/50 rounded-[20px]" 
+                  style={{
+                    boxShadow: '0 8px 32px rgba(168, 85, 247, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', 
+                    borderImage: 'linear-gradient(135deg, #a855f7, #ec4899) 1',
+                    borderRadius: '20px'
+                  }}
+                >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Target className="w-4 h-4 text-purple-500" />
@@ -1326,7 +1366,13 @@ const Dashboard = () => {
               {/* Additional Real Data Cards for Desktop */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Daily Calories Card */}
-                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300">
+                <Card 
+                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-orange-200/50 dark:border-orange-700/50 rounded-[20px]" 
+                  style={{
+                    borderImage: 'linear-gradient(135deg, #f97316, #f59e0b) 1',
+                    borderRadius: '20px'
+                  }}
+                >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Apple className="w-4 h-4 text-orange-500" />
@@ -1357,7 +1403,13 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Water Intake Card */}
-                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300">
+                <Card 
+                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-blue-200/50 dark:border-blue-700/50 rounded-[20px]" 
+                  style={{
+                    borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4) 1',
+                    borderRadius: '20px'
+                  }}
+                >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
@@ -1388,7 +1440,13 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Steps Card */}
-                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300">
+                <Card 
+                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-green-200/50 dark:border-green-700/50 rounded-[20px]" 
+                  style={{
+                    borderImage: 'linear-gradient(135deg, #22c55e, #10b981) 1',
+                    borderRadius: '20px'
+                  }}
+                >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Activity className="w-4 h-4 text-green-500" />
@@ -1419,7 +1477,13 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Protein Card */}
-                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300">
+                <Card 
+                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-red-200/50 dark:border-red-700/50 rounded-[20px]" 
+                  style={{
+                    borderImage: 'linear-gradient(135deg, #ef4444, #dc2626) 1',
+                    borderRadius: '20px'
+                  }}
+                >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <div className="w-4 h-4 bg-red-500 rounded-full"></div>
@@ -1453,7 +1517,13 @@ const Dashboard = () => {
               {/* Additional Mock Data Summary Cards */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Daily Summary Card */}
-                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md">
+                <Card 
+                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-health-200/50 dark:border-health-700/50 rounded-[20px]" 
+                  style={{
+                    borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6, #a855f7) 1',
+                    borderRadius: '20px'
+                  }}
+                >
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
                       <Calendar className="w-5 h-5 text-blue-500" />
@@ -1496,7 +1566,13 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Weekly Streak & Goals Card */}
-                <Card className="glass-effect border-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md">
+                <Card 
+                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-yellow-200/50 dark:border-yellow-700/50 rounded-[20px]" 
+                  style={{
+                    borderImage: 'linear-gradient(135deg, #f59e0b, #eab308, #facc15) 1',
+                    borderRadius: '20px'
+                  }}
+                >
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
                       <Trophy className="w-5 h-5 text-yellow-500" />
@@ -1582,7 +1658,13 @@ const Dashboard = () => {
 
               {/* Premium Plans Promotion for Desktop - Only show for non-subscribers */}
               {!subscription?.subscribed && (
-                <Card className="glass-effect bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50">
+                <Card 
+                  className="glass-effect bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50 dark:border-purple-700/50 rounded-[20px]" 
+                  style={{
+                    borderImage: 'linear-gradient(135deg, #3b82f6, #a855f7, #06b6d4) 1',
+                    borderRadius: '20px'
+                  }}
+                >
                   <CardHeader className="text-center pb-4">
                     <CardTitle className="text-xl font-bold text-primary-dark flex items-center justify-center gap-3">
                       <Zap className="w-6 h-6 text-blue-500" />

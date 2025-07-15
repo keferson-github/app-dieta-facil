@@ -74,7 +74,13 @@ const NutritionChart = ({ macros, dailyData, targets }: NutritionChartProps) => 
   };
 
   return (
-    <Card className="glass-effect">
+    <Card 
+      className="glass-effect border border-blue-200/50 dark:border-blue-700/50 rounded-[10px]" 
+      style={{
+        borderImage: 'linear-gradient(135deg, rgb(59 130 246 / 0.3), rgb(16 185 129 / 0.3), rgb(245 158 11 / 0.3)) 1',
+        borderRadius: '10px'
+      }}
+    >
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
           <Apple className="w-5 h-5 text-health-500" />

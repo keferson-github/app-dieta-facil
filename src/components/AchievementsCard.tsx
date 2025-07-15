@@ -53,7 +53,13 @@ const AchievementsCard = ({ achievements, totalPoints, level }: AchievementsCard
   };
 
   return (
-    <Card className="glass-effect">
+    <Card 
+      className="glass-effect border border-yellow-200/50 dark:border-yellow-700/50 rounded-[10px]" 
+      style={{
+        borderImage: 'linear-gradient(135deg, rgb(245 158 11 / 0.4), rgb(251 191 36 / 0.4), rgb(252 211 77 / 0.4)) 1',
+        borderRadius: '10px'
+      }}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
@@ -99,7 +105,14 @@ const AchievementsCard = ({ achievements, totalPoints, level }: AchievementsCard
           </h4>
           <div className="space-y-3">
             {completedAchievements.slice(0, 3).map((achievement) => (
-              <div key={achievement.id} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
+              <div 
+                key={achievement.id} 
+                className="flex items-center gap-3 p-3 bg-white rounded-[10px] border border-green-200/50 dark:border-green-700/50"
+                style={{
+                  borderImage: 'linear-gradient(135deg, rgb(16 185 129 / 0.3), rgb(34 197 94 / 0.3)) 1',
+                  borderRadius: '10px'
+                }}
+              >
                 <div className="text-2xl">{achievement.icon}</div>
                 <div className="flex-1">
                   <div className="font-medium text-gray-900">{achievement.title}</div>

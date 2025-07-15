@@ -79,7 +79,11 @@ const DualRowChartsCarousel = ({ topRowItems, bottomRowItems }: DualRowChartsCar
           {topRowItems.map((item) => (
             <Card 
               key={item.id}
-              className="min-w-full snap-start glass-effect border-0 shadow-sm hover:shadow-md transition-shadow"
+              className="min-w-full snap-start glass-effect border border-purple-200/50 dark:border-purple-700/50 shadow-sm hover:shadow-md transition-shadow rounded-[10px]"
+              style={{
+                borderImage: 'linear-gradient(135deg, rgb(147 51 234 / 0.3), rgb(168 85 247 / 0.3)) 1',
+                borderRadius: '10px'
+              }}
             >
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-semibold text-primary-dark">
@@ -118,7 +122,11 @@ const DualRowChartsCarousel = ({ topRowItems, bottomRowItems }: DualRowChartsCar
           {bottomRowItems.map((item) => (
             <Card 
               key={item.id}
-              className="min-w-full snap-start glass-effect border-0 shadow-sm hover:shadow-md transition-shadow"
+              className="min-w-full snap-start glass-effect border border-orange-200/50 dark:border-orange-700/50 shadow-sm hover:shadow-md transition-shadow rounded-[10px]"
+              style={{
+                borderImage: 'linear-gradient(135deg, rgb(245 158 11 / 0.3), rgb(251 146 60 / 0.3)) 1',
+                borderRadius: '10px'
+              }}
             >
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-semibold text-primary-dark">

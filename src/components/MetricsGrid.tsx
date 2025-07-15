@@ -148,9 +148,13 @@ const MetricsGrid = ({
             <Card
               key={metric.name}
               className={cn(
-                "glass-effect border-0 shadow-sm hover:shadow-health transition-all duration-200 cursor-pointer",
+                "glass-effect border border-blue-200/50 dark:border-blue-700/50 shadow-sm hover:shadow-health transition-all duration-200 cursor-pointer rounded-[10px]",
                 "active:scale-95"
               )}
+              style={{
+                borderImage: 'linear-gradient(135deg, rgb(59 130 246 / 0.3), rgb(16 185 129 / 0.3), rgb(245 158 11 / 0.3)) 1',
+                borderRadius: '10px'
+              }}
               onClick={() => onQuickLog?.(metric.name.toLowerCase())}
             >
               <CardContent className="p-4">
@@ -200,7 +204,11 @@ const MetricsGrid = ({
           return (
             <Card
               key={metric.name}
-              className="glass-effect border-0 shadow-sm hover:shadow-health transition-all duration-200 cursor-pointer active:scale-95"
+              className="glass-effect border border-cyan-200/50 dark:border-cyan-700/50 shadow-sm hover:shadow-health transition-all duration-200 cursor-pointer active:scale-95 rounded-[10px]"
+              style={{
+                borderImage: 'linear-gradient(135deg, rgb(6 182 212 / 0.3), rgb(147 51 234 / 0.3)) 1',
+                borderRadius: '10px'
+              }}
               onClick={() => onQuickLog?.(metric.name.toLowerCase())}
             >
               <CardContent className="p-3">
@@ -234,7 +242,13 @@ const MetricsGrid = ({
       </div>
 
       {/* Today's Summary */}
-      <Card className="glass-effect border-0 shadow-sm">
+      <Card 
+        className="glass-effect border border-green-200/50 dark:border-green-700/50 shadow-sm rounded-[10px]"
+        style={{
+          borderImage: 'linear-gradient(135deg, rgb(34 197 94 / 0.3), rgb(16 185 129 / 0.3)) 1',
+          borderRadius: '10px'
+        }}
+      >
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-primary-dark flex items-center gap-2">

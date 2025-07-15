@@ -89,7 +89,13 @@ const ChartsCarousel = ({ items, className }: ChartsCarouselProps) => {
               key={item.id}
               className="w-full flex-shrink-0"
             >
-              <Card className="glass-effect border-0 shadow-health h-full">
+              <Card 
+                className="glass-effect border border-purple-200/50 dark:border-purple-700/50 shadow-health h-full rounded-[10px]"
+                style={{
+                  borderImage: 'linear-gradient(135deg, rgb(147 51 234 / 0.3), rgb(168 85 247 / 0.3), rgb(196 181 253 / 0.3)) 1',
+                  borderRadius: '10px'
+                }}
+              >
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg font-semibold text-primary-dark flex items-center justify-between">
                     {item.title}

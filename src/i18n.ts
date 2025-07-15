@@ -96,6 +96,17 @@ const resources = {
         "welcome_champion": "Olá, campeão!",
         "welcome_champion_female": "Olá, campeã!",
         "ready_evolution": "Pronto para mais um dia de evolução?",
+        "hello": "Olá",
+        "current_plan": "Plano Atual",
+        "subscription": "Assinatura",
+        "subscription_short": "Up",
+        "settings_short": "Config",
+        "logout_short": "Sair",
+        "greetings": {
+          "good_morning": "Bom dia",
+          "good_afternoon": "Boa tarde",
+          "good_evening": "Boa noite"
+        },
         "plan": "Plano",
         "active": "Ativo",
         "upgrade": "Upgrade",
@@ -305,7 +316,24 @@ const resources = {
           "welcome_team": "🎉 Bem-vindo ao time!",
           "welcome_team_desc": "Sua assinatura foi ativada com sucesso! Vamos alcançar seus objetivos juntos.",
           "process_canceled": "Processo cancelado",
-          "process_canceled_desc": "Sem problemas! Você ainda pode continuar usando o plano gratuito."
+          "process_canceled_desc": "Sem problemas! Você ainda pode continuar usando o plano gratuito.",
+          "error": "Erro",
+          "error_profile": "Não foi possível carregar seu perfil.",
+          "error_unexpected": "Ocorreu um erro inesperado.",
+          "water_logged": "Água registrada!",
+          "water_logged_desc": "{{amount}}ml adicionados ao seu consumo diário.",
+          "error_water": "Não foi possível registrar o consumo de água.",
+          "steps_logged": "Passos registrados!",
+          "steps_logged_desc": "{{steps}} passos registrados para hoje.",
+          "error_steps": "Não foi possível registrar os passos.",
+          "meal_logged": "Refeição registrada!",
+          "meal_logged_desc": "Refeição adicionada ao seu log diário.",
+          "error_meal": "Não foi possível registrar a refeição.",
+          "workout_logged": "Treino registrado!",
+          "workout_logged_desc": "Treino adicionado ao seu log diário.",
+          "error_workout": "Não foi possível registrar o treino.",
+          "feature_available": "Recurso disponível",
+          "feature_available_desc": "{{feature}} está disponível gratuitamente no Plano Nutri!"
         }
       }
     }
@@ -404,6 +432,17 @@ const resources = {
         "welcome_champion": "Hello, champion!",
         "welcome_champion_female": "Hello, champion!",
         "ready_evolution": "Ready for another day of evolution?",
+        "hello": "Hello",
+        "current_plan": "Current Plan",
+        "subscription": "Subscription",
+        "subscription_short": "Sub",
+        "settings_short": "Settings",
+        "logout_short": "Logout",
+        "greetings": {
+          "good_morning": "Good morning",
+          "good_afternoon": "Good afternoon",
+          "good_evening": "Good evening"
+        },
         "plan": "Plan",
         "active": "Active",
         "upgrade": "Upgrade",
@@ -447,11 +486,11 @@ const resources = {
         "premium_feature": "🔒 Premium Feature",
         "premium_description": "This feature is available in the {plan} plan. Upgrade to access!",
         "coming_soon": "Coming soon!",
-        "feature_coming_soon": "The \"{feature}\" feature will be available soon.",
+        "feature_coming_soon": "The feature \"{feature}\" will be available soon.",
         "logout_error": "Error",
-        "logout_error_desc": "Could not initiate logout. Please try again.",
+        "logout_error_desc": "Could not logout. Please try again.",
         "logout_success": "Logout successful",
-        "logout_success_desc": "You have been disconnected successfully.",
+        "logout_success_desc": "You have been logged out successfully.",
         "bmi_categories": {
           "underweight": "Underweight",
           "normal": "Normal weight",
@@ -613,7 +652,24 @@ const resources = {
           "welcome_team": "🎉 Welcome to the team!",
           "welcome_team_desc": "Your subscription has been activated successfully! Let's achieve your goals together.",
           "process_canceled": "Process Canceled",
-          "process_canceled_desc": "No problem! You can still continue using the free plan."
+          "process_canceled_desc": "No problem! You can still continue using the free plan.",
+          "error": "Error",
+          "error_profile": "Could not load your profile.",
+          "error_unexpected": "An unexpected error occurred.",
+          "water_logged": "Water logged!",
+          "water_logged_desc": "{{amount}}ml added to your daily consumption.",
+          "error_water": "Could not log water consumption.",
+          "steps_logged": "Steps logged!",
+          "steps_logged_desc": "{{steps}} steps logged for today.",
+          "error_steps": "Could not log steps.",
+          "meal_logged": "Meal logged!",
+          "meal_logged_desc": "Meal added to your daily log.",
+          "error_meal": "Could not log meal.",
+          "workout_logged": "Workout logged!",
+          "workout_logged_desc": "Workout added to your daily log.",
+          "error_workout": "Could not log workout.",
+          "feature_available": "Feature available",
+          "feature_available_desc": "{{feature}} is available for free in the Nutri Plan!"
         }
       }
     }
@@ -712,6 +768,17 @@ const resources = {
         "welcome_champion": "¡Hola, campeón!",
         "welcome_champion_female": "¡Hola, campeona!",
         "ready_evolution": "¿Listo para otro día de evolución?",
+        "hello": "Hola",
+        "current_plan": "Plan Actual",
+        "subscription": "Suscripción",
+        "subscription_short": "Sub",
+        "settings_short": "Config",
+        "logout_short": "Salir",
+        "greetings": {
+          "good_morning": "Buenos días",
+          "good_afternoon": "Buenas tardes",
+          "good_evening": "Buenas noches"
+        },
         "plan": "Plan",
         "active": "Activo",
         "upgrade": "Actualizar",
@@ -921,7 +988,24 @@ const resources = {
           "welcome_team": "🎉 ¡Bienvenido al equipo!",
           "welcome_team_desc": "¡Su suscripción se ha activado exitosamente! Vamos a alcanzar sus objetivos juntos.",
           "process_canceled": "Proceso Cancelado",
-          "process_canceled_desc": "¡Sin problemas! Aún puede continuar usando el plan gratuito."
+          "process_canceled_desc": "¡Sin problemas! Aún puede continuar usando el plan gratuito.",
+          "error": "Error",
+          "error_profile": "No se pudo cargar su perfil.",
+          "error_unexpected": "Ocurrió un error inesperado.",
+          "water_logged": "¡Agua registrada!",
+          "water_logged_desc": "{{amount}}ml agregados a su consumo diario.",
+          "error_water": "No se pudo registrar el consumo de agua.",
+          "steps_logged": "¡Pasos registrados!",
+          "steps_logged_desc": "{{steps}} pasos registrados para hoy.",
+          "error_steps": "No se pudo registrar los pasos.",
+          "meal_logged": "¡Comida registrada!",
+          "meal_logged_desc": "Comida agregada a su registro diario.",
+          "error_meal": "No se pudo registrar la comida.",
+          "workout_logged": "¡Entrenamiento registrado!",
+          "workout_logged_desc": "Entrenamiento agregado a su registro diario.",
+          "error_workout": "No se pudo registrar el entrenamiento.",
+          "feature_available": "Característica disponible",
+          "feature_available_desc": "¡{{feature}} está disponible gratuitamente en el Plan Nutri!"
         }
       }
     }

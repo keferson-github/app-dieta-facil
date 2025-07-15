@@ -87,10 +87,20 @@ const MacroNutrientsCarousel = ({ macros }: MacroNutrientsCarouselProps) => {
           const percentage = (macro.current / macro.target) * 100;
           const pieData = createPieData(macro.current, macro.target);
           
+          const cardGradient = index === 0 
+            ? 'linear-gradient(135deg, rgb(59 130 246 / 0.3), rgb(37 99 235 / 0.3)) 1'
+            : index === 1 
+            ? 'linear-gradient(135deg, rgb(16 185 129 / 0.3), rgb(5 150 105 / 0.3)) 1'
+            : 'linear-gradient(135deg, rgb(245 158 11 / 0.3), rgb(217 119 6 / 0.3)) 1';
+          
           return (
             <Card 
               key={macro.name}
-              className="min-w-[280px] snap-start glass-effect border-0 shadow-sm hover:shadow-md transition-shadow"
+              className="min-w-[280px] snap-start glass-effect border border-health-200/50 dark:border-health-700/50 shadow-sm hover:shadow-md transition-shadow rounded-[10px]"
+              style={{
+                borderImage: cardGradient,
+                borderRadius: '10px'
+              }}
             >
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-semibold text-primary-dark flex items-center gap-2">
