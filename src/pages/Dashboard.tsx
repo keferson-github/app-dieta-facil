@@ -895,7 +895,8 @@ const Dashboard = () => {
             </div>
 
             {/* Quick Actions Card */}
-            <Card className="glass-effect shadow-sm border border-health-200/50 dark:border-health-700/50" style={{borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6, #a855f7) 1'}}>
+            <div className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-health-500 via-transparent to-blue-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]">
+              <Card className="rounded-[19px] bg-white dark:bg-slate-900 glass-effect border-0">
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg font-semibold text-primary-dark">
                   🚀 Ações Rápidas
@@ -955,10 +956,12 @@ const Dashboard = () => {
                 </Button>
               </CardContent>
             </Card>
+            </div>
 
             {/* Premium Plans Promotion - Only show for non-subscribers */}
             {!subscription?.subscribed && (
-              <Card className="glass-effect shadow-sm bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50 dark:border-purple-700/50" style={{borderImage: 'linear-gradient(135deg, #3b82f6, #a855f7, #06b6d4) 1'}}>
+              <div className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-blue-500 via-transparent to-purple-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]">
+                <Card className="rounded-[19px] bg-white dark:bg-slate-900 glass-effect border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
                     <Zap className="w-5 h-5 text-blue-500" />
@@ -1019,6 +1022,7 @@ const Dashboard = () => {
                   </Button>
                 </CardContent>
               </Card>
+              </div>
             )}
           </div>
 
