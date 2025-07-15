@@ -51,7 +51,8 @@ const ActivityChart = ({ data, weeklyGoal }: ActivityChartProps) => {
   };
 
   return (
-    <Card className="glass-effect border border-green-200/50 dark:border-green-700/50" style={{borderImage: 'linear-gradient(135deg, #22c55e, #10b981, #3b82f6) 1'}}>
+    <div className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-green-500 via-transparent to-emerald-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]">
+      <Card className="rounded-[19px] bg-white dark:bg-slate-900 glass-effect border-0">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
@@ -135,6 +136,7 @@ const ActivityChart = ({ data, weeklyGoal }: ActivityChartProps) => {
         </div>
       </CardContent>
     </Card>
+    </div>
   );
 };
 
