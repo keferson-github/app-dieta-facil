@@ -90,10 +90,9 @@ const ChartsCarousel = ({ items, className }: ChartsCarouselProps) => {
               className="w-full flex-shrink-0"
             >
               <Card 
-                className="glass-effect border border-purple-200/50 dark:border-purple-700/50 shadow-health h-full rounded-[10px]"
+                className="glass-effect border border-purple-200/50 dark:border-purple-700/50 shadow-health h-full"
                 style={{
-                  borderImage: 'linear-gradient(135deg, rgb(147 51 234 / 0.3), rgb(168 85 247 / 0.3), rgb(196 181 253 / 0.3)) 1',
-                  borderRadius: '10px'
+                  borderImage: 'linear-gradient(135deg, rgb(147 51 234 / 0.3), rgb(168 85 247 / 0.3), rgb(196 181 253 / 0.3)) 1'
                 }}
               >
                 <CardHeader className="pb-4">

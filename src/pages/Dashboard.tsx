@@ -895,13 +895,7 @@ const Dashboard = () => {
             </div>
 
             {/* Quick Actions Card */}
-            <Card 
-              className="glass-effect shadow-sm border border-health-200/50 dark:border-health-700/50 rounded-[20px]" 
-              style={{
-                borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6, #a855f7) 1',
-                borderRadius: '20px'
-              }}
-            >
+            <Card className="glass-effect shadow-sm border border-health-200/50 dark:border-health-700/50" style={{borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6, #a855f7) 1'}}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg font-semibold text-primary-dark">
                   🚀 Ações Rápidas
@@ -964,13 +958,7 @@ const Dashboard = () => {
 
             {/* Premium Plans Promotion - Only show for non-subscribers */}
             {!subscription?.subscribed && (
-              <Card 
-                className="glass-effect shadow-sm bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50 dark:border-purple-700/50 rounded-[20px]" 
-                style={{
-                  borderImage: 'linear-gradient(135deg, #3b82f6, #a855f7, #06b6d4) 1',
-                  borderRadius: '20px'
-                }}
-              >
+              <Card className="glass-effect shadow-sm bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50 dark:border-purple-700/50" style={{borderImage: 'linear-gradient(135deg, #3b82f6, #a855f7, #06b6d4) 1'}}>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
                     <Zap className="w-5 h-5 text-blue-500" />
@@ -1099,14 +1087,8 @@ const Dashboard = () => {
               {/* Modern Dashboard Metrics with Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* BMI Card with Donut Chart */}
-                <Card 
-                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-health-200/50 dark:border-health-700/50 rounded-[20px]" 
-                  style={{
-                    boxShadow: '0 8px 32px rgba(250, 250, 250, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04)', 
-                    borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6) 1',
-                    borderRadius: '20px'
-                  }}
-                >
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-health-200/50 dark:border-health-700/50" 
+                      style={{boxShadow: '0 8px 32px rgba(250, 250, 250, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6) 1'}}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <PieChart className="w-4 h-4 text-health-500" />
@@ -1161,14 +1143,8 @@ const Dashboard = () => {
                 </Card>
                 
                 {/* Progress Card with Bar Chart */}
-                <Card 
-                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-blue-200/50 dark:border-blue-700/50 rounded-[20px]" 
-                  style={{
-                    boxShadow: '0 8px 32px rgba(59, 130, 246, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', 
-                    borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4) 1',
-                    borderRadius: '20px'
-                  }}
-                >
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-blue-200/50 dark:border-blue-700/50" 
+                      style={{boxShadow: '0 8px 32px rgba(59, 130, 246, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4) 1'}}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <BarChart className="w-4 h-4 text-blue-500" />
@@ -1209,14 +1185,8 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Activity Card with Column Chart */}
-                <Card 
-                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-green-200/50 dark:border-green-700/50 rounded-[20px]" 
-                  style={{
-                    boxShadow: '0 8px 32px rgba(34, 197, 94, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', 
-                    borderImage: 'linear-gradient(135deg, #22c55e, #10b981) 1',
-                    borderRadius: '20px'
-                  }}
-                >
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-green-200/50 dark:border-green-700/50" 
+                      style={{boxShadow: '0 8px 32px rgba(34, 197, 94, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #22c55e, #10b981) 1'}}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Activity className="w-4 h-4 text-green-500" />
@@ -1275,14 +1245,8 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Goals Card with Target Chart */}
-                <Card 
-                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-purple-200/50 dark:border-purple-700/50 rounded-[20px]" 
-                  style={{
-                    boxShadow: '0 8px 32px rgba(168, 85, 247, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', 
-                    borderImage: 'linear-gradient(135deg, #a855f7, #ec4899) 1',
-                    borderRadius: '20px'
-                  }}
-                >
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-purple-200/50 dark:border-purple-700/50" 
+                      style={{boxShadow: '0 8px 32px rgba(168, 85, 247, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #a855f7, #ec4899) 1'}}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Target className="w-4 h-4 text-purple-500" />
@@ -1366,13 +1330,7 @@ const Dashboard = () => {
               {/* Additional Real Data Cards for Desktop */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Daily Calories Card */}
-                <Card 
-                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-orange-200/50 dark:border-orange-700/50 rounded-[20px]" 
-                  style={{
-                    borderImage: 'linear-gradient(135deg, #f97316, #f59e0b) 1',
-                    borderRadius: '20px'
-                  }}
-                >
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-orange-200/50 dark:border-orange-700/50" style={{borderImage: 'linear-gradient(135deg, #f97316, #f59e0b) 1'}}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Apple className="w-4 h-4 text-orange-500" />
@@ -1403,13 +1361,7 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Water Intake Card */}
-                <Card 
-                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-blue-200/50 dark:border-blue-700/50 rounded-[20px]" 
-                  style={{
-                    borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4) 1',
-                    borderRadius: '20px'
-                  }}
-                >
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-blue-200/50 dark:border-blue-700/50" style={{borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4) 1'}}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
@@ -1440,13 +1392,7 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Steps Card */}
-                <Card 
-                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-green-200/50 dark:border-green-700/50 rounded-[20px]" 
-                  style={{
-                    borderImage: 'linear-gradient(135deg, #22c55e, #10b981) 1',
-                    borderRadius: '20px'
-                  }}
-                >
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-green-200/50 dark:border-green-700/50" style={{borderImage: 'linear-gradient(135deg, #22c55e, #10b981) 1'}}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Activity className="w-4 h-4 text-green-500" />
@@ -1477,13 +1423,7 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Protein Card */}
-                <Card 
-                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-red-200/50 dark:border-red-700/50 rounded-[20px]" 
-                  style={{
-                    borderImage: 'linear-gradient(135deg, #ef4444, #dc2626) 1',
-                    borderRadius: '20px'
-                  }}
-                >
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-red-200/50 dark:border-red-700/50" style={{borderImage: 'linear-gradient(135deg, #ef4444, #dc2626) 1'}}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <div className="w-4 h-4 bg-red-500 rounded-full"></div>
@@ -1517,13 +1457,7 @@ const Dashboard = () => {
               {/* Additional Mock Data Summary Cards */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Daily Summary Card */}
-                <Card 
-                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-health-200/50 dark:border-health-700/50 rounded-[20px]" 
-                  style={{
-                    borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6, #a855f7) 1',
-                    borderRadius: '20px'
-                  }}
-                >
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-health-200/50 dark:border-health-700/50" style={{borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6, #a855f7) 1'}}>
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
                       <Calendar className="w-5 h-5 text-blue-500" />
@@ -1566,13 +1500,7 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Weekly Streak & Goals Card */}
-                <Card 
-                  className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-yellow-200/50 dark:border-yellow-700/50 rounded-[20px]" 
-                  style={{
-                    borderImage: 'linear-gradient(135deg, #f59e0b, #eab308, #facc15) 1',
-                    borderRadius: '20px'
-                  }}
-                >
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-yellow-200/50 dark:border-yellow-700/50" style={{borderImage: 'linear-gradient(135deg, #f59e0b, #eab308, #facc15) 1'}}>
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
                       <Trophy className="w-5 h-5 text-yellow-500" />
@@ -1658,13 +1586,7 @@ const Dashboard = () => {
 
               {/* Premium Plans Promotion for Desktop - Only show for non-subscribers */}
               {!subscription?.subscribed && (
-                <Card 
-                  className="glass-effect bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50 dark:border-purple-700/50 rounded-[20px]" 
-                  style={{
-                    borderImage: 'linear-gradient(135deg, #3b82f6, #a855f7, #06b6d4) 1',
-                    borderRadius: '20px'
-                  }}
-                >
+                <Card className="glass-effect bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50 dark:border-purple-700/50" style={{borderImage: 'linear-gradient(135deg, #3b82f6, #a855f7, #06b6d4) 1'}}>
                   <CardHeader className="text-center pb-4">
                     <CardTitle className="text-xl font-bold text-primary-dark flex items-center justify-center gap-3">
                       <Zap className="w-6 h-6 text-blue-500" />

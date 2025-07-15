@@ -105,10 +105,9 @@ export function PricingPlans({ plans, currentPlan, onPlanSelect }: PricingPlansP
         return (
           <Card 
             key={plan.id} 
-            className={`relative ${cardStyle} ${isCurrentPlan ? 'ring-2 ring-primary' : ''} ${isPopular ? 'border-primary' : ''} border border-blue-200/50 dark:border-blue-700/50 rounded-[10px]`}
+            className={`relative ${cardStyle} ${isCurrentPlan ? 'ring-2 ring-primary' : ''} ${isPopular ? 'border-primary' : ''} border border-blue-200/50 dark:border-blue-700/50`}
             style={{
-              borderImage: borderGradient,
-              borderRadius: '10px'
+              borderImage: borderGradient
             }}
           >
             {isPopular && (

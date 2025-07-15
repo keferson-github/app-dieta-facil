@@ -45,13 +45,7 @@ const WeightProgressChart = ({ data, currentWeight, targetWeight, goal }: Weight
   };
 
   return (
-    <Card 
-      className="glass-effect border border-blue-200/50 dark:border-blue-700/50 rounded-[20px]" 
-      style={{
-        borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4, #10b981) 1',
-        borderRadius: '20px'
-      }}
-    >
+    <Card className="glass-effect border border-blue-200/50 dark:border-blue-700/50" style={{borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4, #10b981) 1'}}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>

@@ -96,10 +96,9 @@ const MacroNutrientsCarousel = ({ macros }: MacroNutrientsCarouselProps) => {
           return (
             <Card 
               key={macro.name}
-              className="min-w-[280px] snap-start glass-effect border border-health-200/50 dark:border-health-700/50 shadow-sm hover:shadow-md transition-shadow rounded-[10px]"
+              className="min-w-[280px] snap-start glass-effect border border-health-200/50 dark:border-health-700/50 shadow-sm hover:shadow-md transition-shadow"
               style={{
-                borderImage: cardGradient,
-                borderRadius: '10px'
+                borderImage: cardGradient
               }}
             >
               <CardHeader className="pb-3">
