@@ -144,52 +144,60 @@ const MetricsGrid = ({
           const percentage = Math.min(100, (metric.current / metric.target) * 100);
           const IconComponent = metric.icon;
           
+          // Define colors for gradient borders based on metric type
+          const gradientColors = {
+            'Calorias': 'from-orange-500 to-red-500/30',
+            'Proteínas': 'from-blue-500 to-cyan-500/30', 
+            'Carboidratos': 'from-green-500 to-emerald-500/30',
+            'Gorduras': 'from-yellow-500 to-amber-500/30'
+          };
+          
           return (
-            <Card
+            <div
               key={metric.name}
               className={cn(
-                "glass-effect border border-blue-200/50 dark:border-blue-700/50 shadow-sm hover:shadow-health transition-all duration-200 cursor-pointer",
-                "active:scale-95"
+                "relative rounded-[20px] p-[1px] cursor-pointer transition-all duration-200 active:scale-95",
+                `bg-gradient-to-br ${gradientColors[metric.name as keyof typeof gradientColors] || 'from-blue-500 to-purple-500/30'}`,
+                "shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]"
               )}
-              style={{
-                borderImage: 'linear-gradient(135deg, rgb(59 130 246 / 0.3), rgb(16 185 129 / 0.3), rgb(245 158 11 / 0.3)) 1'
-              }}
               onClick={() => onQuickLog?.(metric.name.toLowerCase())}
             >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className={cn(
-                    "w-8 h-8 rounded-lg flex items-center justify-center",
-                    metric.color.replace('text-', 'bg-').replace('-600', '-100')
-                  )}>
-                    <IconComponent className={cn("w-4 h-4", metric.color)} />
-                  </div>
-                  <span className="text-xs font-medium text-secondary-dark">
-                    {Math.round(percentage)}%
-                  </span>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-lg font-bold text-primary-dark">
-                      {formatNumber(metric.current, metric.unit)}
-                    </span>
-                    <span className="text-xs text-secondary-dark">
-                      /{formatNumber(metric.target, metric.unit)} {metric.unit}
+              <Card className="rounded-[19px] bg-white dark:bg-slate-900 glass-effect hover:shadow-health transition-all duration-200 h-full border-0">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={cn(
+                      "w-8 h-8 rounded-lg flex items-center justify-center",
+                      metric.color.replace('text-', 'bg-').replace('-600', '-100')
+                    )}>
+                      <IconComponent className={cn("w-4 h-4", metric.color)} />
+                    </div>
+                    <span className="text-xs font-medium text-secondary-dark">
+                      {Math.round(percentage)}%
                     </span>
                   </div>
                   
-                  <Progress 
-                    value={percentage} 
-                    className="h-2"
-                  />
-                  
-                  <p className="text-xs font-medium text-secondary-dark">
-                    {metric.name}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="space-y-2">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-lg font-bold text-primary-dark">
+                        {formatNumber(metric.current, metric.unit)}
+                      </span>
+                      <span className="text-xs text-secondary-dark">
+                        /{formatNumber(metric.target, metric.unit)} {metric.unit}
+                      </span>
+                    </div>
+                    
+                    <Progress 
+                      value={percentage} 
+                      className="h-2"
+                    />
+                    
+                    <p className="text-xs font-medium text-secondary-dark">
+                      {metric.name}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           );
         })}
       </div>
