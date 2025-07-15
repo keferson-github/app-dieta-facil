@@ -97,13 +97,13 @@ const MacroNutrientsCarousel = ({ macros }: MacroNutrientsCarouselProps) => {
           return (
             <div
               key={macro.name}
-              className={`relative rounded-[20px] p-[1px] min-w-[280px] snap-start shadow-[0_4px_8px_0_rgba(0,0,0,0.08)] ${
+              className={`relative rounded-[10px] p-[1px] min-w-[280px] snap-start shadow-[0_4px_8px_0_rgba(0,0,0,0.08)] ${
                 macro.name === 'Proteínas' ? 'bg-gradient-to-br from-blue-500 via-transparent to-blue-400/30' :
                 macro.name === 'Carboidratos' ? 'bg-gradient-to-br from-green-500 via-transparent to-green-400/30' :
                 'bg-gradient-to-br from-yellow-500 via-transparent to-yellow-400/30'
               }`}
             >
-              <Card className="rounded-[19px] bg-white dark:bg-slate-900 glass-effect hover:shadow-md transition-shadow h-full border-0">
+              <Card className="rounded-[9px] bg-white dark:bg-slate-900 glass-effect hover:shadow-md transition-shadow h-full border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base font-semibold text-primary-dark flex items-center gap-2">
                     <span className="text-lg">{macro.icon}</span>

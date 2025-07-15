@@ -51,8 +51,8 @@ const ActivityChart = ({ data, weeklyGoal }: ActivityChartProps) => {
   };
 
   return (
-    <div className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-green-500 via-transparent to-emerald-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]">
-      <Card className="rounded-[19px] bg-white dark:bg-slate-900 glass-effect border-0">
+    <div className="relative rounded-[10px] p-[1px] bg-gradient-to-br from-green-500 via-transparent to-emerald-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]">
+      <Card className="rounded-[9px] bg-white dark:bg-slate-900 glass-effect border-0">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>

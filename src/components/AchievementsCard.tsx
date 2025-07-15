@@ -53,8 +53,8 @@ const AchievementsCard = ({ achievements, totalPoints, level }: AchievementsCard
   };
 
   return (
-    <div className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-yellow-500 via-transparent to-amber-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]">
-      <Card className="rounded-[19px] bg-white dark:bg-slate-900 glass-effect border-0">
+    <div className="relative rounded-[10px] p-[1px] bg-gradient-to-br from-yellow-500 via-transparent to-amber-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]">
+      <Card className="rounded-[9px] bg-white dark:bg-slate-900 glass-effect border-0">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
@@ -102,9 +102,9 @@ const AchievementsCard = ({ achievements, totalPoints, level }: AchievementsCard
             {completedAchievements.slice(0, 3).map((achievement) => (
               <div 
                 key={achievement.id} 
-                className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-green-500 via-transparent to-emerald-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]"
+                className="relative rounded-[10px] p-[1px] bg-gradient-to-br from-green-500 via-transparent to-emerald-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]"
               >
-                <div className="rounded-[19px] bg-white dark:bg-slate-900 flex items-center gap-3 p-3">
+                <div className="rounded-[9px] bg-white dark:bg-slate-900 flex items-center gap-3 p-3">
                   <div className="text-2xl">{achievement.icon}</div>
                   <div className="flex-1">
                     <div className="font-medium text-gray-900">{achievement.title}</div>
