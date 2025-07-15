@@ -53,12 +53,8 @@ const AchievementsCard = ({ achievements, totalPoints, level }: AchievementsCard
   };
 
   return (
-    <Card 
-      className="glass-effect border border-yellow-200/50 dark:border-yellow-700/50" 
-      style={{
-        borderImage: 'linear-gradient(135deg, rgb(245 158 11 / 0.4), rgb(251 191 36 / 0.4), rgb(252 211 77 / 0.4)) 1'
-      }}
-    >
+    <div className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-yellow-500 via-transparent to-amber-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]">
+      <Card className="rounded-[19px] bg-white dark:bg-slate-900 glass-effect border-0">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
@@ -182,6 +178,7 @@ const AchievementsCard = ({ achievements, totalPoints, level }: AchievementsCard
         </div>
       </CardContent>
     </Card>
+    </div>
   );
 };
 
