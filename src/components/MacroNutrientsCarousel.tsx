@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
@@ -47,14 +47,14 @@ const MacroNutrientsCarousel = ({ macros }: MacroNutrientsCarouselProps) => {
     }
   ];
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (scrollRef.current) {
       const scrollLeft = scrollRef.current.scrollLeft;
-      const cardWidth = scrollRef.current.offsetWidth;
+      const cardWidth = 280 + 16; // 280px (min-width) + 16px (gap)
       const newIndex = Math.round(scrollLeft / cardWidth);
-      setCurrentIndex(newIndex);
+      setCurrentIndex(Math.min(newIndex, macroData.length - 1));
     }
-  };
+  }, [macroData.length]);
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
@@ -62,7 +62,7 @@ const MacroNutrientsCarousel = ({ macros }: MacroNutrientsCarouselProps) => {
       scrollContainer.addEventListener('scroll', handleScroll);
       return () => scrollContainer.removeEventListener('scroll', handleScroll);
     }
-  }, []);
+  }, [handleScroll]);
 
   const createPieData = (current: number, target: number) => [
     { name: 'Consumido', value: current, color: '#3b82f6' },
@@ -87,81 +87,85 @@ const MacroNutrientsCarousel = ({ macros }: MacroNutrientsCarouselProps) => {
           const percentage = (macro.current / macro.target) * 100;
           const pieData = createPieData(macro.current, macro.target);
           
-          const cardGradient = index === 0 
-            ? 'linear-gradient(135deg, rgb(59 130 246 / 0.3), rgb(37 99 235 / 0.3)) 1'
-            : index === 1 
-            ? 'linear-gradient(135deg, rgb(16 185 129 / 0.3), rgb(5 150 105 / 0.3)) 1'
-            : 'linear-gradient(135deg, rgb(245 158 11 / 0.3), rgb(217 119 6 / 0.3)) 1';
+          // Define colors for gradient borders based on macro type
+          const gradientColors = {
+            'Proteínas': 'from-blue-500 to-cyan-500/30',
+            'Carboidratos': 'from-green-500 to-emerald-500/30', 
+            'Gorduras': 'from-yellow-500 to-amber-500/30'
+          };
           
           return (
-            <Card 
+            <div
               key={macro.name}
-              className="min-w-[280px] snap-start glass-effect border border-health-200/50 dark:border-health-700/50 shadow-sm hover:shadow-md transition-shadow"
-              style={{
-                borderImage: cardGradient
-              }}
+              className={`relative rounded-[20px] p-[1px] min-w-[280px] snap-start shadow-[0_4px_8px_0_rgba(0,0,0,0.08)] ${
+                macro.name === 'Proteínas' ? 'bg-gradient-to-br from-blue-500 via-transparent to-blue-400/30' :
+                macro.name === 'Carboidratos' ? 'bg-gradient-to-br from-green-500 via-transparent to-green-400/30' :
+                'bg-gradient-to-br from-yellow-500 via-transparent to-yellow-400/30'
+              }`}
             >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold text-primary-dark flex items-center gap-2">
-                  <span className="text-lg">{macro.icon}</span>
-                  {macro.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-bold text-primary-dark">
-                        {macro.current}g
-                      </span>
-                      <span className="text-sm text-secondary-dark">
-                        / {macro.target}g
-                      </span>
+              <Card className="rounded-[19px] bg-white dark:bg-slate-900 glass-effect hover:shadow-md transition-shadow h-full border-0">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-semibold text-primary-dark flex items-center gap-2">
+                    <span className="text-lg">{macro.icon}</span>
+                    {macro.name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-2xl font-bold text-primary-dark">
+                          {macro.current}g
+                        </span>
+                        <span className="text-sm text-secondary-dark">
+                          / {macro.target}g
+                        </span>
+                      </div>
+                      <Progress 
+                        value={Math.min(percentage, 100)} 
+                        className="mt-2 h-2"
+                        style={{ 
+                          background: '#f3f4f6'
+                        }}
+                      />
+                      <p className="text-xs text-secondary-dark mt-1">
+                        {percentage.toFixed(0)}% da meta
+                      </p>
                     </div>
-                    <Progress 
-                      value={Math.min(percentage, 100)} 
-                      className="mt-2 h-2"
-                      style={{ 
-                        background: '#f3f4f6'
-                      }}
-                    />
-                    <p className="text-xs text-secondary-dark mt-1">
-                      {percentage.toFixed(0)}% da meta
-                    </p>
+                    
+                    <div className="w-16 h-16 ml-4">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={pieData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={12}
+                            outerRadius={30}
+                            paddingAngle={2}
+                            dataKey="value"
+                            startAngle={90}
+                            endAngle={450}
+                          >
+                            <Cell fill={macro.color} />
+                            <Cell fill="#e5e7eb" />
+                          </Pie>
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                   
-                  <div className="w-16 h-16 ml-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={pieData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={12}
-                          outerRadius={30}
-                          paddingAngle={2}
-                          dataKey="value"
-                          startAngle={90}
-                          endAngle={450}
-                        >
-                          <Cell fill={macro.color} />
-                          <Cell fill="#e5e7eb" />
-                        </Pie>
-                      </PieChart>
-                    </ResponsiveContainer>
+                  <div className="pt-2 border-t border-gray-100">
+                    <p className="text-xs text-secondary-dark text-center">
+                      {macro.current >= macro.target 
+                        ? '🎯 Meta atingida!' 
+                        : `Faltam ${(macro.target - macro.current).toFixed(1)}g`
+                      }
+                    </p>
                   </div>
-                </div>
-                
-                <div className="pt-2 border-t border-gray-100">
-                  <p className="text-xs text-secondary-dark text-center">
-                    {macro.current >= macro.target 
-                      ? '🎯 Meta atingida!' 
-                      : `Faltam ${(macro.target - macro.current).toFixed(1)}g`
-                    }
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           );
         })}
       </div>
