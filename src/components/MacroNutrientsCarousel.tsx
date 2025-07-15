@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
 interface MacroData {
   name: string;
@@ -22,24 +23,25 @@ interface MacroNutrientsCarouselProps {
 const MacroNutrientsCarousel = ({ macros }: MacroNutrientsCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   const macroData: MacroData[] = [
     {
-      name: 'Proteínas',
+      name: t('dashboard.metrics.proteins'),
       current: macros.protein.current,
       target: macros.protein.target,
       color: '#3b82f6',
       icon: '💪'
     },
     {
-      name: 'Carboidratos',
+      name: t('dashboard.metrics.carbohydrates'),
       current: macros.carbs.current,
       target: macros.carbs.target,
       color: '#10b981',
       icon: '🌾'
     },
     {
-      name: 'Gorduras',
+      name: t('dashboard.metrics.fats'),
       current: macros.fat.current,
       target: macros.fat.target,
       color: '#f59e0b',
@@ -65,17 +67,17 @@ const MacroNutrientsCarousel = ({ macros }: MacroNutrientsCarouselProps) => {
   }, [handleScroll]);
 
   const createPieData = (current: number, target: number) => [
-    { name: 'Consumido', value: current, color: '#3b82f6' },
-    { name: 'Restante', value: Math.max(0, target - current), color: '#e5e7eb' }
+    { name: t('dashboard.charts.consumed'), value: current, color: '#3b82f6' },
+    { name: t('dashboard.charts.remaining'), value: Math.max(0, target - current), color: '#e5e7eb' }
   ];
 
   return (
     <div className="relative">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-primary-dark flex items-center gap-2">
-          🍎 Macronutrientes de Hoje
+          🍎 {t('dashboard.todaySummary')}
         </h3>
-        <p className="text-sm text-secondary-dark">Acompanhe sua distribuição nutricional</p>
+        <p className="text-sm text-secondary-dark">{t('dashboard.nutritionDescription')}</p>
       </div>
 
       <div 
@@ -88,20 +90,17 @@ const MacroNutrientsCarousel = ({ macros }: MacroNutrientsCarouselProps) => {
           const pieData = createPieData(macro.current, macro.target);
           
           // Define colors for gradient borders based on macro type
-          const gradientColors = {
-            'Proteínas': 'from-blue-500 to-cyan-500/30',
-            'Carboidratos': 'from-green-500 to-emerald-500/30', 
-            'Gorduras': 'from-yellow-500 to-amber-500/30'
+          const getGradientClass = (macroName: string) => {
+            if (macroName === t('dashboard.metrics.proteins')) return 'from-blue-500 to-cyan-500/30';
+            if (macroName === t('dashboard.metrics.carbohydrates')) return 'from-green-500 to-emerald-500/30'; 
+            if (macroName === t('dashboard.metrics.fats')) return 'from-yellow-500 to-amber-500/30';
+            return 'from-gray-500 to-gray-500/30';
           };
           
           return (
             <div
               key={macro.name}
-              className={`relative rounded-[10px] p-[1px] min-w-[280px] snap-start shadow-[0_4px_8px_0_rgba(0,0,0,0.08)] ${
-                macro.name === 'Proteínas' ? 'bg-gradient-to-br from-blue-500 via-transparent to-blue-400/30' :
-                macro.name === 'Carboidratos' ? 'bg-gradient-to-br from-green-500 via-transparent to-green-400/30' :
-                'bg-gradient-to-br from-yellow-500 via-transparent to-yellow-400/30'
-              }`}
+              className={`relative rounded-[10px] p-[1px] min-w-[280px] snap-start shadow-[0_4px_8px_0_rgba(0,0,0,0.08)] bg-gradient-to-br ${getGradientClass(macro.name)}`}
             >
               <Card className="rounded-[9px] bg-white dark:bg-slate-900 glass-effect hover:shadow-md transition-shadow h-full border-0">
                 <CardHeader className="pb-3">
@@ -129,7 +128,7 @@ const MacroNutrientsCarousel = ({ macros }: MacroNutrientsCarouselProps) => {
                         }}
                       />
                       <p className="text-xs text-secondary-dark mt-1">
-                        {percentage.toFixed(0)}% da meta
+                        {percentage.toFixed(0)}% {t('dashboard.charts.target')}
                       </p>
                     </div>
                     
@@ -158,7 +157,7 @@ const MacroNutrientsCarousel = ({ macros }: MacroNutrientsCarouselProps) => {
                   <div className="pt-2 border-t border-gray-100">
                     <p className="text-xs text-secondary-dark text-center">
                       {macro.current >= macro.target 
-                        ? '🎯 Meta atingida!' 
+                        ? `🎯 ${t('dashboard.goalAchieved')}!` 
                         : `Faltam ${(macro.target - macro.current).toFixed(1)}g`
                       }
                     </p>

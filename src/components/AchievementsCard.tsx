@@ -23,6 +23,23 @@ interface AchievementsCardProps {
 const AchievementsCard = ({ achievements, totalPoints, level }: AchievementsCardProps) => {
   const { t } = useTranslation();
   
+  // Função para traduzir conquistas baseada no código da conquista
+  const translateAchievement = (achievement: Achievement) => {
+    const achievementKey = `achievements.${achievement.id}`;
+    const titleKey = `${achievementKey}.title`;
+    const descKey = `${achievementKey}.description`;
+    
+    // Verificar se a tradução existe, senão usar o valor original do banco
+    const translatedTitle = t(titleKey, { defaultValue: achievement.title });
+    const translatedDesc = t(descKey, { defaultValue: achievement.description });
+    
+    return {
+      ...achievement,
+      title: translatedTitle,
+      description: translatedDesc
+    };
+  };
+  
   const completedAchievements = achievements.filter(a => a.achieved);
   const inProgressAchievements = achievements.filter(a => !a.achieved && a.progress !== undefined);
   
@@ -127,18 +144,20 @@ const AchievementsCard = ({ achievements, totalPoints, level }: AchievementsCard
               {t('dashboard.currentProgress')}
             </h4>
             <div className="space-y-3">
-              {inProgressAchievements.slice(0, 2).map((achievement) => (
+              {inProgressAchievements.slice(0, 2).map((achievement) => {
+                const translatedAchievement = translateAchievement(achievement);
+                return (
                 <div key={achievement.id} className="p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{achievement.icon}</span>
-                      <span className="font-medium text-gray-900">{achievement.title}</span>
+                      <span className="font-medium text-gray-900">{translatedAchievement.title}</span>
                     </div>
                     <Badge variant="outline" className={getCategoryColor(achievement.category)}>
                       {getCategoryIcon(achievement.category)}
                     </Badge>
                   </div>
-                  <div className="text-sm text-gray-600 mb-2">{achievement.description}</div>
+                  <div className="text-sm text-gray-600 mb-2">{translatedAchievement.description}</div>
                   {achievement.progress !== undefined && achievement.maxProgress && (
                     <div>
                       <div className="flex justify-between text-sm text-gray-600 mb-1">
@@ -154,7 +173,8 @@ const AchievementsCard = ({ achievements, totalPoints, level }: AchievementsCard
                     </div>
                   )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

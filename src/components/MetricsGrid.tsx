@@ -12,6 +12,7 @@ import {
   Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface NutritionMetric {
   name: string;
@@ -49,10 +50,19 @@ const MetricsGrid = ({
   onQuickLog,
   className 
 }: MetricsGridProps) => {
+  const { t, i18n } = useTranslation();
+
+  const getDateLocale = () => {
+    switch (i18n.language) {
+      case 'en': return 'en-US';
+      case 'es': return 'es-ES';
+      default: return 'pt-BR';
+    }
+  };
 
   const nutritionMetrics: NutritionMetric[] = [
     {
-      name: "Calorias",
+      name: t('dashboard.metrics.calories'),
       current: metrics.calories.current,
       target: metrics.calories.target,
       unit: "kcal",
@@ -60,7 +70,7 @@ const MetricsGrid = ({
       icon: Zap,
     },
     {
-      name: "Proteínas",
+      name: t('dashboard.metrics.proteins'),
       current: metrics.protein.current,
       target: metrics.protein.target,
       unit: "g",
@@ -68,7 +78,7 @@ const MetricsGrid = ({
       icon: Target,
     },
     {
-      name: "Carboidratos",
+      name: t('dashboard.metrics.carbohydrates'),
       current: metrics.carbs.current,
       target: metrics.carbs.target,
       unit: "g",
@@ -76,7 +86,7 @@ const MetricsGrid = ({
       icon: Activity,
     },
     {
-      name: "Gorduras",
+      name: t('dashboard.metrics.fats'),
       current: metrics.fat.current,
       target: metrics.fat.target,
       unit: "g",
@@ -87,7 +97,7 @@ const MetricsGrid = ({
 
   const secondaryMetrics = [
     {
-      name: "Água",
+      name: t('dashboard.metrics.water'),
       current: metrics.water.current,
       target: metrics.water.target,
       unit: "L",
@@ -95,7 +105,7 @@ const MetricsGrid = ({
       icon: Droplets,
     },
     {
-      name: "Passos",
+      name: t('dashboard.metrics.steps'),
       current: metrics.steps.current,
       target: metrics.steps.target,
       unit: "",
@@ -127,7 +137,7 @@ const MetricsGrid = ({
           className="health-gradient shadow-health flex-1 h-12"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Adicionar Refeição
+          {t('dashboard.addMeal')}
         </Button>
         <Button
           variant="outline"
@@ -146,10 +156,10 @@ const MetricsGrid = ({
           
           // Define colors for gradient borders based on metric type
           const gradientColors = {
-            'Calorias': 'from-orange-500 to-red-500/30',
-            'Proteínas': 'from-blue-500 to-cyan-500/30', 
-            'Carboidratos': 'from-green-500 to-emerald-500/30',
-            'Gorduras': 'from-yellow-500 to-amber-500/30'
+            [t('dashboard.metrics.calories')]: 'from-orange-500 to-red-500/30',
+            [t('dashboard.metrics.proteins')]: 'from-blue-500 to-cyan-500/30', 
+            [t('dashboard.metrics.carbohydrates')]: 'from-green-500 to-emerald-500/30',
+            [t('dashboard.metrics.fats')]: 'from-yellow-500 to-amber-500/30'
           };
           
           return (
@@ -210,8 +220,8 @@ const MetricsGrid = ({
           
           // Define colors for gradient borders based on metric type
           const secondaryGradientColors = {
-            'Água': 'from-cyan-500 to-blue-500/30',
-            'Passos': 'from-purple-500 to-indigo-500/30'
+            [t('dashboard.metrics.water')]: 'from-cyan-500 to-blue-500/30',
+            [t('dashboard.metrics.steps')]: 'from-purple-500 to-indigo-500/30'
           };
           
           return (
@@ -265,10 +275,10 @@ const MetricsGrid = ({
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-primary-dark flex items-center gap-2">
                 <Apple className="w-4 h-4 text-health-600" />
-                Resumo de Hoje
+                {t('dashboard.todaySummary')}
               </h3>
               <span className="text-xs bg-health-50 dark:bg-health-900/20 text-health-700 dark:text-health-400 px-2 py-1 rounded-full">
-                {new Date().toLocaleDateString('pt-BR', { 
+                {new Date().toLocaleDateString(getDateLocale(), { 
                   weekday: 'short', 
                   day: 'numeric', 
                   month: 'short' 
@@ -281,13 +291,13 @@ const MetricsGrid = ({
                 <p className="text-xl font-bold text-primary-dark">
                   {metrics.calories.target - metrics.calories.current}
                 </p>
-                <p className="text-xs text-secondary-dark">Calorias restantes</p>
+                <p className="text-xs text-secondary-dark">{t('dashboard.remainingCalories')}</p>
               </div>
               <div>
                 <p className="text-xl font-bold text-health-600">
                   {Math.round((metrics.calories.current / metrics.calories.target) * 100)}%
                 </p>
-                <p className="text-xs text-secondary-dark">Meta atingida</p>
+                <p className="text-xs text-secondary-dark">{t('dashboard.goalAchieved')}</p>
               </div>
             </div>
           </CardContent>

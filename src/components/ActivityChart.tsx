@@ -23,7 +23,15 @@ const ActivityChart = ({ data, weeklyGoal }: ActivityChartProps) => {
   const averageDuration = totalWorkouts > 0 ? totalDuration / totalWorkouts : 0;
   const goalProgress = (totalWorkouts / weeklyGoal) * 100;
 
-  const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const dayNames = [
+    t('dashboard.charts.days.sun'),
+    t('dashboard.charts.days.mon'),
+    t('dashboard.charts.days.tue'),
+    t('dashboard.charts.days.wed'),
+    t('dashboard.charts.days.thu'),
+    t('dashboard.charts.days.fri'),
+    t('dashboard.charts.days.sat')
+  ];
   
   const getBarColor = (workouts: number) => {
     if (workouts === 0) return '#e5e7eb';

@@ -102,14 +102,17 @@ export function PricingPlans({ plans, currentPlan, onPlanSelect }: PricingPlansP
           ? 'linear-gradient(135deg, rgb(59 130 246 / 0.4), rgb(37 99 235 / 0.4)) 1'
           : 'linear-gradient(135deg, rgb(147 51 234 / 0.4), rgb(126 34 206 / 0.4)) 1';
 
+        // Mobile gradient wrapper styles
+        const mobileWrapperClass = plan.name === "Plano Energia"
+          ? "relative rounded-[20px] p-[1px] bg-gradient-to-br from-blue-500 via-transparent to-blue-600/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]"
+          : "relative rounded-[20px] p-[1px] bg-gradient-to-br from-purple-500 via-transparent to-purple-600/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]";
+
         return (
-          <Card 
-            key={plan.id} 
-            className={`relative ${cardStyle} ${isCurrentPlan ? 'ring-2 ring-primary' : ''} ${isPopular ? 'border-primary' : ''} border border-blue-200/50 dark:border-blue-700/50`}
-            style={{
-              borderImage: borderGradient
-            }}
-          >
+          <div className={`md:contents ${mobileWrapperClass}`}>
+            <Card 
+              key={plan.id} 
+              className={`relative ${cardStyle} ${isCurrentPlan ? 'ring-2 ring-primary' : ''} ${isPopular ? 'border-primary' : ''} rounded-[19px] bg-white dark:bg-slate-900 md:border md:border-blue-200/50 md:dark:border-blue-700/50 md:rounded-lg md:bg-card md:dark:bg-card border-0`}
+            >
             {isPopular && (
               <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground">
                 {t('pricing.most_popular')}
@@ -164,6 +167,7 @@ export function PricingPlans({ plans, currentPlan, onPlanSelect }: PricingPlansP
               )}
             </CardFooter>
           </Card>
+          </div>
         );
       })}
     </div>

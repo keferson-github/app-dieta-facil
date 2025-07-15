@@ -39,14 +39,14 @@ const MobileNavigation = ({ className }: MobileNavigationProps) => {
     
     if (error) {
       toast({
-        title: "Erro",
-        description: "Não foi possível fazer logout.",
+        title: t('notifications.dashboard.error'),
+        description: t('dashboard.logout_error_desc'),
         variant: "destructive",
       });
     } else {
       toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso.",
+        title: t('dashboard.logout_success'),
+        description: t('dashboard.logout_success_desc'),
       });
       navigate('/');
     }
@@ -54,27 +54,27 @@ const MobileNavigation = ({ className }: MobileNavigationProps) => {
 
   const moreOptions = [
     {
-      label: "Metas",
+      label: t('dashboard.goal'),
       icon: Target,
       action: () => navigate('/goals'),
     },
     {
-      label: "Planejamento",
+      label: t('dashboard.planning'),
       icon: Calendar,
       action: () => navigate('/planning'),
     },
     {
-      label: "Fotos de Progresso",
+      label: t('dashboard.progress.progress_photos'),
       icon: Camera,
       action: () => navigate('/progress-photos'),
     },
     {
-      label: "Configurações",
+      label: t('dashboard.settings'),
       icon: Settings,
       action: () => navigate('/settings'),
     },
     {
-      label: "Assinatura",
+      label: t('dashboard.subscription'),
       icon: CreditCard,
       action: () => navigate('/subscription'),
     },
@@ -88,13 +88,13 @@ const MobileNavigation = ({ className }: MobileNavigationProps) => {
 
   const navItems = [
     {
-      label: "Painel",
+      label: t('dashboard.dashboard'),
       icon: Home,
       path: "/dashboard",
       action: () => navigate('/dashboard'),
     },
     {
-      label: "Diário",
+      label: t('dashboard.diary'),
       icon: Book,
       path: "/diary",
       action: () => navigate('/diary'),
@@ -107,13 +107,13 @@ const MobileNavigation = ({ className }: MobileNavigationProps) => {
       isCenter: true,
     },
     {
-      label: "Progresso",
+      label: t('dashboard.progress.title'),
       icon: TrendingUp,
       path: "/progress",
       action: () => navigate('/detailed-reports'),
     },
     {
-      label: "Mais",
+      label: t('dashboard.more'),
       icon: MoreHorizontal,
       path: "/more",
       action: () => setIsMoreOpen(true),

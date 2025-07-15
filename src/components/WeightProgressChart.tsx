@@ -17,14 +17,22 @@ interface WeightProgressChartProps {
 }
 
 const WeightProgressChart = ({ data, currentWeight, targetWeight, goal }: WeightProgressChartProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   
   const weightDifference = currentWeight - (data[0]?.weight || currentWeight);
   const isProgressing = goal === 'lose_weight' ? weightDifference < 0 : weightDifference > 0;
   const progressPercentage = Math.abs(weightDifference / (targetWeight - (data[0]?.weight || currentWeight)) * 100);
 
+  const getDateLocale = () => {
+    switch (i18n.language) {
+      case 'en': return 'en-US';
+      case 'es': return 'es-ES';
+      default: return 'pt-BR';
+    }
+  };
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', { 
+    return new Date(dateString).toLocaleDateString(getDateLocale(), { 
       month: 'short', 
       day: 'numeric' 
     });
@@ -93,7 +101,7 @@ const WeightProgressChart = ({ data, currentWeight, targetWeight, goal }: Weight
                 y={targetWeight} 
                 stroke="#10b981" 
                 strokeDasharray="5 5"
-                label={{ value: `Meta: ${targetWeight}kg`, position: "top" }}
+                label={{ value: `${t('dashboard.charts.target')}: ${targetWeight}kg`, position: "top" }}
               />
               <Line 
                 type="monotone" 

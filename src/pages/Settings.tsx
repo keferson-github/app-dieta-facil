@@ -197,7 +197,7 @@ const Settings = () => {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-primary-dark">
-                    Configurações
+                    {t('settings.title')}
                   </h1>
                 </div>
               </div>

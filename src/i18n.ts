@@ -45,7 +45,16 @@ const resources = {
         "fast_results": {
           "title": "Resultados Rápidos",
           "description": "Veja mudanças em poucas semanas"
-        }
+        },
+        "personalized_meals": "Refeições personalizadas",
+        "weekly_menu": "Cardápio semanal",
+        "calorie_control": "Controle calórico",
+        "workout_sheets": "Fichas de treino",
+        "home_gym_exercises": "Exercícios para casa/academia",
+        "all_energy_features": "Tudo do Energia",
+        "progress_tracking": "Acompanhamento de progresso",
+        "detailed_reports": "Relatórios detalhados",
+        "priority_support": "Suporte prioritário"
       },
       "how_it_works": {
         "title": "Como funciona",
@@ -205,7 +214,131 @@ const resources = {
         "recentAchievements": "Conquistas Recentes",
         "currentProgress": "Progresso Atual",
         "nextLevel": "Próximo Nível",
-        "pointsToNextLevel": "pontos para o próximo nível"
+        "pointsToNextLevel": "pontos para o próximo nível",
+        "quickActions": "Ações Rápidas",
+        "quickActionsDescription": "Adicione dados ou comece um treino",
+        "newMeal": "Nova Refeição",
+        "workout": "Treino",
+        "addWater": "+250ml",
+        "weight": "Peso",
+        "completeReports": "Ver Relatórios Completos",
+        "premiumPlans": "⚡ Planos Premium",
+        "premiumPlansDescription": "Desbloqueie todo o potencial da sua jornada fitness",
+        "energyPlan": "Plano Energia",
+        "energyPlanDescription": "Nutrição + Treinos personalizados",
+        "performancePlan": "Plano Performance",
+        "performancePlanDescription": "Acompanhamento completo + relatórios avançados",
+        "popularPlan": "Popular",
+        "completePlan": "Completo",
+        "viewPremiumPlans": "Ver Planos Premium",
+        "planFeatures": {
+          "energyPlan": {
+            "completeWorkouts": "Fichas de treino completas",
+            "homeGymExercises": "Exercícios para casa e academia"
+          },
+          "performancePlan": {
+            "allEnergyPlan": "Tudo do Plano Energia",
+            "detailedReports": "Relatórios detalhados de progresso",
+            "prioritySupport": "Suporte prioritário"
+          }
+        },
+        "addMeal": "Adicionar Refeição",
+        "todaySummary": "Resumo de Hoje",
+        "remainingCalories": "Calorias restantes",
+        "goalAchieved": "Meta atingida",
+        "remainingPercent": "% restante",
+        "goalReached": "Meta alcançada! 🎉",
+        "percentHydrated": "% hidratado",
+        "percentOfGoal": "% da meta",
+        "percentOfDailyGoal": "% da meta diária",
+        "goalDefined": "Objetivo definido",
+        "dailySummary": "📊 Resumo do Dia",
+        "yourDataAndProgress": "📊 Seus Dados e Progresso",
+        "caloriesConsumed": "Calorias consumidas",
+        "stepsWalked": "Passos dados",
+        "waterConsumed": "Água consumida",
+        "mealsLogged": "Refeições registradas",
+        "registerNewMeal": "Registrar Nova Refeição",
+        "streakAndGoals": "🔥 Streak & Metas",
+        "currentStreak": "Sequência Atual",
+        "consecutiveDays": "Dias consecutivos",
+        "completedGoals": "Metas Concluídas",
+        "thisWeekGoals": "Desta semana",
+        "todayCalories": "Calorias Hoje",
+        "hydration": "Hidratação",
+        "stepsToday": "Passos Hoje",
+        "proteins": "Proteínas",
+        "unlockYourPotential": "⚡ Desbloqueie Todo Seu Potencial",
+        "chooseIdealPlan": "Escolha o plano ideal para acelerar seus resultados",
+        "mostPopular": "Mais Popular",
+        "completeNutrition": "Nutrição completa + treinos personalizados para resultados acelerados",
+        "completeWorkoutSheets": "Fichas de treino completas",
+        "homeGymExercises": "Exercícios para casa e academia",
+        "personalizedMeals": "Cardápios personalizados",
+        "advancedTracking": "Acompanhamento premium com relatórios avançados e suporte prioritário",
+        "allEnergyPlan": "Tudo do Plano Energia",
+        "detailedProgressReports": "Relatórios detalhados de progresso",
+        "prioritySupport247": "Suporte prioritário 24/7",
+        "chooseMyPremiumPlan": "Escolher Meu Plano Premium",
+        "cancelAnytime": "Cancele a qualquer momento • Sem compromisso",
+        "chooseYourPlan": "Escolha seu Plano",
+        "complete": "Completo",
+        "metrics": {
+          "calories": "Calorias",
+          "proteins": "Proteínas", 
+          "carbohydrates": "Carboidratos",
+          "fats": "Gorduras",
+          "water": "Água",
+          "steps": "Passos"
+        },
+        "language": {
+          "selectLanguage": "Selecionar Idioma",
+          "language": "Idioma"
+        },
+        "planning": "Planejamento",
+        "dashboard": "Painel",
+        "diary": "Diário",
+        "more": "Mais",
+        "charts": {
+          "consumed": "Consumido",
+          "remaining": "Restante",
+          "target": "Meta",
+          "days": {
+            "sun": "Dom",
+            "mon": "Seg", 
+            "tue": "Ter",
+            "wed": "Qua",
+            "thu": "Qui",
+            "fri": "Sex",
+            "sat": "Sáb"
+          }
+        }
+      },
+      "achievements": {
+        "first_login": {
+          "title": "Primeiro Acesso",
+          "description": "Bem-vindo ao Dieta Fácil! Você fez seu primeiro login."
+        },
+        "first_meal": {
+          "title": "Primeira Refeição",
+          "description": "Você registrou sua primeira refeição."
+        },
+        "first_workout": {
+          "title": "Primeiro Treino",
+          "description": "Você completou seu primeiro treino."
+        },
+        "meal_streak_30": {
+          "title": "Mestre da Consistência",
+          "description": "Registre refeições por 30 dias consecutivos."
+        },
+        "meals_100": {
+          "title": "Mestre da Nutrição",
+          "description": "Registre 100 refeições."
+        },
+        "protein_master": {
+          "title": "Mestre das Proteínas",
+          "description": "Atinja sua meta de proteínas por 7 dias consecutivos."
+        }
       },
       "settings": {
         "language": {
@@ -381,7 +514,16 @@ const resources = {
         "fast_results": {
           "title": "Fast Results",
           "description": "See changes in weeks"
-        }
+        },
+        "personalized_meals": "Personalized meals",
+        "weekly_menu": "Weekly menu",
+        "calorie_control": "Calorie control",
+        "workout_sheets": "Workout sheets",
+        "home_gym_exercises": "Home and gym exercises",
+        "all_energy_features": "All Energy features",
+        "progress_tracking": "Progress tracking",
+        "detailed_reports": "Detailed reports",
+        "priority_support": "Priority support"
       },
       "how_it_works": {
         "title": "How it works",
@@ -541,7 +683,131 @@ const resources = {
         "recentAchievements": "Recent Achievements",
         "currentProgress": "Current Progress",
         "nextLevel": "Next Level",
-        "pointsToNextLevel": "points to next level"
+        "pointsToNextLevel": "points to next level",
+        "quickActions": "Quick Actions",
+        "quickActionsDescription": "Add data or start a workout",
+        "newMeal": "New Meal",
+        "workout": "Workout",
+        "addWater": "+250ml",
+        "weight": "Weight",
+        "completeReports": "View Complete Reports",
+        "premiumPlans": "⚡ Premium Plans",
+        "premiumPlansDescription": "Unlock your fitness journey's full potential",
+        "energyPlan": "Energy Plan",
+        "energyPlanDescription": "Nutrition + Personalized Workouts",
+        "performancePlan": "Performance Plan",
+        "performancePlanDescription": "Complete tracking + advanced reports",
+        "popularPlan": "Popular",
+        "completePlan": "Complete",
+        "viewPremiumPlans": "View Premium Plans",
+        "planFeatures": {
+          "energyPlan": {
+            "completeWorkouts": "Complete workout sheets",
+            "homeGymExercises": "Exercises for home and gym"
+          },
+          "performancePlan": {
+            "allEnergyPlan": "Everything from Energy Plan",
+            "detailedReports": "Detailed progress reports",
+            "prioritySupport": "Priority support"
+          }
+        },
+        "addMeal": "Add Meal",
+        "todaySummary": "Today's Summary",
+        "remainingCalories": "Remaining calories",
+        "goalAchieved": "Goal achieved",
+        "remainingPercent": "% remaining",
+        "goalReached": "Goal reached! 🎉",
+        "percentHydrated": "% hydrated",
+        "percentOfGoal": "% of goal",
+        "percentOfDailyGoal": "% of daily goal",
+        "goalDefined": "Goal defined",
+        "dailySummary": "📊 Daily Summary",
+        "yourDataAndProgress": "📊 Your Data and Progress",
+        "caloriesConsumed": "Calories consumed",
+        "stepsWalked": "Steps taken",
+        "waterConsumed": "Water consumed",
+        "mealsLogged": "Meals logged",
+        "registerNewMeal": "Log New Meal",
+        "streakAndGoals": "🔥 Streak & Goals",
+        "currentStreak": "Current Streak",
+        "consecutiveDays": "Consecutive days",
+        "completedGoals": "Completed Goals",
+        "thisWeekGoals": "This week",
+        "todayCalories": "Today's Calories",
+        "hydration": "Hydration",
+        "stepsToday": "Steps Today",
+        "proteins": "Proteins",
+        "unlockYourPotential": "⚡ Unlock Your Full Potential",
+        "chooseIdealPlan": "Choose the ideal plan to accelerate your results",
+        "mostPopular": "Most Popular",
+        "completeNutrition": "Complete nutrition + personalized workouts for accelerated results",
+        "completeWorkoutSheets": "Complete workout sheets",
+        "homeGymExercises": "Home and gym exercises",
+        "personalizedMeals": "Personalized meal plans",
+        "advancedTracking": "Premium tracking with advanced reports and priority support",
+        "allEnergyPlan": "Everything from Energy Plan",
+        "detailedProgressReports": "Detailed progress reports",
+        "prioritySupport247": "Priority support 24/7",
+        "chooseMyPremiumPlan": "Choose My Premium Plan",
+        "cancelAnytime": "Cancel anytime • No commitment",
+        "chooseYourPlan": "Choose Your Plan",
+        "complete": "Complete",
+        "metrics": {
+          "calories": "Calories",
+          "proteins": "Proteins", 
+          "carbohydrates": "Carbohydrates",
+          "fats": "Fats",
+          "water": "Water",
+          "steps": "Steps"
+        },
+        "language": {
+          "selectLanguage": "Select Language",
+          "language": "Language"
+        },
+        "planning": "Planning",
+        "dashboard": "Dashboard",
+        "diary": "Diary",
+        "more": "More",
+        "charts": {
+          "consumed": "Consumed",
+          "remaining": "Remaining",
+          "target": "Target",
+          "days": {
+            "sun": "Sun",
+            "mon": "Mon", 
+            "tue": "Tue",
+            "wed": "Wed",
+            "thu": "Thu",
+            "fri": "Fri",
+            "sat": "Sat"
+          }
+        }
+      },
+      "achievements": {
+        "first_login": {
+          "title": "First Access",
+          "description": "Welcome to Easy Diet! You made your first login."
+        },
+        "first_meal": {
+          "title": "First Meal",
+          "description": "You logged your first meal."
+        },
+        "first_workout": {
+          "title": "First Workout",
+          "description": "You completed your first workout."
+        },
+        "meal_streak_30": {
+          "title": "Consistency Master",
+          "description": "Log meals for 30 consecutive days."
+        },
+        "meals_100": {
+          "title": "Nutrition Master",
+          "description": "Log 100 meals."
+        },
+        "protein_master": {
+          "title": "Protein Master",
+          "description": "Reach your protein goal for 7 consecutive days."
+        }
       },
       "settings": {
         "language": {
@@ -717,7 +983,16 @@ const resources = {
         "fast_results": {
           "title": "Resultados Rápidos",
           "description": "Ve cambios en semanas"
-        }
+        },
+        "personalized_meals": "Comidas personalizadas",
+        "weekly_menu": "Menú semanal",
+        "calorie_control": "Control de calorías",
+        "workout_sheets": "Fichas de entrenamiento",
+        "home_gym_exercises": "Ejercicios para casa y gimnasio",
+        "all_energy_features": "Todo del Energía",
+        "progress_tracking": "Seguimiento de progreso",
+        "detailed_reports": "Informes detallados",
+        "priority_support": "Soporte prioritario"
       },
       "how_it_works": {
         "title": "Cómo funciona",
@@ -877,7 +1152,131 @@ const resources = {
         "recentAchievements": "Logros Recientes",
         "currentProgress": "Progreso Actual",
         "nextLevel": "Próximo Nivel",
-        "pointsToNextLevel": "puntos para el próximo nivel"
+        "pointsToNextLevel": "puntos para el próximo nivel",
+        "quickActions": "Acciones Rápidas",
+        "quickActionsDescription": "Añade datos o comienza un entrenamiento",
+        "newMeal": "Nueva Comida",
+        "workout": "Entrenamiento",
+        "addWater": "+250ml",
+        "weight": "Peso",
+        "completeReports": "Ver Informes Completos",
+        "premiumPlans": "⚡ Planes Premium",
+        "premiumPlansDescription": "Desbloquea todo el potencial de tu jornada fitness",
+        "energyPlan": "Plan Energía",
+        "energyPlanDescription": "Nutrición + Entrenamientos personalizados",
+        "performancePlan": "Plan Performance",
+        "performancePlanDescription": "Seguimiento completo + informes avanzados",
+        "popularPlan": "Popular",
+        "completePlan": "Completo",
+        "viewPremiumPlans": "Ver Planes Premium",
+        "planFeatures": {
+          "energyPlan": {
+            "completeWorkouts": "Fichas de entrenamiento completas",
+            "homeGymExercises": "Ejercicios para casa y gimnasio"
+          },
+          "performancePlan": {
+            "allEnergyPlan": "Todo del Plan Energía",
+            "detailedReports": "Informes detallados de progreso",
+            "prioritySupport": "Soporte prioritario"
+          }
+        },
+        "addMeal": "Añadir Comida",
+        "todaySummary": "Resumen de Hoy",
+        "remainingCalories": "Calorías restantes",
+        "goalAchieved": "Meta alcanzada",
+        "remainingPercent": "% restante",
+        "goalReached": "¡Meta alcanzada! 🎉",
+        "percentHydrated": "% hidratado",
+        "percentOfGoal": "% de la meta",
+        "percentOfDailyGoal": "% de la meta diaria",
+        "goalDefined": "Objetivo definido",
+        "dailySummary": "📊 Resumen del Día",
+        "yourDataAndProgress": "📊 Tus Datos y Progreso",
+        "caloriesConsumed": "Calorías consumidas",
+        "stepsWalked": "Pasos dados",
+        "waterConsumed": "Agua consumida",
+        "mealsLogged": "Comidas registradas",
+        "registerNewMeal": "Registrar Nueva Comida",
+        "streakAndGoals": "🔥 Racha y Metas",
+        "currentStreak": "Racha Actual",
+        "consecutiveDays": "Días consecutivos",
+        "completedGoals": "Metas Completadas",
+        "thisWeekGoals": "Esta semana",
+        "todayCalories": "Calorías de Hoy",
+        "hydration": "Hidratación",
+        "stepsToday": "Pasos Hoy",
+        "proteins": "Proteínas",
+        "unlockYourPotential": "⚡ Desbloquea Todo Tu Potencial",
+        "chooseIdealPlan": "Elige el plan ideal para acelerar tus resultados",
+        "mostPopular": "Más Popular",
+        "completeNutrition": "Nutrición completa + entrenamientos personalizados para resultados acelerados",
+        "completeWorkoutSheets": "Fichas de entrenamiento completas",
+        "homeGymExercises": "Ejercicios para casa y gimnasio",
+        "personalizedMeals": "Planes de comidas personalizados",
+        "advancedTracking": "Seguimiento premium con informes avanzados y soporte prioritario",
+        "allEnergyPlan": "Todo del Plan Energía",
+        "detailedProgressReports": "Informes detallados de progreso",
+        "prioritySupport247": "Soporte prioritario 24/7",
+        "chooseMyPremiumPlan": "Elegir Mi Plan Premium",
+        "cancelAnytime": "Cancela en cualquier momento • Sin compromiso",
+        "chooseYourPlan": "Elige tu Plan",
+        "complete": "Completo",
+        "metrics": {
+          "calories": "Calorías",
+          "proteins": "Proteínas", 
+          "carbohydrates": "Carbohidratos",
+          "fats": "Grasas",
+          "water": "Agua",
+          "steps": "Pasos"
+        },
+        "language": {
+          "selectLanguage": "Seleccionar Idioma",
+          "language": "Idioma"
+        },
+        "planning": "Planificación",
+        "dashboard": "Panel",
+        "diary": "Diario",
+        "more": "Más",
+        "charts": {
+          "consumed": "Consumido",
+          "remaining": "Restante",
+          "target": "Meta",
+          "days": {
+            "sun": "Dom",
+            "mon": "Lun", 
+            "tue": "Mar",
+            "wed": "Mié",
+            "thu": "Jue",
+            "fri": "Vie",
+            "sat": "Sáb"
+          }
+        }
+      },
+      "achievements": {
+        "first_login": {
+          "title": "Primer Acceso",
+          "description": "¡Bienvenido a Dieta Fácil! Hiciste tu primer login."
+        },
+        "first_meal": {
+          "title": "Primera Comida",
+          "description": "Registraste tu primera comida."
+        },
+        "first_workout": {
+          "title": "Primer Entrenamiento",
+          "description": "Completaste tu primer entrenamiento."
+        },
+        "meal_streak_30": {
+          "title": "Maestro de la Consistencia",
+          "description": "Registra comidas por 30 días consecutivos."
+        },
+        "meals_100": {
+          "title": "Maestro de la Nutrición",
+          "description": "Registra 100 comidas."
+        },
+        "protein_master": {
+          "title": "Maestro de las Proteínas",
+          "description": "Alcanza tu meta de proteínas por 7 días consecutivos."
+        }
       },
       "settings": {
         "language": {

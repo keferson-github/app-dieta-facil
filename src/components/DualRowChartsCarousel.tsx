@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from 'react-i18next';
 
 interface CarouselItem {
   id: string;
@@ -13,6 +14,7 @@ interface DualRowChartsCarouselProps {
 }
 
 const DualRowChartsCarousel = ({ topRowItems, bottomRowItems }: DualRowChartsCarouselProps) => {
+  const { t } = useTranslation();
   const [topIndex, setTopIndex] = useState(0);
   const [bottomIndex, setBottomIndex] = useState(0);
   const topScrollRef = useRef<HTMLDivElement>(null);
@@ -62,10 +64,10 @@ const DualRowChartsCarousel = ({ topRowItems, bottomRowItems }: DualRowChartsCar
       {/* Header */}
       <div className="text-center">
         <h3 className="text-lg font-semibold text-primary-dark mb-2">
-          📊 Seus Dados e Progresso
+          📊 {t('dashboard.completeReports')}
         </h3>
         <p className="text-sm text-secondary-dark">
-          Acompanhe sua evolução com gráficos detalhados
+          {t('dashboard.weightProgressDescription')}
         </p>
       </div>
 

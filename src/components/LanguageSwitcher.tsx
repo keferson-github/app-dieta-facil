@@ -63,7 +63,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ fixed = true }) => 
     <Button
       variant="outline"
       className={`flex items-center gap-2 px-3 py-1.5 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white/90 transition-colors border ${
-        isMobileOrTablet ? 'rounded-full p-2 w-10 h-10' : ''
+        isMobileOrTablet ? 'rounded-[10px] p-2 w-10 h-10' : 'rounded-[10px]'
       }`}
     >
       <ReactCountryFlag 
@@ -89,7 +89,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ fixed = true }) => 
         <DialogContent className={`${isMobile ? 'max-w-xs' : 'max-w-sm'} rounded-[10px]`}>
           <DialogHeader>
             <DialogTitle className="text-center">
-              {isMobile ? 'Idioma' : 'Selecionar Idioma'}
+              {isMobile ? t('dashboard.language.language') : t('dashboard.language.selectLanguage')}
             </DialogTitle>
           </DialogHeader>
           <div className={`space-y-2 ${isMobile ? 'pt-2' : 'pt-4'}`}>

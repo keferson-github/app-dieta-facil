@@ -54,12 +54,12 @@ interface Plan {
   features: string[];
 }
 
-// helper to get features per plan
+// helper to get features per plan - using translation keys that will be resolved dynamically
 const getPlanFeatures = (planName: string): string[] => {
   const featuresMap: Record<string, string[]> = {
-    'Plano Nutri': ['Refeições personalizadas', 'Cardápio semanal', 'Controle calórico'],
-    'Plano Energia': ['Refeições personalizadas', 'Cardápio semanal', 'Fichas de treino', 'Exercícios para casa/academia'],
-    'Plano Performance': ['Tudo do Energia', 'Acompanhamento de progresso', 'Relatórios detalhados', 'Suporte prioritário'],
+    'Plano Nutri': ['features.personalized_meals', 'features.weekly_menu', 'features.calorie_control'],
+    'Plano Energia': ['features.personalized_meals', 'features.weekly_menu', 'features.workout_sheets', 'features.home_gym_exercises'],
+    'Plano Performance': ['features.all_energy_features', 'features.progress_tracking', 'features.detailed_reports', 'features.priority_support'],
   };
   return featuresMap[planName] || [];
 };
@@ -68,8 +68,17 @@ const getPlanFeatures = (planName: string): string[] => {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
+  
+  const getDateLocale = useCallback(() => {
+    switch (i18n.language) {
+      case 'en': return 'en-US';
+      case 'es': return 'es-ES';
+      default: return 'pt-BR';
+    }
+  }, [i18n.language]);
+  
   const [userProfile, setUserProfile] = useState<Tables<"user_profiles"> | null>(null);
   const [loading, setLoading] = useState(true);
   const [welcomeMessage, setWelcomeMessage] = useState("");
@@ -164,13 +173,13 @@ const Dashboard = () => {
       if (error) throw error;
       const mapped = (data || []).map(p => ({
         ...p,
-        features: getPlanFeatures(p.name),
+        features: getPlanFeatures(p.name).map(featureKey => t(featureKey)),
       }));
       setPlans(mapped);
     } catch (error) {
       console.error('Erro ao carregar planos:', error);
     }
-  }, []);
+  }, [t]);
 
   const checkUserProfile = useCallback(async () => {
     try {
@@ -561,11 +570,11 @@ const Dashboard = () => {
     for (let i = 0; i < 7; i++) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const key = d.toLocaleDateString('pt-BR', { weekday: 'short' });
+      const key = d.toLocaleDateString(getDateLocale(), { weekday: 'short' });
       activityMap[key] = { workouts: 0, duration: 0 };
     }
     (workoutLogs || []).forEach(l => {
-      const dayKey = new Date(l.logged_at).toLocaleDateString('pt-BR', { weekday: 'short' });
+      const dayKey = new Date(l.logged_at).toLocaleDateString(getDateLocale(), { weekday: 'short' });
       if (!activityMap[dayKey]) activityMap[dayKey] = { workouts: 0, duration: 0 };
       activityMap[dayKey].workouts += 1;
       activityMap[dayKey].duration += l.duration_minutes || 0;
@@ -590,7 +599,7 @@ const Dashboard = () => {
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(today.getDate() - i);
-      const dayKey = date.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' });
+      const dayKey = date.toLocaleDateString(getDateLocale(), { month: 'short', day: 'numeric' });
       const isoDate = date.toISOString().split('T')[0];
       nutritionMap[isoDate] = { calories: 0, protein: 0, carbs: 0, fat: 0 };
     }
@@ -612,7 +621,7 @@ const Dashboard = () => {
     Object.entries(nutritionMap).forEach(([isoDate, data]) => {
       const date = new Date(isoDate);
       dailyNutritionData.push({
-        date: date.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }),
+        date: date.toLocaleDateString(getDateLocale(), { month: 'short', day: 'numeric' }),
         calories: data.calories,
         protein: data.protein,
         carbs: data.carbs,
@@ -642,7 +651,7 @@ const Dashboard = () => {
       targetWeight: userProfile?.target_weight || 0,
       goal: (userProfile?.goal as 'lose_weight' | 'maintain_weight' | 'gain_muscle') || 'lose_weight',
     });
-  }, [userProfile]);
+  }, [userProfile, getDateLocale]);
 
   useEffect(() => {
     if (userProfile) {
@@ -853,7 +862,7 @@ const Dashboard = () => {
             <div className="space-y-6">
               <div className="text-center">
                 <h3 className="text-lg font-semibold text-primary-dark mb-2">
-                  📊 Seus Dados e Progresso
+                  {t('dashboard.yourDataAndProgress')}
                 </h3>
                 <p className="text-sm text-secondary-dark">
                   Acompanhe sua evolução com gráficos detalhados
@@ -899,10 +908,10 @@ const Dashboard = () => {
               <Card className="rounded-[9px] bg-white dark:bg-slate-900 glass-effect border-0">
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg font-semibold text-primary-dark">
-                  🚀 Ações Rápidas
+                  🚀 {t('dashboard.quickActions')}
                 </CardTitle>
                 <CardDescription className="text-sm text-secondary-dark">
-                  Adicione dados ou comece um treino
+                  {t('dashboard.quickActionsDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -913,7 +922,7 @@ const Dashboard = () => {
                     onClick={() => navigate('/create-meal')}
                   >
                     <ChefHat className="w-5 h-5" />
-                    <span className="text-xs">Nova Refeição</span>
+                    <span className="text-xs">{t('dashboard.newMeal')}</span>
                   </Button>
                   <Button
                     variant="outline"
@@ -921,7 +930,7 @@ const Dashboard = () => {
                     onClick={() => navigate('/create-workout-plan')}
                   >
                     <Dumbbell className="w-5 h-5" />
-                    <span className="text-xs">Treino</span>
+                    <span className="text-xs">{t('dashboard.workout')}</span>
                   </Button>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -931,7 +940,7 @@ const Dashboard = () => {
                     onClick={() => handleWaterLog(250)}
                   >
                     <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span className="text-xs">+250ml</span>
+                    <span className="text-xs">{t('dashboard.addWater')}</span>
                   </Button>
                   <Button
                     variant="outline"
@@ -944,7 +953,7 @@ const Dashboard = () => {
                     }}
                   >
                     <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    <span className="text-xs">Peso</span>
+                    <span className="text-xs">{t('dashboard.weight')}</span>
                   </Button>
                 </div>
                 <Button
@@ -952,7 +961,7 @@ const Dashboard = () => {
                   onClick={() => navigate('/detailed-reports')}
                 >
                   <BarChart3 className="w-4 h-4 mr-2" />
-                  Ver Relatórios Completos
+                  {t('dashboard.completeReports')}
                 </Button>
               </CardContent>
             </Card>
@@ -965,10 +974,10 @@ const Dashboard = () => {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
                     <Zap className="w-5 h-5 text-blue-500" />
-                    ⚡ Planos Premium
+                    {t('dashboard.premiumPlans')}
                   </CardTitle>
                   <CardDescription className="text-sm text-secondary-dark">
-                    Desbloqueie todo o potencial da sua jornada fitness
+                    {t('dashboard.premiumPlansDescription')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -977,18 +986,18 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-2">
                         <Zap className="w-4 h-4" />
-                        Plano Energia
+                        {t('dashboard.energyPlan')}
                       </h4>
                       <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 text-xs">
-                        Popular
+                        {t('dashboard.popularPlan')}
                       </Badge>
                     </div>
                     <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                      Nutrição + Treinos personalizados
+                      {t('dashboard.energyPlanDescription')}
                     </p>
                     <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
-                      <div>✓ Fichas de treino completas</div>
-                      <div>✓ Exercícios para casa e academia</div>
+                      <div>✓ {t('dashboard.planFeatures.energyPlan.completeWorkouts')}</div>
+                      <div>✓ {t('dashboard.planFeatures.energyPlan.homeGymExercises')}</div>
                     </div>
                   </div>
 
@@ -997,19 +1006,19 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-semibold text-purple-700 dark:text-purple-400 flex items-center gap-2">
                         <Target className="w-4 h-4" />
-                        Plano Performance
+                        {t('dashboard.performancePlan')}
                       </h4>
                       <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 text-xs">
-                        Completo
+                        {t('dashboard.completePlan')}
                       </Badge>
                     </div>
                     <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                      Acompanhamento completo + relatórios avançados
+                      {t('dashboard.performancePlanDescription')}
                     </p>
                     <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
-                      <div>✓ Tudo do Plano Energia</div>
-                      <div>✓ Relatórios detalhados de progresso</div>
-                      <div>✓ Suporte prioritário</div>
+                      <div>✓ {t('dashboard.planFeatures.performancePlan.allEnergyPlan')}</div>
+                      <div>✓ {t('dashboard.planFeatures.performancePlan.detailedReports')}</div>
+                      <div>✓ {t('dashboard.planFeatures.performancePlan.prioritySupport')}</div>
                     </div>
                   </div>
 
@@ -1018,7 +1027,7 @@ const Dashboard = () => {
                     className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg"
                   >
                     <ArrowRight className="w-4 h-4 mr-2" />
-                    Ver Planos Premium
+                    {t('dashboard.viewPremiumPlans')}
                   </Button>
                 </CardContent>
               </Card>
@@ -1182,7 +1191,7 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="text-xs text-center text-gray-500 dark:text-gray-400 font-medium">
-                        {(progressPercentage || 63) < 100 ? `${(100 - (progressPercentage || 63)).toFixed(0)}% restante` : "Meta alcançada! 🎉"}
+                        {(progressPercentage || 63) < 100 ? `${(100 - (progressPercentage || 63)).toFixed(0)}${t('dashboard.remainingPercent')}` : t('dashboard.goalReached')}
                       </div>
                     </div>
                   </CardContent>
@@ -1307,7 +1316,7 @@ const Dashboard = () => {
                         <div className="flex items-center justify-center gap-2">
                           <div className="flex items-center gap-1">
                             <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-                            <span>Objetivo definido</span>
+                            <span>{t('dashboard.goalDefined')}</span>
                           </div>
                         </div>
                       </div>
@@ -1338,7 +1347,7 @@ const Dashboard = () => {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Apple className="w-4 h-4 text-orange-500" />
-                      Calorias Hoje
+                      {t('dashboard.todayCalories')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -1358,7 +1367,7 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="text-xs text-center text-gray-500 dark:text-gray-400">
-                        {Math.round((realData.calories.current / realData.calories.target) * 100)}% da meta diária
+                        {Math.round((realData.calories.current / realData.calories.target) * 100)}{t('dashboard.percentOfDailyGoal')}
                       </div>
                     </div>
                   </CardContent>
@@ -1369,7 +1378,7 @@ const Dashboard = () => {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
-                      Hidratação
+                      {t('dashboard.hydration')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -1389,7 +1398,7 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="text-xs text-center text-gray-500 dark:text-gray-400">
-                        {Math.round((realData.water.current / realData.water.target) * 100)}% hidratado
+                        {Math.round((realData.water.current / realData.water.target) * 100)}{t('dashboard.percentHydrated')}
                       </div>
                     </div>
                   </CardContent>
@@ -1400,7 +1409,7 @@ const Dashboard = () => {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Activity className="w-4 h-4 text-green-500" />
-                      Passos Hoje
+                      {t('dashboard.stepsToday')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -1420,7 +1429,7 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="text-xs text-center text-gray-500 dark:text-gray-400">
-                        {Math.round((realData.steps.current / realData.steps.target) * 100)}% da meta
+                        {Math.round((realData.steps.current / realData.steps.target) * 100)}{t('dashboard.percentOfGoal')}
                       </div>
                     </div>
                   </CardContent>
@@ -1431,7 +1440,7 @@ const Dashboard = () => {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                      Proteínas
+                      {t('dashboard.proteins')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -1451,7 +1460,7 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="text-xs text-center text-gray-500 dark:text-gray-400">
-                        {Math.round((realData.protein.current / realData.protein.target) * 100)}% da meta
+                        {Math.round((realData.protein.current / realData.protein.target) * 100)}{t('dashboard.percentOfGoal')}
                       </div>
                     </div>
                   </CardContent>
@@ -1465,7 +1474,7 @@ const Dashboard = () => {
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
                       <Calendar className="w-5 h-5 text-blue-500" />
-                      📊 Resumo do Dia
+                      {t('dashboard.dailySummary')}
                     </CardTitle>
                     <CardDescription>
                       Suas principais métricas de hoje
@@ -1475,19 +1484,19 @@ const Dashboard = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
                         <div className="text-2xl font-bold text-blue-600">{realData.calories.current}</div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">Calorias consumidas</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">{t('dashboard.caloriesConsumed')}</div>
                       </div>
                       <div className="text-center p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
                         <div className="text-2xl font-bold text-green-600">{realData.steps.current.toLocaleString()}</div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">Passos dados</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">{t('dashboard.stepsWalked')}</div>
                       </div>
                       <div className="text-center p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
                         <div className="text-2xl font-bold text-purple-600">{realData.water.current}L</div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">Água consumida</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">{t('dashboard.waterConsumed')}</div>
                       </div>
                       <div className="text-center p-3 bg-orange-50 dark:bg-orange-950/30 rounded-lg">
                         <div className="text-2xl font-bold text-orange-600">{metrics?.today_meals_count || 0}</div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">Refeições registradas</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">{t('dashboard.mealsLogged')}</div>
                       </div>
                     </div>
                     <div className="text-center">
@@ -1497,7 +1506,7 @@ const Dashboard = () => {
                         className="health-gradient w-full"
                       >
                         <Plus className="w-4 h-4 mr-2" />
-                        Registrar Nova Refeição
+                        {t('dashboard.registerNewMeal')}
                       </Button>
                     </div>
                   </CardContent>
@@ -1508,7 +1517,7 @@ const Dashboard = () => {
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
                       <Trophy className="w-5 h-5 text-yellow-500" />
-                      🔥 Streak & Metas
+                      {t('dashboard.streakAndGoals')}
                     </CardTitle>
                     <CardDescription>
                       Seu progresso semanal e sequência
@@ -1522,8 +1531,8 @@ const Dashboard = () => {
                             🔥
                           </div>
                           <div>
-                            <div className="font-semibold text-yellow-700 dark:text-yellow-400">Sequência Atual</div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">Dias consecutivos</div>
+                            <div className="font-semibold text-yellow-700 dark:text-yellow-400">{t('dashboard.currentStreak')}</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('dashboard.consecutiveDays')}</div>
                           </div>
                         </div>
                         <div className="text-2xl font-bold text-yellow-600">{metrics?.overall_streak || 0}</div>
@@ -1535,8 +1544,8 @@ const Dashboard = () => {
                             🎯
                           </div>
                           <div>
-                            <div className="font-semibold text-green-700 dark:text-green-400">Metas Concluídas</div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">Desta semana</div>
+                            <div className="font-semibold text-green-700 dark:text-green-400">{t('dashboard.completedGoals')}</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('dashboard.thisWeekGoals')}</div>
                           </div>
                         </div>
                         <div className="text-2xl font-bold text-green-600">{realData.activityDays.active}/{realData.activityDays.total}</div>
@@ -1594,70 +1603,74 @@ const Dashboard = () => {
                   <CardHeader className="text-center pb-4">
                     <CardTitle className="text-xl font-bold text-primary-dark flex items-center justify-center gap-3">
                       <Zap className="w-6 h-6 text-blue-500" />
-                      ⚡ Desbloqueie Todo Seu Potencial
+                      {t('dashboard.unlockYourPotential')}
                     </CardTitle>
                     <CardDescription className="text-secondary-dark">
-                      Escolha o plano ideal para acelerar seus resultados
+                      {t('dashboard.chooseIdealPlan')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid md:grid-cols-2 gap-4 mb-6">
+                    <div className="grid md:grid-cols-2 gap-3 mb-4">
                       {/* Plano Energia Desktop */}
-                      <div className="bg-white/70 dark:bg-slate-800/70 rounded-xl p-4 border border-blue-200/50">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-2">
-                            <Zap className="w-5 h-5" />
-                            Plano Energia
-                          </h4>
-                          <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-                            Mais Popular
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                          Nutrição completa + treinos personalizados para resultados acelerados
-                        </p>
-                        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                          <div className="flex items-center gap-2">
-                            <Check className="w-4 h-4 text-green-500" />
-                            Fichas de treino completas
+                      <div className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-blue-500 via-transparent to-blue-600/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)] md:bg-white/70 md:dark:bg-slate-800/70 md:rounded-xl md:p-3 md:border md:border-blue-200/50 md:shadow-none">
+                        <div className="rounded-[19px] bg-white dark:bg-slate-900 p-2.5 md:rounded-none md:bg-transparent md:dark:bg-transparent md:p-0">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <h4 className="text-sm font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-1.5">
+                              <Zap className="w-3.5 h-3.5" />
+                              {t('dashboard.energyPlan')}
+                            </h4>
+                            <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 text-xs py-0.5 px-1.5">
+                              {t('dashboard.mostPopular')}
+                            </Badge>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Check className="w-4 h-4 text-green-500" />
-                            Exercícios para casa e academia
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Check className="w-4 h-4 text-green-500" />
-                            Cardápios personalizados
+                          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1.5">
+                            {t('dashboard.completeNutrition')}
+                          </p>
+                          <div className="space-y-0.5 text-xs text-gray-600 dark:text-gray-400">
+                            <div className="flex items-center gap-1.5">
+                              <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
+                              {t('dashboard.completeWorkoutSheets')}
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
+                              {t('dashboard.homeGymExercises')}
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
+                              {t('dashboard.personalizedMeals')}
+                            </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Plano Performance Desktop */}
-                      <div className="bg-white/70 dark:bg-slate-800/70 rounded-xl p-4 border border-purple-200/50">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="font-semibold text-purple-700 dark:text-purple-400 flex items-center gap-2">
-                            <Target className="w-5 h-5" />
-                            Plano Performance
-                          </h4>
-                          <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
-                            Completo
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                          Acompanhamento premium com relatórios avançados e suporte prioritário
-                        </p>
-                        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                          <div className="flex items-center gap-2">
-                            <Check className="w-4 h-4 text-green-500" />
-                            Tudo do Plano Energia
+                      <div className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-purple-500 via-transparent to-purple-600/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)] md:bg-white/70 md:dark:bg-slate-800/70 md:rounded-xl md:p-3 md:border md:border-purple-200/50 md:shadow-none">
+                        <div className="rounded-[19px] bg-white dark:bg-slate-900 p-2.5 md:rounded-none md:bg-transparent md:dark:bg-transparent md:p-0">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-400 flex items-center gap-1.5">
+                              <Target className="w-3.5 h-3.5" />
+                              {t('dashboard.performancePlan')}
+                            </h4>
+                            <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 text-xs py-0.5 px-1.5">
+                              {t('dashboard.complete')}
+                            </Badge>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Check className="w-4 h-4 text-green-500" />
-                            Relatórios detalhados de progresso
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Check className="w-4 h-4 text-green-500" />
-                            Suporte prioritário 24/7
+                          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1.5">
+                            {t('dashboard.advancedTracking')}
+                          </p>
+                          <div className="space-y-0.5 text-xs text-gray-600 dark:text-gray-400">
+                            <div className="flex items-center gap-1.5">
+                              <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
+                              {t('dashboard.allEnergyPlan')}
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
+                              {t('dashboard.detailedProgressReports')}
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
+                              {t('dashboard.prioritySupport247')}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1671,10 +1684,10 @@ const Dashboard = () => {
 
 >
                         <ArrowRight className="w-5 h-5 mr-2" />
-                        Escolher Meu Plano Premium
+                        {t('dashboard.chooseMyPremiumPlan')}
                       </Button>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                        Cancele a qualquer momento • Sem compromisso
+                        {t('dashboard.cancelAnytime')}
                       </p>
                     </div>
                   </CardContent>
@@ -1686,17 +1699,17 @@ const Dashboard = () => {
 
         {/* Pricing Modal */}
         {showPricing && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative z-[61]">
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold text-primary-dark">
-                    Escolha seu Plano
+                    {t('dashboard.chooseYourPlan')}
                   </h2>
                   <Button
                     variant="ghost"
                     onClick={() => setShowPricing(false)}
-                    className="h-8 w-8 p-0"
+                    className="h-16 w-16 p-0 text-2xl font-bold hover:bg-gray-100 dark:hover:bg-slate-800"
                   >
                     ×
                   </Button>
