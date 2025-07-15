@@ -208,83 +208,91 @@ const MetricsGrid = ({
           const percentage = Math.min(100, (metric.current / metric.target) * 100);
           const IconComponent = metric.icon;
           
+          // Define colors for gradient borders based on metric type
+          const secondaryGradientColors = {
+            'Água': 'from-cyan-500 to-blue-500/30',
+            'Passos': 'from-purple-500 to-indigo-500/30'
+          };
+          
           return (
-            <Card
+            <div
               key={metric.name}
-              className="glass-effect border border-cyan-200/50 dark:border-cyan-700/50 shadow-sm hover:shadow-health transition-all duration-200 cursor-pointer active:scale-95"
-              style={{
-                borderImage: 'linear-gradient(135deg, rgb(6 182 212 / 0.3), rgb(147 51 234 / 0.3)) 1'
-              }}
+              className={cn(
+                "relative rounded-[20px] p-[1px] cursor-pointer transition-all duration-200 active:scale-95",
+                `bg-gradient-to-br ${secondaryGradientColors[metric.name as keyof typeof secondaryGradientColors] || 'from-cyan-500 to-purple-500/30'}`,
+                "shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]"
+              )}
               onClick={() => onQuickLog?.(metric.name.toLowerCase())}
             >
-              <CardContent className="p-3">
-                <div className="flex items-center gap-3">
-                  <div className={cn(
-                    "w-8 h-8 rounded-lg flex items-center justify-center",
-                    metric.color.replace('text-', 'bg-').replace('-600', '-100')
-                  )}>
-                    <IconComponent className={cn("w-4 h-4", metric.color)} />
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline justify-between mb-1">
-                      <span className="text-sm font-bold text-primary-dark">
-                        {formatNumber(metric.current, metric.unit)}
-                      </span>
-                      <span className="text-xs text-secondary-dark">
-                        /{formatNumber(metric.target, metric.unit)} {metric.unit}
-                      </span>
+              <Card className="rounded-[19px] bg-white dark:bg-slate-900 glass-effect hover:shadow-health transition-all duration-200 h-full border-0">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      "w-8 h-8 rounded-lg flex items-center justify-center",
+                      metric.color.replace('text-', 'bg-').replace('-600', '-100')
+                    )}>
+                      <IconComponent className={cn("w-4 h-4", metric.color)} />
                     </div>
-                    <Progress value={percentage} className="h-1.5" />
-                    <p className="text-xs font-medium text-secondary-dark mt-1">
-                      {metric.name}
-                    </p>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline justify-between mb-1">
+                        <span className="text-sm font-bold text-primary-dark">
+                          {formatNumber(metric.current, metric.unit)}
+                        </span>
+                        <span className="text-xs text-secondary-dark">
+                          /{formatNumber(metric.target, metric.unit)} {metric.unit}
+                        </span>
+                      </div>
+                      <Progress value={percentage} className="h-1.5" />
+                      <p className="text-xs font-medium text-secondary-dark mt-1">
+                        {metric.name}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           );
         })}
       </div>
 
       {/* Today's Summary */}
-      <Card 
-        className="glass-effect border border-green-200/50 dark:border-green-700/50 shadow-sm"
-        style={{
-          borderImage: 'linear-gradient(135deg, rgb(34 197 94 / 0.3), rgb(16 185 129 / 0.3)) 1'
-        }}
+      <div 
+        className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-green-500 to-emerald-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]"
       >
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-primary-dark flex items-center gap-2">
-              <Apple className="w-4 h-4 text-health-600" />
-              Resumo de Hoje
-            </h3>
-            <span className="text-xs bg-health-50 dark:bg-health-900/20 text-health-700 dark:text-health-400 px-2 py-1 rounded-full">
-              {new Date().toLocaleDateString('pt-BR', { 
-                weekday: 'short', 
-                day: 'numeric', 
-                month: 'short' 
-              })}
-            </span>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div>
-              <p className="text-xl font-bold text-primary-dark">
-                {metrics.calories.target - metrics.calories.current}
-              </p>
-              <p className="text-xs text-secondary-dark">Calorias restantes</p>
+        <Card className="rounded-[19px] bg-white dark:bg-slate-900 glass-effect border-0">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-primary-dark flex items-center gap-2">
+                <Apple className="w-4 h-4 text-health-600" />
+                Resumo de Hoje
+              </h3>
+              <span className="text-xs bg-health-50 dark:bg-health-900/20 text-health-700 dark:text-health-400 px-2 py-1 rounded-full">
+                {new Date().toLocaleDateString('pt-BR', { 
+                  weekday: 'short', 
+                  day: 'numeric', 
+                  month: 'short' 
+                })}
+              </span>
             </div>
-            <div>
-              <p className="text-xl font-bold text-health-600">
-                {Math.round((metrics.calories.current / metrics.calories.target) * 100)}%
-              </p>
-              <p className="text-xs text-secondary-dark">Meta atingida</p>
+            
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div>
+                <p className="text-xl font-bold text-primary-dark">
+                  {metrics.calories.target - metrics.calories.current}
+                </p>
+                <p className="text-xs text-secondary-dark">Calorias restantes</p>
+              </div>
+              <div>
+                <p className="text-xl font-bold text-health-600">
+                  {Math.round((metrics.calories.current / metrics.calories.target) * 100)}%
+                </p>
+                <p className="text-xs text-secondary-dark">Meta atingida</p>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
