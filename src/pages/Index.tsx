@@ -127,9 +127,6 @@ const Index = () => {
             <Button className="health-gradient shadow-health px-4 py-2" onClick={() => navigate('/auth?mode=login')}>
               Entrar
             </Button>
-            <Button className="health-gradient shadow-health hidden lg:block" onClick={() => navigate('/auth?mode=register')}>
-              {t('nav.start_now')}
-            </Button>
             <LanguageSwitcher fixed={false} />
             <ThemeToggle />
           </div>
