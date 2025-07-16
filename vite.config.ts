@@ -14,10 +14,15 @@ export default defineConfig(() => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Garantir que apenas uma instância do React seja usada
+      "react": path.resolve(__dirname, "node_modules/react"),
+      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
     },
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react/jsx-runtime'],
+    // Forçar pre-bundling dos pacotes React para evitar problemas de contexto
+    force: true,
   },
   build: {
     target: 'esnext',
@@ -26,14 +31,14 @@ export default defineConfig(() => ({
       external: [],
       output: {
         manualChunks: (id) => {
-          // React core - manter juntos para evitar problemas de contexto
-          if (id.includes('react') || id.includes('react-dom')) {
+          // React core - IMPORTANTE: manter todos juntos para evitar problemas de contexto
+          if (id.includes('react') || 
+              id.includes('react-dom') || 
+              id.includes('react/jsx-runtime') ||
+              id.includes('react-router') ||
+              id.includes('react-hook-form') ||
+              id.includes('react-i18next')) {
             return 'vendor-react';
-          }
-          
-          // Router
-          if (id.includes('react-router')) {
-            return 'vendor-router';
           }
           
           // Radix UI Components - manter agrupados por funcionalidade
@@ -57,7 +62,7 @@ export default defineConfig(() => ({
           }
           
           // Internacionalização
-          if (id.includes('i18next') || id.includes('react-i18next')) {
+          if (id.includes('i18next')) {
             return 'i18n';
           }
           
@@ -67,8 +72,7 @@ export default defineConfig(() => ({
           }
           
           // Form utilities
-          if (id.includes('react-hook-form') || 
-              id.includes('@hookform/resolvers') ||
+          if (id.includes('@hookform/resolvers') ||
               id.includes('zod')) {
             return 'form-utils';
           }
