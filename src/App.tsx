@@ -16,6 +16,13 @@ import ExerciseLibrary from "./pages/ExerciseLibrary";
 import DetailedReports from "./pages/DetailedReports";
 import BodyMeasurements from "./pages/BodyMeasurements";
 import ProgressPhotos from "./pages/ProgressPhotos";
+import MealHistory from "./pages/MealHistory";
+import WorkoutHistory from "./pages/WorkoutHistory";
+import Achievements from "./pages/Achievements";
+import Goals from "./pages/Goals";
+import CalendarPage from "./pages/CalendarPage";
+import Subscription from "./pages/Subscription";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import './i18n';
 
@@ -40,6 +47,13 @@ const App = () => (
           <Route path="/detailed-reports" element={<DetailedReports />} />
           <Route path="/body-measurements" element={<BodyMeasurements />} />
           <Route path="/progress-photos" element={<ProgressPhotos />} />
+          <Route path="/meal-history" element={<MealHistory />} />
+          <Route path="/workout-history" element={<WorkoutHistory />} />
+          <Route path="/achievements" element={<Achievements />} />
+          <Route path="/goals" element={<Goals />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/subscription" element={<Subscription />} />
+          <Route path="/profile" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

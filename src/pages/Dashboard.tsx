@@ -6,13 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Settings, 
-  TrendingUp, 
-  Calendar, 
-  Target, 
-  Apple, 
-  Dumbbell, 
+import {
+  Settings,
+  TrendingUp,
+  Calendar,
+  Target,
+  Apple,
+  Dumbbell,
   CreditCard,
   ChefHat,
   BarChart3,
@@ -44,6 +44,7 @@ import MacroNutrientsCarousel from "@/components/MacroNutrientsCarousel";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useIsMobile } from "@/hooks/use-mobile";
+import Sidebar from "@/components/Sidebar";
 
 interface Plan {
   id: string;
@@ -70,7 +71,7 @@ const Dashboard = () => {
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
-  
+
   const getDateLocale = useCallback(() => {
     switch (i18n.language) {
       case 'en': return 'en-US';
@@ -78,16 +79,16 @@ const Dashboard = () => {
       default: return 'pt-BR';
     }
   }, [i18n.language]);
-  
+
   const [userProfile, setUserProfile] = useState<Tables<"user_profiles"> | null>(null);
   const [loading, setLoading] = useState(true);
   const [welcomeMessage, setWelcomeMessage] = useState("");
 
   // Hook para dados reais do dashboard
-  const { 
-    metrics, 
-    weeklySteps, 
-    loading: dashboardLoading, 
+  const {
+    metrics,
+    weeklySteps,
+    loading: dashboardLoading,
     error: dashboardError,
     logWaterIntake,
     logDailySteps,
@@ -141,15 +142,16 @@ const Dashboard = () => {
 
   const [showPricing, setShowPricing] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { subscription, loading: subscriptionLoading, refetch: refetchSubscription } = useSubscription();
 
   // Helper functions (moved after hooks)
   const getWelcomeMessage = useCallback(() => {
     // Obter horário atual no timezone de São Paulo
     const now = new Date();
-    const saoPauloTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
+    const saoPauloTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
     const hour = saoPauloTime.getHours();
-    
+
     // Determinar saudação baseada no horário
     let greeting = "";
     if (hour >= 5 && hour < 12) {
@@ -159,7 +161,7 @@ const Dashboard = () => {
     } else {
       greeting = t('dashboard.greetings.good_evening');
     }
-    
+
     return greeting;
   }, [t]);
 
@@ -184,7 +186,7 @@ const Dashboard = () => {
   const checkUserProfile = useCallback(async () => {
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
+
       if (sessionError || !session) {
         navigate('/auth');
         return;
@@ -235,7 +237,7 @@ const Dashboard = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         const greeting = getWelcomeMessage();
-        
+
         if (session?.user?.user_metadata?.full_name) {
           const firstName = session.user.user_metadata.full_name.split(' ')[0];
           setWelcomeMessage(`${greeting}, ${firstName}`);
@@ -247,7 +249,7 @@ const Dashboard = () => {
         setWelcomeMessage(getWelcomeMessage());
       }
     };
-    
+
     loadWelcomeMessage();
   }, [getWelcomeMessage]);
 
@@ -274,7 +276,7 @@ const Dashboard = () => {
   const getActivityLevelText = useCallback(() => {
     const level = userProfile?.activity_level;
     if (!level) return null; // Retorna null se não houver dados
-    
+
     const levelMap: Record<string, string> = {
       'sedentary': t('dashboard.activity_levels.sedentary'),
       'lightly_active': t('dashboard.activity_levels.lightly_active'),
@@ -282,7 +284,7 @@ const Dashboard = () => {
       'very_active': t('dashboard.activity_levels.very_active'),
       'extremely_active': t('dashboard.activity_levels.extremely_active'),
     };
-    
+
     return levelMap[level] || level;
   }, [userProfile?.activity_level, t]);
 
@@ -302,7 +304,7 @@ const Dashboard = () => {
       };
       return categoryMap[metrics.bmi_category] || { category: 'Normal', color: 'text-health-600' };
     }
-    
+
     // Fallback para cálculo manual do BMI
     if (bmi < 18.5) return { category: t('dashboard.bmi_categories.underweight'), color: 'text-blue-600' };
     if (bmi < 25) return { category: t('dashboard.bmi_categories.normal'), color: 'text-health-600' };
@@ -321,42 +323,42 @@ const Dashboard = () => {
   // Função para obter dados reais do dashboard
   const getRealData = () => {
     return {
-      calories: { 
+      calories: {
         current: 0, // TODO: Calcular calorias reais dos logs de refeições
         target: metrics?.calories_target || 2000
       },
-      protein: { 
+      protein: {
         current: 0, // TODO: Calcular proteínas reais dos logs de refeições
         target: metrics?.protein_target || 150
       },
-      carbs: { 
+      carbs: {
         current: 0, // TODO: Calcular carboidratos reais dos logs de refeições
         target: metrics?.carbs_target || 250
       },
-      fat: { 
+      fat: {
         current: 0, // TODO: Calcular gorduras reais dos logs de refeições
         target: metrics?.fat_target || 67
       },
-      water: { 
+      water: {
         current: metrics?.today_water_ml ? metrics.today_water_ml / 1000 : 0,
         target: metrics?.water_target_ml ? metrics.water_target_ml / 1000 : 2.5
       },
-      steps: { 
+      steps: {
         current: metrics?.today_steps || 0,
         target: metrics?.steps_target || 10000
       },
-      weight: { 
+      weight: {
         current: metrics?.current_weight || userProfile?.weight || 0,
         target: metrics?.target_weight || userProfile?.target_weight || 70
       },
-      activityDays: { 
+      activityDays: {
         active: metrics?.week_active_days || 0,
-        total: 7 
+        total: 7
       },
-      weeklyActivityHeights: weeklySteps.length > 0 
-        ? weeklySteps.slice(0, 7).reverse().map(step => 
-            Math.min((step.completion_percentage || 0), 100)
-          ).concat(Array(7 - Math.min(weeklySteps.length, 7)).fill(0))
+      weeklyActivityHeights: weeklySteps.length > 0
+        ? weeklySteps.slice(0, 7).reverse().map(step =>
+          Math.min((step.completion_percentage || 0), 100)
+        ).concat(Array(7 - Math.min(weeklySteps.length, 7)).fill(0))
         : Array(7).fill(0) // Array vazio para 7 dias se não houver dados
     };
   };
@@ -398,8 +400,8 @@ const Dashboard = () => {
 
   const handleMealLog = async () => {
     try {
-      await updateActivitySummary({ 
-        meals_logged: (metrics?.today_meals_count || 0) + 1 
+      await updateActivitySummary({
+        meals_logged: (metrics?.today_meals_count || 0) + 1
       });
       toast({
         title: t('notifications.dashboard.meal_logged'),
@@ -416,8 +418,8 @@ const Dashboard = () => {
 
   const handleWorkoutLog = async () => {
     try {
-      await updateActivitySummary({ 
-        workouts_completed: (metrics?.today_workouts_count || 0) + 1 
+      await updateActivitySummary({
+        workouts_completed: (metrics?.today_workouts_count || 0) + 1
       });
       toast({
         title: t('notifications.dashboard.workout_logged'),
@@ -445,7 +447,7 @@ const Dashboard = () => {
         navigate('/weekly-menu');
         return;
       }
-      
+
       // Para outros recursos do Plano Nutri, mostrar "em breve"
       toast({
         title: t('notifications.dashboard.feature_available'),
@@ -517,7 +519,7 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
-    
+
     if (error) {
       toast({
         title: t('dashboard.logout_error'),
@@ -593,7 +595,7 @@ const Dashboard = () => {
 
     const dailyNutritionData: DailyNutritionDatum[] = [];
     const nutritionMap: Record<string, { calories: number; protein: number; carbs: number; fat: number }> = {};
-    
+
     // Inicializar com os últimos 7 dias
     const today = new Date();
     for (let i = 6; i >= 0; i--) {
@@ -603,7 +605,7 @@ const Dashboard = () => {
       const isoDate = date.toISOString().split('T')[0];
       nutritionMap[isoDate] = { calories: 0, protein: 0, carbs: 0, fat: 0 };
     }
-    
+
     if (nutritionRows) {
       // Agregar dados por data real das refeições
       nutritionRows.forEach(r => {
@@ -662,13 +664,13 @@ const Dashboard = () => {
   const getGoalText = useCallback(() => {
     const goal = userProfile?.goal;
     if (!goal) return null; // Retorna null se não houver dados
-    
+
     const goalMap: Record<string, string> = {
       'lose_weight': t('dashboard.goals.lose_weight'),
       'maintain_weight': t('dashboard.goals.maintain_weight'),
       'gain_muscle': t('dashboard.goals.gain_muscle'),
     };
-    
+
     return goalMap[goal] || goal;
   }, [userProfile?.goal, t]);
 
@@ -695,7 +697,536 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-health-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pb-20 md:pb-0">
+      {/* Desktop Layout with Sidebar */}
+      <div className="hidden lg:flex min-h-screen bg-gradient-to-br from-health-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
+
+        {/* Main Content Area */}
+        <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-0'}`}>
+          {/* Desktop Header */}
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm border-b border-white/20 dark:border-slate-800/20 shadow-sm">
+            <div className="px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold text-primary-dark">
+                    {welcomeMessage || t('dashboard.hello')} 💪
+                  </h1>
+                  <p className="text-secondary-dark mt-1">
+                    {t('dashboard.ready_evolution')}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {!subscription?.subscribed && (
+                    <Button
+                      onClick={() => setShowPricing(true)}
+                      className="health-gradient shadow-health hover:shadow-lg transition-all"
+                      size="sm"
+                    >
+                      <Zap className="w-4 h-4 mr-2" />
+                      {t('dashboard.subscription')}
+                    </Button>
+                  )}
+                  <LanguageSwitcher fixed={false} />
+                  <ThemeToggle />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Dashboard Content */}
+          <div className="p-6 space-y-6 max-w-7xl">
+            {/* Modern Dashboard Metrics with Charts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* BMI Card with Donut Chart */}
+              <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-health-200/50 dark:border-health-700/50"
+                style={{ boxShadow: '0 8px 32px rgba(250, 250, 250, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6) 1' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <PieChart className="w-4 h-4 text-health-500" />
+                    IMC
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-2xl font-bold text-health-600 mb-1">{bmi > 0 ? bmi.toFixed(1) : '25.2'}</div>
+                      <div className={`text-xs font-medium ${bmiData.color}`}>{bmiData.category || 'Normal'}</div>
+                    </div>
+                    <div className="relative w-16 h-16">
+                      {/* SVG Donut Chart */}
+                      <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
+                        {/* Background circle */}
+                        <circle
+                          cx="32"
+                          cy="32"
+                          r="28"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="6"
+                          className="text-health-100 dark:text-health-800"
+                        />
+                        {/* Progress circle */}
+                        <circle
+                          cx="32"
+                          cy="32"
+                          r="28"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="6"
+                          strokeLinecap="round"
+                          className="text-health-500"
+                          strokeDasharray={`${Math.min((bmi || 25.2) / 30, 1) * 175.93} 175.93`}
+                          style={{
+                            transition: 'stroke-dasharray 1s ease-out'
+                          }}
+                        />
+                      </svg>
+                      {/* Center content */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center">
+                          <PieChart className="w-4 h-4 text-health-500 mx-auto mb-1" />
+                          <div className="text-xs font-bold text-health-600">{Math.round(Math.min((bmi || 25.2) / 30, 1) * 100)}%</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Progress Card with Bar Chart */}
+              <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-blue-200/50 dark:border-blue-700/50"
+                style={{ boxShadow: '0 8px 32px rgba(59, 130, 246, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4) 1' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <BarChart className="w-4 h-4 text-blue-500" />
+                    Progresso
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-2xl font-bold text-blue-600">{progressPercentage > 0 ? progressPercentage.toFixed(0) : '63'}%</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 text-right">
+                        <div className="font-medium">Meta: {realData.weight.target}kg</div>
+                        <div>Atual: {realData.weight.current}kg</div>
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 shadow-inner">
+                        <div
+                          className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full transition-all duration-1000 ease-out shadow-sm relative overflow-hidden"
+                          style={{ width: `${Math.min(progressPercentage || 63, 100)}%` }}
+                        >
+                          {/* Animated shine effect */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                        </div>
+                      </div>
+                      {/* Progress markers */}
+                      <div className="flex justify-between mt-1">
+                        <span className="text-xs text-gray-400">0%</span>
+                        <span className="text-xs text-gray-400">50%</span>
+                        <span className="text-xs text-gray-400">100%</span>
+                      </div>
+                    </div>
+                    <div className="text-xs text-center text-gray-500 dark:text-gray-400 font-medium">
+                      {(progressPercentage || 63) < 100 ? `${(100 - (progressPercentage || 63)).toFixed(0)}${t('dashboard.remainingPercent')}` : t('dashboard.goalReached')}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Activity Card with Column Chart */}
+              <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-green-200/50 dark:border-green-700/50"
+                style={{ boxShadow: '0 8px 32px rgba(34, 197, 94, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #22c55e, #10b981) 1' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-green-500" />
+                    Atividade
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-bold text-green-600">{getActivityLevelText()}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="font-medium">{realData.activityDays.active}/{realData.activityDays.total} dias</span>
+                      </div>
+                    </div>
+                    <div className="flex items-end justify-between gap-1 h-16 px-1">
+                      {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day, i) => {
+                        const heights = realData.weeklyActivityHeights;
+                        const isActive = i < realData.activityDays.active;
+                        return (
+                          <div key={i} className="flex flex-col items-center gap-1 flex-1">
+                            <div
+                              className={`w-full rounded-t transition-all duration-300 hover:scale-110 ${isActive
+                                ? 'bg-gradient-to-t from-green-500 to-green-400 shadow-sm'
+                                : 'bg-gray-300 dark:bg-gray-600'
+                                }`}
+                              style={{
+                                height: `${heights[i]}%`,
+                                minHeight: '12px',
+                                maxWidth: '12px'
+                              }}
+                            ></div>
+                            <div className={`text-xs font-medium ${isActive ? 'text-green-600' : 'text-gray-400'
+                              }`}>
+                              {day.charAt(0)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="flex items-center gap-1">
+                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                          <span>Ativo</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                          <span>Descanso</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Goals Card with Target Chart */}
+              <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-purple-200/50 dark:border-purple-700/50"
+                style={{ boxShadow: '0 8px 32px rgba(168, 85, 247, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #a855f7, #ec4899) 1' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Target className="w-4 h-4 text-purple-500" />
+                    Meta
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-bold text-purple-600">{getGoalText()}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="font-medium">Em andamento</span>
+                      </div>
+                    </div>
+                    {/* Circular progress for goal */}
+                    <div className="flex items-center justify-center">
+                      <div className="relative w-20 h-20">
+                        <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80">
+                          {/* Background circle */}
+                          <circle
+                            cx="40"
+                            cy="40"
+                            r="32"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="6"
+                            className="text-purple-100 dark:text-purple-900/50"
+                          />
+                          {/* Progress circle */}
+                          <circle
+                            cx="40"
+                            cy="40"
+                            r="32"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="6"
+                            strokeLinecap="round"
+                            className="text-purple-500"
+                            strokeDasharray={`${(progressPercentage || 63) * 2.01} 201.06`}
+                            style={{
+                              transition: 'stroke-dasharray 1s ease-out'
+                            }}
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center">
+                            <Target className="w-4 h-4 text-purple-500 mx-auto mb-1" />
+                            <div className="text-xs font-bold text-purple-600">{(progressPercentage || 63).toFixed(0)}%</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+                          <span>{t('dashboard.goalDefined')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Charts for Desktop */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <WeightProgressChart
+                data={chartData.weightData}
+                currentWeight={chartData.currentWeight}
+                targetWeight={chartData.targetWeight}
+                goal={chartData.goal}
+              />
+
+              <ActivityChart
+                data={chartData.activityData}
+                weeklyGoal={5}
+              />
+            </div>
+
+            {/* Additional Real Data Cards for Desktop */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Daily Calories Card */}
+              <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-orange-200/50 dark:border-orange-700/50" style={{ borderImage: 'linear-gradient(135deg, #f97316, #f59e0b) 1' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Apple className="w-4 h-4 text-orange-500" />
+                    {t('dashboard.todayCalories')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-2xl font-bold text-orange-600">{realData.calories.current}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="font-medium">Meta: {realData.calories.target}</span>
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full transition-all duration-1000 ease-out"
+                          style={{ width: `${Math.min((realData.calories.current / realData.calories.target) * 100, 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                      {Math.round((realData.calories.current / realData.calories.target) * 100)}{t('dashboard.percentOfDailyGoal')}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Water Intake Card */}
+              <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-blue-200/50 dark:border-blue-700/50" style={{ borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4) 1' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                    {t('dashboard.hydration')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-2xl font-bold text-blue-600">{realData.water.current}L</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="font-medium">Meta: {realData.water.target}L</span>
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all duration-1000 ease-out"
+                          style={{ width: `${Math.min((realData.water.current / realData.water.target) * 100, 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                      {Math.round((realData.water.current / realData.water.target) * 100)}{t('dashboard.percentHydrated')}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Steps Card */}
+              <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-green-200/50 dark:border-green-700/50" style={{ borderImage: 'linear-gradient(135deg, #22c55e, #10b981) 1' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-green-500" />
+                    {t('dashboard.stepsToday')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-2xl font-bold text-green-600">{realData.steps.current.toLocaleString()}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="font-medium">Meta: {realData.steps.target.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-1000 ease-out"
+                          style={{ width: `${Math.min((realData.steps.current / realData.steps.target) * 100, 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                      {Math.round((realData.steps.current / realData.steps.target) * 100)}{t('dashboard.percentOfGoal')}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Protein Card */}
+              <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-red-200/50 dark:border-red-700/50" style={{ borderImage: 'linear-gradient(135deg, #ef4444, #dc2626) 1' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                    {t('dashboard.proteins')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-2xl font-bold text-red-600">{realData.protein.current}g</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="font-medium">Meta: {realData.protein.target}g</span>
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-red-400 to-red-600 h-2 rounded-full transition-all duration-1000 ease-out"
+                          style={{ width: `${Math.min((realData.protein.current / realData.protein.target) * 100, 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                      {Math.round((realData.protein.current / realData.protein.target) * 100)}{t('dashboard.percentOfGoal')}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <NutritionChart
+                macros={chartData.nutritionMacros}
+                dailyData={chartData.dailyNutritionData}
+                targets={{
+                  calories: realData.calories.target,
+                  protein: realData.protein.target,
+                  carbs: realData.carbs.target,
+                  fat: realData.fat.target
+                }}
+              />
+
+              <AchievementsCard
+                achievements={chartData.achievements || []}
+                totalPoints={chartData.userStats?.total_points || 0}
+                level={chartData.userStats?.current_level || 1}
+              />
+            </div>
+
+            {/* Premium Plans Promotion for Desktop - Only show for non-subscribers */}
+            {!subscription?.subscribed && (
+              <Card className="glass-effect bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50 dark:border-purple-700/50" style={{ borderImage: 'linear-gradient(135deg, #3b82f6, #a855f7, #06b6d4) 1' }}>
+                <CardHeader className="text-center pb-4">
+                  <CardTitle className="text-xl font-bold text-primary-dark flex items-center justify-center gap-3">
+                    <Zap className="w-6 h-6 text-blue-500" />
+                    {t('dashboard.unlockYourPotential')}
+                  </CardTitle>
+                  <CardDescription className="text-secondary-dark">
+                    {t('dashboard.chooseIdealPlan')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-3 mb-4">
+                    {/* Plano Energia Desktop */}
+                    <div className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-blue-500 via-transparent to-blue-600/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)] md:bg-white/70 md:dark:bg-slate-800/70 md:rounded-xl md:p-3 md:border md:border-blue-200/50 md:shadow-none">
+                      <div className="rounded-[19px] bg-white dark:bg-slate-900 p-2.5 md:rounded-none md:bg-transparent md:dark:bg-transparent md:p-0">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <h4 className="text-sm font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-1.5">
+                            <Zap className="w-3.5 h-3.5" />
+                            {t('dashboard.energyPlan')}
+                          </h4>
+                          <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 text-xs py-0.5 px-1.5">
+                            {t('dashboard.mostPopular')}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-1.5">
+                          {t('dashboard.completeNutrition')}
+                        </p>
+                        <div className="space-y-0.5 text-xs text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-1.5">
+                            <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
+                            {t('dashboard.completeWorkoutSheets')}
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
+                            {t('dashboard.homeGymExercises')}
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
+                            {t('dashboard.personalizedMeals')}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Plano Performance Desktop */}
+                    <div className="relative rounded-[20px] p-[1px] bg-gradient-to-br from-purple-500 via-transparent to-purple-600/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)] md:bg-white/70 md:dark:bg-slate-800/70 md:rounded-xl md:p-3 md:border md:border-purple-200/50 md:shadow-none">
+                      <div className="rounded-[19px] bg-white dark:bg-slate-900 p-2.5 md:rounded-none md:bg-transparent md:dark:bg-transparent md:p-0">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-400 flex items-center gap-1.5">
+                            <Target className="w-3.5 h-3.5" />
+                            {t('dashboard.performancePlan')}
+                          </h4>
+                          <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 text-xs py-0.5 px-1.5">
+                            {t('dashboard.complete')}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-1.5">
+                          {t('dashboard.advancedTracking')}
+                        </p>
+                        <div className="space-y-0.5 text-xs text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-1.5">
+                            <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
+                            {t('dashboard.allEnergyPlan')}
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
+                            {t('dashboard.detailedProgressReports')}
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
+                            {t('dashboard.prioritySupport247')}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-center">
+                    <Button
+                      onClick={() => setShowPricing(true)}
+                      size="lg"
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg px-8"
+                    >
+                      <ArrowRight className="w-5 h-5 mr-2" />
+                      {t('dashboard.chooseMyPremiumPlan')}
+                    </Button>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      {t('dashboard.cancelAnytime')}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile/Tablet Layout */}
+      <div className="lg:hidden min-h-screen bg-gradient-to-br from-health-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pb-20 md:pb-0">
         {/* Desktop Header - Hidden on Mobile */}
         <div className="hidden md:block container mx-auto px-4 py-6 lg:py-8 max-w-7xl">
           <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm rounded-2xl border border-white/20 dark:border-slate-800/20 shadow-health p-6 mb-8">
@@ -724,10 +1255,10 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
                 {!subscription?.subscribed && (
-                  <Button 
+                  <Button
                     onClick={() => setShowPricing(true)}
                     className="health-gradient shadow-health hover:shadow-lg transition-all flex-1 sm:w-auto text-sm sm:text-base px-2 sm:px-4"
                     size="sm"
@@ -737,7 +1268,7 @@ const Dashboard = () => {
                     <span className="inline sm:hidden">{t('dashboard.subscription_short')}</span>
                   </Button>
                 )}
-                <Button 
+                <Button
                   onClick={() => navigate('/settings')}
                   variant="outline"
                   className="border-health-200 hover:bg-health-50 flex-1 sm:w-auto text-sm sm:text-base px-2 sm:px-4"
@@ -748,7 +1279,7 @@ const Dashboard = () => {
                   <span className="inline sm:hidden">{t('dashboard.settings_short')}</span>
                 </Button>
                 <ThemeToggle />
-                <Button 
+                <Button
                   onClick={handleLogout}
                   variant="outline"
                   className="border-red-200 hover:bg-red-50 text-red-600 hover:text-red-700 flex-1 sm:w-auto text-sm sm:text-base px-2 sm:px-4"
@@ -784,7 +1315,7 @@ const Dashboard = () => {
               </div>
               <div className="flex items-center gap-2">
                 {!subscription?.subscribed && (
-                  <Button 
+                  <Button
                     onClick={() => setShowPricing(true)}
                     size="sm"
                     className="health-gradient shadow-health h-8 px-3 text-xs"
@@ -808,21 +1339,21 @@ const Dashboard = () => {
             {/* Daily Metrics Grid */}
             <MetricsGrid
               metrics={{
-                calories: { 
-                  current: realData.calories.current, 
-                  target: realData.calories.target 
+                calories: {
+                  current: realData.calories.current,
+                  target: realData.calories.target
                 },
-                protein: { 
+                protein: {
                   current: realData.protein.current,
-                  target: realData.protein.target 
+                  target: realData.protein.target
                 },
-                carbs: { 
+                carbs: {
                   current: realData.carbs.current,
-                  target: realData.carbs.target 
+                  target: realData.carbs.target
                 },
-                fat: { 
+                fat: {
                   current: realData.fat.current,
-                  target: realData.fat.target 
+                  target: realData.fat.target
                 },
                 water: realData.water,
                 steps: realData.steps
@@ -843,17 +1374,17 @@ const Dashboard = () => {
             {/* Macro Nutrients Carousel (Pie Charts) */}
             <MacroNutrientsCarousel
               macros={{
-                protein: { 
+                protein: {
                   current: realData.protein.current,
-                  target: realData.protein.target 
+                  target: realData.protein.target
                 },
-                carbs: { 
+                carbs: {
                   current: realData.carbs.current,
-                  target: realData.carbs.target 
+                  target: realData.carbs.target
                 },
-                fat: { 
+                fat: {
                   current: realData.fat.current,
-                  target: realData.fat.target 
+                  target: realData.fat.target
                 }
               }}
             />
@@ -870,21 +1401,21 @@ const Dashboard = () => {
               </div>
 
               {/* Weight Progress Chart */}
-              <WeightProgressChart 
-                data={chartData.weightData} 
+              <WeightProgressChart
+                data={chartData.weightData}
                 currentWeight={chartData.currentWeight}
                 targetWeight={chartData.targetWeight}
                 goal={chartData.goal}
               />
 
               {/* Activity Chart */}
-              <ActivityChart 
-                data={chartData.activityData} 
+              <ActivityChart
+                data={chartData.activityData}
                 weeklyGoal={5}
               />
 
               {/* Nutrition Chart */}
-              <NutritionChart 
+              <NutritionChart
                 macros={chartData.nutritionMacros}
                 dailyData={chartData.dailyNutritionData}
                 targets={{
@@ -896,7 +1427,7 @@ const Dashboard = () => {
               />
 
               {/* Achievements Card */}
-              <AchievementsCard 
+              <AchievementsCard
                 achievements={chartData.achievements}
                 totalPoints={chartData.userStats?.total_points || 0}
                 level={chartData.userStats?.current_level || 1}
@@ -906,131 +1437,131 @@ const Dashboard = () => {
             {/* Quick Actions Card */}
             <div className="relative rounded-[10px] p-[1px] bg-gradient-to-br from-health-500 via-transparent to-blue-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]">
               <Card className="rounded-[9px] bg-white dark:bg-slate-900 glass-effect border-0">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg font-semibold text-primary-dark">
-                  🚀 {t('dashboard.quickActions')}
-                </CardTitle>
-                <CardDescription className="text-sm text-secondary-dark">
-                  {t('dashboard.quickActionsDescription')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-semibold text-primary-dark">
+                    🚀 {t('dashboard.quickActions')}
+                  </CardTitle>
+                  <CardDescription className="text-sm text-secondary-dark">
+                    {t('dashboard.quickActionsDescription')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      variant="outline"
+                      className="h-12 flex-col gap-1"
+                      onClick={() => navigate('/create-meal')}
+                    >
+                      <ChefHat className="w-5 h-5" />
+                      <span className="text-xs">{t('dashboard.newMeal')}</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="h-12 flex-col gap-1"
+                      onClick={() => navigate('/create-workout-plan')}
+                    >
+                      <Dumbbell className="w-5 h-5" />
+                      <span className="text-xs">{t('dashboard.workout')}</span>
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      variant="outline"
+                      className="h-10 flex items-center gap-1"
+                      onClick={() => handleWaterLog(250)}
+                    >
+                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      <span className="text-xs">{t('dashboard.addWater')}</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="h-10 flex items-center gap-1"
+                      onClick={() => {
+                        toast({
+                          title: "Registro de Peso",
+                          description: "Abrindo formulário...",
+                        });
+                      }}
+                    >
+                      <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                      <span className="text-xs">{t('dashboard.weight')}</span>
+                    </Button>
+                  </div>
                   <Button
-                    variant="outline"
-                    className="h-12 flex-col gap-1"
-                    onClick={() => navigate('/create-meal')}
+                    className="w-full health-gradient shadow-health"
+                    onClick={() => navigate('/detailed-reports')}
                   >
-                    <ChefHat className="w-5 h-5" />
-                    <span className="text-xs">{t('dashboard.newMeal')}</span>
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    {t('dashboard.completeReports')}
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="h-12 flex-col gap-1"
-                    onClick={() => navigate('/create-workout-plan')}
-                  >
-                    <Dumbbell className="w-5 h-5" />
-                    <span className="text-xs">{t('dashboard.workout')}</span>
-                  </Button>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    variant="outline"
-                    className="h-10 flex items-center gap-1"
-                    onClick={() => handleWaterLog(250)}
-                  >
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span className="text-xs">{t('dashboard.addWater')}</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-10 flex items-center gap-1"
-                    onClick={() => {
-                      toast({
-                        title: "Registro de Peso",
-                        description: "Abrindo formulário...",
-                      });
-                    }}
-                  >
-                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    <span className="text-xs">{t('dashboard.weight')}</span>
-                  </Button>
-                </div>
-                <Button
-                  className="w-full health-gradient shadow-health"
-                  onClick={() => navigate('/detailed-reports')}
-                >
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  {t('dashboard.completeReports')}
-                </Button>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Premium Plans Promotion - Only show for non-subscribers */}
             {!subscription?.subscribed && (
               <div className="relative rounded-[10px] p-[1px] bg-gradient-to-br from-blue-500 via-transparent to-purple-500/30 shadow-[0_4px_8px_0_rgba(0,0,0,0.08)]">
                 <Card className="rounded-[9px] bg-white dark:bg-slate-900 glass-effect border-0">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-blue-500" />
-                    {t('dashboard.premiumPlans')}
-                  </CardTitle>
-                  <CardDescription className="text-sm text-secondary-dark">
-                    {t('dashboard.premiumPlansDescription')}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Plano Energia Preview */}
-                  <div className="bg-white/70 dark:bg-slate-800/70 rounded-lg p-3 border border-blue-200/50">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-2">
-                        <Zap className="w-4 h-4" />
-                        {t('dashboard.energyPlan')}
-                      </h4>
-                      <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 text-xs">
-                        {t('dashboard.popularPlan')}
-                      </Badge>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-blue-500" />
+                      {t('dashboard.premiumPlans')}
+                    </CardTitle>
+                    <CardDescription className="text-sm text-secondary-dark">
+                      {t('dashboard.premiumPlansDescription')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Plano Energia Preview */}
+                    <div className="bg-white/70 dark:bg-slate-800/70 rounded-lg p-3 border border-blue-200/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-2">
+                          <Zap className="w-4 h-4" />
+                          {t('dashboard.energyPlan')}
+                        </h4>
+                        <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 text-xs">
+                          {t('dashboard.popularPlan')}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                        {t('dashboard.energyPlanDescription')}
+                      </p>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                        <div>✓ {t('dashboard.planFeatures.energyPlan.completeWorkouts')}</div>
+                        <div>✓ {t('dashboard.planFeatures.energyPlan.homeGymExercises')}</div>
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                      {t('dashboard.energyPlanDescription')}
-                    </p>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
-                      <div>✓ {t('dashboard.planFeatures.energyPlan.completeWorkouts')}</div>
-                      <div>✓ {t('dashboard.planFeatures.energyPlan.homeGymExercises')}</div>
-                    </div>
-                  </div>
 
-                  {/* Plano Performance Preview */}
-                  <div className="bg-white/70 dark:bg-slate-800/70 rounded-lg p-3 border border-purple-200/50">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold text-purple-700 dark:text-purple-400 flex items-center gap-2">
-                        <Target className="w-4 h-4" />
-                        {t('dashboard.performancePlan')}
-                      </h4>
-                      <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 text-xs">
-                        {t('dashboard.completePlan')}
-                      </Badge>
+                    {/* Plano Performance Preview */}
+                    <div className="bg-white/70 dark:bg-slate-800/70 rounded-lg p-3 border border-purple-200/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-semibold text-purple-700 dark:text-purple-400 flex items-center gap-2">
+                          <Target className="w-4 h-4" />
+                          {t('dashboard.performancePlan')}
+                        </h4>
+                        <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 text-xs">
+                          {t('dashboard.completePlan')}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                        {t('dashboard.performancePlanDescription')}
+                      </p>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                        <div>✓ {t('dashboard.planFeatures.performancePlan.allEnergyPlan')}</div>
+                        <div>✓ {t('dashboard.planFeatures.performancePlan.detailedReports')}</div>
+                        <div>✓ {t('dashboard.planFeatures.performancePlan.prioritySupport')}</div>
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                      {t('dashboard.performancePlanDescription')}
-                    </p>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
-                      <div>✓ {t('dashboard.planFeatures.performancePlan.allEnergyPlan')}</div>
-                      <div>✓ {t('dashboard.planFeatures.performancePlan.detailedReports')}</div>
-                      <div>✓ {t('dashboard.planFeatures.performancePlan.prioritySupport')}</div>
-                    </div>
-                  </div>
 
-                  <Button
-                    onClick={() => setShowPricing(true)}
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg"
-                  >
-                    <ArrowRight className="w-4 h-4 mr-2" />
-                    {t('dashboard.viewPremiumPlans')}
-                  </Button>
-                </CardContent>
-              </Card>
+                    <Button
+                      onClick={() => setShowPricing(true)}
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg"
+                    >
+                      <ArrowRight className="w-4 h-4 mr-2" />
+                      {t('dashboard.viewPremiumPlans')}
+                    </Button>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </div>
@@ -1041,21 +1572,21 @@ const Dashboard = () => {
               <div className="block lg:hidden">
                 <MetricsGrid
                   metrics={{
-                    calories: { 
+                    calories: {
                       current: realData.calories.current,
-                      target: realData.calories.target 
+                      target: realData.calories.target
                     },
-                    protein: { 
-                      current: realData.protein.current, 
-                      target: realData.protein.target 
+                    protein: {
+                      current: realData.protein.current,
+                      target: realData.protein.target
                     },
-                    carbs: { 
-                      current: realData.carbs.current, 
-                      target: realData.carbs.target 
+                    carbs: {
+                      current: realData.carbs.current,
+                      target: realData.carbs.target
                     },
-                    fat: { 
-                      current: realData.fat.current, 
-                      target: realData.fat.target 
+                    fat: {
+                      current: realData.fat.current,
+                      target: realData.fat.target
                     },
                     water: realData.water,
                     steps: realData.steps
@@ -1081,17 +1612,17 @@ const Dashboard = () => {
               <div className="block lg:hidden">
                 <MacroNutrientsCarousel
                   macros={{
-                    protein: { 
-                      current: realData.protein.current, 
-                      target: realData.protein.target 
+                    protein: {
+                      current: realData.protein.current,
+                      target: realData.protein.target
                     },
-                    carbs: { 
-                      current: realData.carbs.current, 
-                      target: realData.carbs.target 
+                    carbs: {
+                      current: realData.carbs.current,
+                      target: realData.carbs.target
                     },
-                    fat: { 
-                      current: realData.fat.current, 
-                      target: realData.fat.target 
+                    fat: {
+                      current: realData.fat.current,
+                      target: realData.fat.target
                     }
                   }}
                 />
@@ -1100,8 +1631,8 @@ const Dashboard = () => {
               {/* Modern Dashboard Metrics with Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* BMI Card with Donut Chart */}
-                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-health-200/50 dark:border-health-700/50" 
-                      style={{boxShadow: '0 8px 32px rgba(250, 250, 250, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6) 1'}}>
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-health-200/50 dark:border-health-700/50"
+                  style={{ boxShadow: '0 8px 32px rgba(250, 250, 250, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6) 1' }}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <PieChart className="w-4 h-4 text-health-500" />
@@ -1118,23 +1649,23 @@ const Dashboard = () => {
                         {/* SVG Donut Chart */}
                         <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
                           {/* Background circle */}
-                          <circle 
-                            cx="32" 
-                            cy="32" 
-                            r="28" 
-                            fill="none" 
-                            stroke="currentColor" 
+                          <circle
+                            cx="32"
+                            cy="32"
+                            r="28"
+                            fill="none"
+                            stroke="currentColor"
                             strokeWidth="6"
                             className="text-health-100 dark:text-health-800"
                           />
                           {/* Progress circle */}
-                          <circle 
-                            cx="32" 
-                            cy="32" 
-                            r="28" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            strokeWidth="6" 
+                          <circle
+                            cx="32"
+                            cy="32"
+                            r="28"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="6"
                             strokeLinecap="round"
                             className="text-health-500"
                             strokeDasharray={`${Math.min((bmi || 25.2) / 30, 1) * 175.93} 175.93`}
@@ -1154,10 +1685,10 @@ const Dashboard = () => {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 {/* Progress Card with Bar Chart */}
-                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-blue-200/50 dark:border-blue-700/50" 
-                      style={{boxShadow: '0 8px 32px rgba(59, 130, 246, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4) 1'}}>
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-blue-200/50 dark:border-blue-700/50"
+                  style={{ boxShadow: '0 8px 32px rgba(59, 130, 246, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4) 1' }}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <BarChart className="w-4 h-4 text-blue-500" />
@@ -1175,9 +1706,9 @@ const Dashboard = () => {
                       </div>
                       <div className="relative">
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 shadow-inner">
-                          <div 
-                            className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full transition-all duration-1000 ease-out shadow-sm relative overflow-hidden" 
-                            style={{width: `${Math.min(progressPercentage || 63, 100)}%`}}
+                          <div
+                            className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full transition-all duration-1000 ease-out shadow-sm relative overflow-hidden"
+                            style={{ width: `${Math.min(progressPercentage || 63, 100)}%` }}
                           >
                             {/* Animated shine effect */}
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
@@ -1198,8 +1729,8 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Activity Card with Column Chart */}
-                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-green-200/50 dark:border-green-700/50" 
-                      style={{boxShadow: '0 8px 32px rgba(34, 197, 94, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #22c55e, #10b981) 1'}}>
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-green-200/50 dark:border-green-700/50"
+                  style={{ boxShadow: '0 8px 32px rgba(34, 197, 94, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #22c55e, #10b981) 1' }}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Activity className="w-4 h-4 text-green-500" />
@@ -1220,21 +1751,19 @@ const Dashboard = () => {
                           const isActive = i < realData.activityDays.active;
                           return (
                             <div key={i} className="flex flex-col items-center gap-1 flex-1">
-                              <div 
-                                className={`w-full rounded-t transition-all duration-300 hover:scale-110 ${
-                                  isActive 
-                                    ? 'bg-gradient-to-t from-green-500 to-green-400 shadow-sm' 
-                                    : 'bg-gray-300 dark:bg-gray-600'
-                                }`}
+                              <div
+                                className={`w-full rounded-t transition-all duration-300 hover:scale-110 ${isActive
+                                  ? 'bg-gradient-to-t from-green-500 to-green-400 shadow-sm'
+                                  : 'bg-gray-300 dark:bg-gray-600'
+                                  }`}
                                 style={{
                                   height: `${heights[i]}%`,
                                   minHeight: '12px',
                                   maxWidth: '12px'
                                 }}
                               ></div>
-                              <div className={`text-xs font-medium ${
-                                isActive ? 'text-green-600' : 'text-gray-400'
-                              }`}>
+                              <div className={`text-xs font-medium ${isActive ? 'text-green-600' : 'text-gray-400'
+                                }`}>
                                 {day.charAt(0)}
                               </div>
                             </div>
@@ -1258,8 +1787,8 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Goals Card with Target Chart */}
-                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-purple-200/50 dark:border-purple-700/50" 
-                      style={{boxShadow: '0 8px 32px rgba(168, 85, 247, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #a855f7, #ec4899) 1'}}>
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-purple-200/50 dark:border-purple-700/50"
+                  style={{ boxShadow: '0 8px 32px rgba(168, 85, 247, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)', borderImage: 'linear-gradient(135deg, #a855f7, #ec4899) 1' }}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Target className="w-4 h-4 text-purple-500" />
@@ -1279,23 +1808,23 @@ const Dashboard = () => {
                         <div className="relative w-20 h-20">
                           <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80">
                             {/* Background circle */}
-                            <circle 
-                              cx="40" 
-                              cy="40" 
-                              r="32" 
-                              fill="none" 
-                              stroke="currentColor" 
+                            <circle
+                              cx="40"
+                              cy="40"
+                              r="32"
+                              fill="none"
+                              stroke="currentColor"
                               strokeWidth="6"
                               className="text-purple-100 dark:text-purple-900/50"
                             />
                             {/* Progress circle */}
-                            <circle 
-                              cx="40" 
-                              cy="40" 
-                              r="32" 
-                              fill="none" 
-                              stroke="currentColor" 
-                              strokeWidth="6" 
+                            <circle
+                              cx="40"
+                              cy="40"
+                              r="32"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="6"
                               strokeLinecap="round"
                               className="text-purple-500"
                               strokeDasharray={`${(progressPercentage || 63) * 2.01} 201.06`}
@@ -1333,17 +1862,17 @@ const Dashboard = () => {
                   targetWeight={chartData.targetWeight}
                   goal={chartData.goal}
                 />
-                
+
                 <ActivityChart
                   data={chartData.activityData}
                   weeklyGoal={5}
                 />
               </div>
-              
+
               {/* Additional Real Data Cards for Desktop */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Daily Calories Card */}
-                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-orange-200/50 dark:border-orange-700/50" style={{borderImage: 'linear-gradient(135deg, #f97316, #f59e0b) 1'}}>
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-orange-200/50 dark:border-orange-700/50" style={{ borderImage: 'linear-gradient(135deg, #f97316, #f59e0b) 1' }}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Apple className="w-4 h-4 text-orange-500" />
@@ -1360,9 +1889,9 @@ const Dashboard = () => {
                       </div>
                       <div className="relative">
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                          <div 
-                            className="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full transition-all duration-1000 ease-out" 
-                            style={{width: `${Math.min((realData.calories.current / realData.calories.target) * 100, 100)}%`}}
+                          <div
+                            className="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full transition-all duration-1000 ease-out"
+                            style={{ width: `${Math.min((realData.calories.current / realData.calories.target) * 100, 100)}%` }}
                           ></div>
                         </div>
                       </div>
@@ -1374,7 +1903,7 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Water Intake Card */}
-                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-blue-200/50 dark:border-blue-700/50" style={{borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4) 1'}}>
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-blue-200/50 dark:border-blue-700/50" style={{ borderImage: 'linear-gradient(135deg, #3b82f6, #06b6d4) 1' }}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
@@ -1391,9 +1920,9 @@ const Dashboard = () => {
                       </div>
                       <div className="relative">
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                          <div 
-                            className="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all duration-1000 ease-out" 
-                            style={{width: `${Math.min((realData.water.current / realData.water.target) * 100, 100)}%`}}
+                          <div
+                            className="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all duration-1000 ease-out"
+                            style={{ width: `${Math.min((realData.water.current / realData.water.target) * 100, 100)}%` }}
                           ></div>
                         </div>
                       </div>
@@ -1405,7 +1934,7 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Steps Card */}
-                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-green-200/50 dark:border-green-700/50" style={{borderImage: 'linear-gradient(135deg, #22c55e, #10b981) 1'}}>
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-green-200/50 dark:border-green-700/50" style={{ borderImage: 'linear-gradient(135deg, #22c55e, #10b981) 1' }}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Activity className="w-4 h-4 text-green-500" />
@@ -1422,9 +1951,9 @@ const Dashboard = () => {
                       </div>
                       <div className="relative">
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                          <div 
-                            className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-1000 ease-out" 
-                            style={{width: `${Math.min((realData.steps.current / realData.steps.target) * 100, 100)}%`}}
+                          <div
+                            className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-1000 ease-out"
+                            style={{ width: `${Math.min((realData.steps.current / realData.steps.target) * 100, 100)}%` }}
                           ></div>
                         </div>
                       </div>
@@ -1436,7 +1965,7 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Protein Card */}
-                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-red-200/50 dark:border-red-700/50" style={{borderImage: 'linear-gradient(135deg, #ef4444, #dc2626) 1'}}>
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 border border-red-200/50 dark:border-red-700/50" style={{ borderImage: 'linear-gradient(135deg, #ef4444, #dc2626) 1' }}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <div className="w-4 h-4 bg-red-500 rounded-full"></div>
@@ -1453,9 +1982,9 @@ const Dashboard = () => {
                       </div>
                       <div className="relative">
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                          <div 
-                            className="bg-gradient-to-r from-red-400 to-red-600 h-2 rounded-full transition-all duration-1000 ease-out" 
-                            style={{width: `${Math.min((realData.protein.current / realData.protein.target) * 100, 100)}%`}}
+                          <div
+                            className="bg-gradient-to-r from-red-400 to-red-600 h-2 rounded-full transition-all duration-1000 ease-out"
+                            style={{ width: `${Math.min((realData.protein.current / realData.protein.target) * 100, 100)}%` }}
                           ></div>
                         </div>
                       </div>
@@ -1466,11 +1995,11 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
-              
+
               {/* Additional Mock Data Summary Cards */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Daily Summary Card */}
-                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-health-200/50 dark:border-health-700/50" style={{borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6, #a855f7) 1'}}>
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-health-200/50 dark:border-health-700/50" style={{ borderImage: 'linear-gradient(135deg, #22c55e, #3b82f6, #a855f7) 1' }}>
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
                       <Calendar className="w-5 h-5 text-blue-500" />
@@ -1500,7 +2029,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="text-center">
-                      <Button 
+                      <Button
 
                         onClick={() => navigate('/create-meal')}
                         className="health-gradient w-full"
@@ -1513,7 +2042,7 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Weekly Streak & Goals Card */}
-                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-yellow-200/50 dark:border-yellow-700/50" style={{borderImage: 'linear-gradient(135deg, #f59e0b, #eab308, #facc15) 1'}}>
+                <Card className="glass-effect bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-yellow-200/50 dark:border-yellow-700/50" style={{ borderImage: 'linear-gradient(135deg, #f59e0b, #eab308, #facc15) 1' }}>
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold text-primary-dark flex items-center gap-2">
                       <Trophy className="w-5 h-5 text-yellow-500" />
@@ -1537,7 +2066,7 @@ const Dashboard = () => {
                         </div>
                         <div className="text-2xl font-bold text-yellow-600">{metrics?.overall_streak || 0}</div>
                       </div>
-                      
+
                       <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
@@ -1565,7 +2094,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="text-center">
-                      <Button 
+                      <Button
                         onClick={() => navigate('/create-workout-plan')}
                         variant="outline"
                         className="w-full border-health-200 hover:bg-health-50"
@@ -1577,7 +2106,7 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
-              
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <NutritionChart
                   macros={chartData.nutritionMacros}
@@ -1589,7 +2118,7 @@ const Dashboard = () => {
                     fat: realData.fat.target
                   }}
                 />
-                
+
                 <AchievementsCard
                   achievements={chartData.achievements || []}
                   totalPoints={chartData.userStats?.total_points || 0}
@@ -1599,7 +2128,7 @@ const Dashboard = () => {
 
               {/* Premium Plans Promotion for Desktop - Only show for non-subscribers */}
               {!subscription?.subscribed && (
-                <Card className="glass-effect bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50 dark:border-purple-700/50" style={{borderImage: 'linear-gradient(135deg, #3b82f6, #a855f7, #06b6d4) 1'}}>
+                <Card className="glass-effect bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50 dark:border-purple-700/50" style={{ borderImage: 'linear-gradient(135deg, #3b82f6, #a855f7, #06b6d4) 1' }}>
                   <CardHeader className="text-center pb-4">
                     <CardTitle className="text-xl font-bold text-primary-dark flex items-center justify-center gap-3">
                       <Zap className="w-6 h-6 text-blue-500" />
@@ -1682,7 +2211,7 @@ const Dashboard = () => {
                         size="lg"
                         className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg px-8"
 
->
+                      >
                         <ArrowRight className="w-5 h-5 mr-2" />
                         {t('dashboard.chooseMyPremiumPlan')}
                       </Button>

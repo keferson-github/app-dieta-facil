@@ -144,7 +144,7 @@ const resources = {
           "workout_sheet": "Ficha de Treino"
         },
         "progress": {
-          "title": "Acompanhamento de Progresso",
+          "title": "Progresso",
           "description": "Alimentação, treinos e progresso em um só lugar. Evolua de verdade",
           "detailed_reports": "Relatórios Detalhados",
           "body_measurements": "Medidas Corporais",
